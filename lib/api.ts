@@ -17,6 +17,8 @@ export class ApiRequestError extends Error {
   }
 }
 
+// Note: this function is for client-side use only.
+// Server components should call /auth/me directly using next/headers cookies().
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -55,7 +57,8 @@ async function request<T>(
       code = body.error?.code ?? code;
       message = body.error?.message ?? message;
     } catch {
-      // non-JSON error body
+      // non-JSON error body — fall through with default code/message
+      console.warn('Failed to parse error response body');
     }
     throw new ApiRequestError(code, message, res.status);
   }
