@@ -1,0 +1,86 @@
+// frontend/app/dashboard/layout.tsx
+'use client';
+
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { useAuth } from '@/lib/auth';
+import { api } from '@/lib/api';
+
+function initials(email: string): string {
+  return email.slice(0, 2).toUpperCase();
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { user, isLoading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // Redirect unauthenticated users to login.
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace(`/login?from=${encodeURIComponent(pathname)}`);
+    }
+  }, [user, isLoading, pathname, router]);
+
+  if (isLoading || !user) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--nc-cream)' }}>
+        <span style={{ color: 'var(--nc-stone)', fontWeight: 300, fontSize: 14 }}>Loading…</span>
+      </div>
+    );
+  }
+
+  const handleSignOut = async () => {
+    await api.post('/auth/logout', {}).catch(() => {});
+    router.push('/login');
+  };
+
+  const navItems = [
+    { href: '/dashboard/profile', label: 'My profile', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard', label: 'Overview', icon: '◎', roles: ['client', 'nutritionist'] },
+  ].filter((item) => item.roles.includes(user.role));
+
+  return (
+    <div className="dash-root">
+      <aside className="dash-sidebar">
+        <div className="dash-logo">
+          <Link href="/">Nutri<span>Connect</span></Link>
+        </div>
+        <div className="dash-user">
+          <div className="dash-avatar">{initials(user.email)}</div>
+          <div>
+            <div className="dash-user-name">{user.email.split('@')[0]}</div>
+            <div className="dash-user-role">{user.role}</div>
+          </div>
+        </div>
+        <nav className="dash-nav">
+          <span className="dash-nav-section">Manage</span>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`dash-nav-item${pathname === item.href ? ' active' : ''}`}
+            >
+              <span>{item.icon}</span> {item.label}
+            </Link>
+          ))}
+          <span className="dash-nav-section">Account</span>
+          <Link
+            href={user.role === 'nutritionist' ? `/nutritionists` : '/'}
+            className="dash-nav-item"
+            target="_blank"
+          >
+            <span>↗</span> View public profile
+          </Link>
+        </nav>
+        <div className="dash-footer">
+          <button onClick={handleSignOut} className="dash-nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
+            <span>←</span> Sign out
+          </button>
+        </div>
+      </aside>
+      <main className="dash-main">{children}</main>
+    </div>
+  );
+}
