@@ -45,3 +45,36 @@ export interface ProfileListResponse {
   page: number;
   limit: number;
 }
+
+export interface ClientProfile {
+  id: string;
+  user_id: string;
+  display_name: string;
+  bio: string;
+  city: string;
+  birth_date: string | null;       // "YYYY-MM-DD" or null
+  height_cm: number | null;
+  activity_level: string;          // "" | "sedentary" | "lightly_active" | "moderately_active" | "very_active"
+  goals: string[];
+  dietary_restrictions: string[];
+  allergies: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WeightEntry {
+  id: string;
+  user_id: string;
+  weight_kg: number;
+  recorded_at: string;  // "YYYY-MM-DD"
+  created_at: string;
+}
+
+export interface ActivityEntry {
+  id: string;
+  user_id: string;
+  activity_type: string;
+  duration_minutes: number;
+  recorded_at: string;  // "YYYY-MM-DD"
+  created_at: string;
+}
