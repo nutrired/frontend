@@ -37,8 +37,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const navItems = [
-    { href: '/dashboard/profile', label: 'My profile', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard', label: 'Overview', icon: '◎', roles: ['client', 'nutritionist'] },
+    { href: '/dashboard/profile', label: 'My profile', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/client-profile', label: 'My profile', icon: '◈', roles: ['client'] },
   ].filter((item) => item.roles.includes(user.role));
 
   return (
