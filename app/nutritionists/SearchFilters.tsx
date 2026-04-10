@@ -42,13 +42,6 @@ export function SearchFilters() {
   }
 
   function handleClear() {
-    setQ('');
-    setCity('');
-    setSpecialty('');
-    setLanguage('');
-    setSort('');
-    setMinPrice('');
-    setMaxPrice('');
     router.push('/nutritionists');
   }
 
