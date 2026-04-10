@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export function SearchFilters() {
   const router = useRouter();
@@ -14,6 +14,16 @@ export function SearchFilters() {
   const [sort, setSort] = useState(searchParams.get('sort') ?? '');
   const [minPrice, setMinPrice] = useState(searchParams.get('min_price') ?? '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') ?? '');
+
+  useEffect(() => {
+    setQ(searchParams.get('q') ?? '');
+    setCity(searchParams.get('city') ?? '');
+    setSpecialty(searchParams.get('specialty') ?? '');
+    setLanguage(searchParams.get('language') ?? '');
+    setSort(searchParams.get('sort') ?? '');
+    setMinPrice(searchParams.get('min_price') ?? '');
+    setMaxPrice(searchParams.get('max_price') ?? '');
+  }, [searchParams]);
 
   const hasFilters = q || city || specialty || language || sort || minPrice || maxPrice;
 
@@ -48,6 +58,7 @@ export function SearchFilters() {
         className="nc-filter-input wide"
         type="text"
         placeholder="Search by name or keyword…"
+        aria-label="Search by name or keyword"
         value={q}
         onChange={(e) => setQ(e.target.value)}
       />
@@ -55,6 +66,7 @@ export function SearchFilters() {
         className="nc-filter-input medium"
         type="text"
         placeholder="City"
+        aria-label="City"
         value={city}
         onChange={(e) => setCity(e.target.value)}
       />
@@ -62,6 +74,7 @@ export function SearchFilters() {
         className="nc-filter-input medium"
         type="text"
         placeholder="Specialty"
+        aria-label="Specialty"
         value={specialty}
         onChange={(e) => setSpecialty(e.target.value)}
       />
@@ -69,11 +82,13 @@ export function SearchFilters() {
         className="nc-filter-input medium"
         type="text"
         placeholder="Language"
+        aria-label="Language"
         value={language}
         onChange={(e) => setLanguage(e.target.value)}
       />
       <select
         className="nc-filter-select"
+        aria-label="Sort order"
         value={sort}
         onChange={(e) => setSort(e.target.value)}
       >
@@ -86,7 +101,10 @@ export function SearchFilters() {
           className="nc-filter-input short"
           type="number"
           placeholder="Min €"
+          aria-label="Minimum price in euros"
           min={0}
+          step={1}
+          max={9999}
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
           style={{ width: 80 }}
@@ -96,7 +114,10 @@ export function SearchFilters() {
           className="nc-filter-input short"
           type="number"
           placeholder="Max €"
+          aria-label="Maximum price in euros"
           min={0}
+          step={1}
+          max={9999}
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
           style={{ width: 80 }}
