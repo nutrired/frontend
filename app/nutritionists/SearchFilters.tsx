@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function SearchFilters() {
   const router = useRouter();
@@ -15,6 +15,7 @@ export function SearchFilters() {
   const [minPrice, setMinPrice] = useState(searchParams.get('min_price') ?? '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('max_price') ?? '');
 
+  // Sync state when URL changes (back/forward navigation).
   useEffect(() => {
     setQ(searchParams.get('q') ?? '');
     setCity(searchParams.get('city') ?? '');
@@ -24,6 +25,27 @@ export function SearchFilters() {
     setMinPrice(searchParams.get('min_price') ?? '');
     setMaxPrice(searchParams.get('max_price') ?? '');
   }, [searchParams]);
+
+  // Debounced live search: update URL 400 ms after the last keystroke.
+  // Uses replace (not push) to avoid cluttering browser history while typing.
+  // Skips the initial render so it doesn't fire on mount.
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) { mounted.current = true; return; }
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (q) params.set('q', q);
+      if (city) params.set('city', city);
+      if (specialty) params.set('specialty', specialty);
+      if (language) params.set('language', language);
+      if (sort) params.set('sort', sort);
+      if (minPrice) params.set('min_price', minPrice);
+      if (maxPrice) params.set('max_price', maxPrice);
+      params.set('page', '1');
+      router.replace(`/nutritionists?${params.toString()}`);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [q, city, specialty, language, sort, minPrice, maxPrice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasFilters = q || city || specialty || language || sort || minPrice || maxPrice;
 
@@ -37,7 +59,7 @@ export function SearchFilters() {
     if (sort) params.set('sort', sort);
     if (minPrice) params.set('min_price', minPrice);
     if (maxPrice) params.set('max_price', maxPrice);
-    params.set('page', '1'); // reset to first page on new search
+    params.set('page', '1');
     router.push(`/nutritionists?${params.toString()}`);
   }
 

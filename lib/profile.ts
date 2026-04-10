@@ -45,7 +45,6 @@ export function usePublicProfiles(page = 1, limit = 12, filters: ProfileSearchPa
   const { data, error, isLoading } = useSWR<ProfileListResponse>(
     key,
     () => api.get<ProfileListResponse>(key),
-    { revalidateOnFocus: false },
   );
   return {
     profiles: data?.profiles ?? [],
