@@ -37,6 +37,8 @@ export default function MyNutritionistPage() {
     setCancelling(id);
     try {
       await cancelRelationship(id);
+    } catch {
+      alert('Could not cancel subscription. Please try again.');
     } finally {
       setCancelling(null);
     }
@@ -119,7 +121,7 @@ export default function MyNutritionistPage() {
               )}
               {canRefund && showRefundForm !== rel.id && (
                 <button
-                  onClick={() => setShowRefundForm(rel.id)}
+                  onClick={() => { setShowRefundForm(rel.id); setRefundReason(''); }}
                   style={{ fontSize: 12, padding: '6px 14px', border: '1px solid rgba(139,115,85,0.2)', borderRadius: 5, background: 'transparent', color: 'var(--nc-stone)', cursor: 'pointer' }}
                 >
                   Request refund
