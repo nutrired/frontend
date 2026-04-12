@@ -12,6 +12,9 @@ export interface NutritionistProfile {
   languages: string[];
   certifications: string[];
   status: 'draft' | 'published';
+  tier: string;
+  stripe_connect_account_id: string;
+  intro_consultation_required: boolean;
   created_at: string;
   updated_at: string;
   packages: ServicePackage[];
@@ -24,6 +27,7 @@ export interface ServicePackage {
   description: string;
   price_cents: number;
   sessions: number;
+  billing_type: 'one_time' | 'monthly';
   created_at: string;
   updated_at: string;
 }
@@ -77,4 +81,39 @@ export interface ActivityEntry {
   duration_minutes: number;
   recorded_at: string;  // "YYYY-MM-DD"
   created_at: string;
+}
+
+export interface Relationship {
+  id: string;
+  client_id: string;
+  nutritionist_id: string;
+  package_id: string;
+  status: 'pending_payment' | 'pending_intro' | 'active' | 'cancelled';
+  billing_type: 'one_time' | 'monthly';
+  stripe_session_id: string;
+  stripe_payment_intent_id: string;
+  stripe_subscription_id: string;
+  amount_cents: number;
+  commission_cents: number;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RefundRequest {
+  id: string;
+  relationship_id: string;
+  client_id: string;
+  reason: string;
+  status: 'pending' | 'auto_approved' | 'approved' | 'rejected';
+  created_at: string;
+  resolved_at: string | null;
+}
+
+export interface EarningsSummary {
+  total_earned_cents: number;
+  total_commission_cents: number;
+  active_client_count: number;
+  relationships: Relationship[];
 }
