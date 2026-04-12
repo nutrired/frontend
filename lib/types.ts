@@ -12,8 +12,8 @@ export interface NutritionistProfile {
   languages: string[];
   certifications: string[];
   status: 'draft' | 'published';
-  tier: string;
-  stripe_connect_account_id: string;
+  tier: 'free' | 'pro' | 'premium';
+  stripe_connect_account_id: string | null;
   intro_consultation_required: boolean;
   created_at: string;
   updated_at: string;
