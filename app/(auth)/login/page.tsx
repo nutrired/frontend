@@ -23,8 +23,9 @@ function LoginForm() {
     setUnverified(false);
     setLoading(true);
     try {
-      await api.post('/auth/login', { email, password });
-      router.push(from);
+      const res = await api.post<{ id: string; email: string; role: string }>('/auth/login', { email, password });
+      const defaultRoute = res.role === 'nutritionist' ? '/dashboard/profile' : '/dashboard';
+      router.push(from === '/' ? defaultRoute : from);
       router.refresh();
     } catch (err) {
       if (err instanceof ApiRequestError) {

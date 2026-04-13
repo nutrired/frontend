@@ -33,7 +33,7 @@ async function request<T>(
     },
   });
 
-  if (res.status === 401 && retry) {
+  if (res.status === 401 && retry && path !== '/auth/login') {
     // Try to refresh the access token once.
     const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
       method: 'POST',
