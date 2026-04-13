@@ -3,7 +3,7 @@
 
 import { useNutritionistRelationships, useNutritionistWaitlist, subscribeToTier, openBillingPortal } from '@/lib/hiring';
 import { useMyProfile } from '@/lib/profile';
-import { timeSince } from '../../../lib/utils';
+import { timeSince } from '@/lib/utils';
 import { useState } from 'react';
 
 function statusLabel(status: string): { text: string; color: string } {

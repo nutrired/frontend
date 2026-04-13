@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
-import { timeSince } from '../../../lib/utils';
+import { timeSince } from '@/lib/utils';
 
 export default function MyNutritionistPage() {
   const { relationships, isLoading } = useMyRelationships();
