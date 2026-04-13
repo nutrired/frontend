@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
+import { useMyProfile } from '@/lib/profile';
 
 function initials(email: string): string {
   return email.slice(0, 2).toUpperCase();
@@ -15,6 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const { profile } = useMyProfile();
 
   // Redirect unauthenticated users to login.
   useEffect(() => {
@@ -57,6 +59,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="dash-user-role">{user.role}</div>
           </div>
         </div>
+        {user.role === 'nutritionist' && profile && (
+          <div style={{ padding: '8px 16px 0' }}>
+            <span style={{
+              fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+              padding: '3px 8px', borderRadius: 100,
+              background: profile.tier === 'free' ? 'rgba(139,115,85,0.12)' : 'rgba(74,124,89,0.12)',
+              color: profile.tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-olive)',
+            }}>
+              {profile.tier}
+            </span>
+            {profile.tier === 'free' && (
+              <a href="/dashboard/billing" style={{ fontSize: 11, color: 'var(--nc-terra)', marginLeft: 8, textDecoration: 'none' }}>
+                Upgrade →
+              </a>
+            )}
+          </div>
+        )}
         <nav className="dash-nav">
           <span className="dash-nav-section">Manage</span>
           {navItems.map((item) => (

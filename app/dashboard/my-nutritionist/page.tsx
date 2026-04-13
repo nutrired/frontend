@@ -4,13 +4,11 @@
 import { useState } from 'react';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
 
-function statusLabel(status: string): { text: string; color: string } {
-  switch (status) {
-    case 'active': return { text: 'Active', color: '#4a7c59' };
-    case 'pending_intro': return { text: 'Awaiting intro consultation', color: '#b8860b' };
-    case 'cancelled': return { text: 'Cancelled', color: '#b94a3a' };
-    default: return { text: status, color: 'var(--nc-stone)' };
-  }
+function timeSince(dateStr: string): string {
+  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+  if (days < 30) return `${days}d`;
+  const months = Math.floor(days / 30);
+  return `${months}mo`;
 }
 
 export default function MyNutritionistPage() {
@@ -62,57 +60,82 @@ export default function MyNutritionistPage() {
         </div>
       )}
 
-      {active.map((rel) => {
-        const { text, color } = statusLabel(rel.status);
-        const canCancel = rel.status === 'active';
-
-        return (
-          <div key={rel.id} style={{ background: 'white', border: '1px solid rgba(139,115,85,0.15)', borderRadius: 8, padding: '20px 24px', marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)', marginBottom: 4 }}>
-                  Active programme
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300 }}>
-                  Started {new Date(rel.created_at).toLocaleDateString('es-ES')}
-                </div>
-              </div>
-              <span style={{ fontSize: 12, fontWeight: 600, color, padding: '2px 8px', borderRadius: 4, background: `${color}15` }}>
-                {text}
-              </span>
+      {active.map((rel) => (
+        <div key={rel.id} style={{ border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, padding: 20, marginBottom: 16, background: 'var(--nc-cream)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+            <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--nc-ink)' }}>
+              {rel.nutritionist_display_name}
             </div>
-
-            {canCancel && (
-              <button
-                onClick={() => handleCancel(rel.id)}
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+              padding: '3px 8px', borderRadius: 100,
+              background: rel.nutritionist_tier === 'free' ? 'rgba(139,115,85,0.12)' : 'rgba(74,124,89,0.12)',
+              color: rel.nutritionist_tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-olive)' }}>
+              {rel.nutritionist_tier}
+            </span>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 8 }}>
+            {rel.nutritionist_city} · Conectado hace {timeSince(rel.created_at)}
+          </div>
+          {rel.nutritionist_bio && (
+            <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.5,
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden', marginBottom: 10 }}>
+              {rel.nutritionist_bio}
+            </p>
+          )}
+          <div style={{ marginBottom: 10 }}>
+            {rel.nutritionist_specialties?.slice(0, 3).map(s => (
+              <span key={s} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                background: 'rgba(74,124,89,0.1)', color: 'var(--nc-olive)', marginRight: 4 }}>{s}</span>
+            ))}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 12 }}>
+            Estado: <strong>{rel.status === 'active' ? 'Activo' : rel.status === 'pending_intro' ? 'Pendiente' : 'Cancelado'}</strong>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <a href={`/nutritionists/${rel.nutritionist_slug}`} target="_blank"
+               style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none' }}>
+              Ver perfil ↗
+            </a>
+            {rel.status !== 'cancelled' && (
+              <button onClick={() => handleCancel(rel.id)}
                 disabled={cancelling === rel.id}
-                style={{ fontSize: 12, padding: '6px 14px', border: '1px solid rgba(185,74,58,0.4)', borderRadius: 5, background: 'transparent', color: '#b94a3a', cursor: 'pointer' }}
-              >
-                {cancelling === rel.id ? 'Cancelling…' : 'Cancel programme'}
+                style={{ fontSize: 12, color: 'var(--nc-stone)', background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
+                {cancelling === rel.id ? 'Cancelando…' : 'Cancelar'}
               </button>
             )}
           </div>
-        );
-      })}
+        </div>
+      ))}
 
       {past.length > 0 && (
         <>
           <h2 style={{ fontFamily: 'var(--nc-font-serif)', fontSize: 16, color: 'var(--nc-ink)', marginTop: 32, marginBottom: 16, fontWeight: 400 }}>
             Past programmes
           </h2>
-          {past.map((rel) => {
-            const { text, color } = statusLabel(rel.status);
-            return (
-              <div key={rel.id} style={{ background: 'white', border: '1px solid rgba(139,115,85,0.1)', borderRadius: 8, padding: '16px 24px', marginBottom: 12, opacity: 0.7 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 13, color: 'var(--nc-ink)' }}>
-                    Programme — ended {new Date(rel.updated_at).toLocaleDateString('es-ES')}
-                  </div>
-                  <span style={{ fontSize: 11, color }}>{text}</span>
+          {past.map((rel) => (
+            <div key={rel.id} style={{ border: '1px solid rgba(0,0,0,0.08)', borderRadius: 12, padding: 20, marginBottom: 16, background: 'var(--nc-cream)', opacity: 0.7 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+                <div style={{ fontWeight: 600, fontSize: 15, color: 'var(--nc-ink)' }}>
+                  {rel.nutritionist_display_name}
                 </div>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+                  padding: '3px 8px', borderRadius: 100,
+                  background: 'rgba(185,74,58,0.1)', color: '#b94a3a' }}>
+                  Cancelado
+                </span>
               </div>
-            );
-          })}
+              <div style={{ fontSize: 12, color: 'var(--nc-stone)' }}>
+                {rel.nutritionist_city} · Finalizado {new Date(rel.updated_at).toLocaleDateString('es-ES')}
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <a href={`/nutritionists/${rel.nutritionist_slug}`} target="_blank"
+                   style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none' }}>
+                  Ver perfil ↗
+                </a>
+              </div>
+            </div>
+          ))}
         </>
       )}
     </div>
