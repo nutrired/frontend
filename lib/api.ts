@@ -81,4 +81,13 @@ export const api = {
 
   del: <T>(path: string) =>
     request<T>(path, { method: 'DELETE' }),
+
+  joinWaitlist: (slug: string): Promise<void> =>
+    request<void>(`/nutritionists/${slug}/waitlist`, { method: 'POST' }),
+
+  leaveWaitlist: (slug: string): Promise<void> =>
+    request<void>(`/nutritionists/${slug}/waitlist`, { method: 'DELETE' }),
+
+  getWaitlistStatus: (slug: string): Promise<{ on_waitlist: boolean }> =>
+    request<{ on_waitlist: boolean }>(`/nutritionists/${slug}/waitlist`, { method: 'GET' }),
 };

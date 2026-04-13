@@ -58,6 +58,20 @@ function NutriCard({ profile, index }: { profile: ProfileSummary; index: number 
             View profile →
           </Link>
         </div>
+        {!profile.accepting_new_clients && (
+          <div style={{ padding: '6px 16px 12px' }}>
+            <span style={{ fontSize: 11, color: 'var(--nc-stone)', background: 'rgba(139,115,85,0.1)', padding: '3px 8px', borderRadius: 4, fontWeight: 400 }}>
+              No disponible
+            </span>
+          </div>
+        )}
+        {profile.at_capacity && profile.accepting_new_clients && (
+          <div style={{ padding: '6px 16px 12px' }}>
+            <span style={{ fontSize: 11, color: '#b48c3c', background: 'rgba(180,140,60,0.1)', padding: '3px 8px', borderRadius: 4, fontWeight: 400 }}>
+              Lista de espera
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

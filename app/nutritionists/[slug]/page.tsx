@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { usePublicProfile } from '@/lib/profile';
 import { connectWithNutritionist } from '@/lib/hiring';
 import { api } from '@/lib/api';
+import { WaitlistButton } from '@/components/WaitlistButton';
 import useSWR from 'swr';
 
 function initials(name: string): string {
@@ -78,6 +79,10 @@ export default function PublicProfilePage() {
   const firstName = nameParts[0];
   const rest = nameParts.slice(1).join(' ');
 
+  const isClosed = !profile.accepting_new_clients;
+  const isAtCapacity = profile.accepting_new_clients && profile.at_capacity;
+  const isAvailable = profile.accepting_new_clients && !profile.at_capacity;
+
   return (
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
@@ -88,7 +93,9 @@ export default function PublicProfilePage() {
       <div className="nc-profile-hero">
         <div className="nc-profile-hero-inner">
           <div>
-            <div className="nc-profile-badge">Available</div>
+            {isAvailable && <div className="nc-profile-badge">Available</div>}
+            {isAtCapacity && <div className="nc-profile-badge" style={{ background: 'rgba(180,140,60,0.15)', color: '#b48c3c' }}>Lista de espera</div>}
+            {isClosed && <div className="nc-profile-badge" style={{ background: 'rgba(139,115,85,0.12)', color: 'var(--nc-stone)' }}>No acepta nuevos clientes</div>}
             <h1 className="nc-profile-name">
               {firstName}
               {rest && <><br /><em>{rest}</em></>}
@@ -185,19 +192,29 @@ export default function PublicProfilePage() {
                 </div>
                 {pkg.description && <div className="nc-pkg-desc">{pkg.description}</div>}
                 <div style={{ marginTop: 12 }}>
-                  {connected ? (
-                    <div style={{ fontSize: 13, color: '#4a7c59', fontWeight: 500, padding: '8px 0' }}>
-                      ✓ Request sent — check your dashboard
-                    </div>
-                  ) : (
-                    <button
-                      className="nc-btn-contact"
-                      style={{ width: '100%', cursor: connecting === pkg.id ? 'wait' : 'pointer' }}
-                      disabled={connecting === pkg.id}
-                      onClick={() => handleConnect(pkg.id)}
-                    >
-                      {connecting === pkg.id ? 'Sending request…' : 'Work with me'}
-                    </button>
+                  {isClosed && (
+                    <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, padding: '8px 0', margin: 0 }}>
+                      No acepta nuevos clientes
+                    </p>
+                  )}
+                  {isAtCapacity && (
+                    <WaitlistButton slug={slug} />
+                  )}
+                  {isAvailable && (
+                    connected ? (
+                      <div style={{ fontSize: 13, color: '#4a7c59', fontWeight: 500, padding: '8px 0' }}>
+                        ✓ Request sent — check your dashboard
+                      </div>
+                    ) : (
+                      <button
+                        className="nc-btn-contact"
+                        style={{ width: '100%', cursor: connecting === pkg.id ? 'wait' : 'pointer' }}
+                        disabled={connecting === pkg.id}
+                        onClick={() => handleConnect(pkg.id)}
+                      >
+                        {connecting === pkg.id ? 'Sending request…' : 'Work with me'}
+                      </button>
+                    )
                   )}
                 </div>
               </div>

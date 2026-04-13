@@ -69,6 +69,7 @@ export default function DashboardProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
   const [introConsultationRequired, setIntroConsultationRequired] = useState(false);
+  const [acceptingNewClients, setAcceptingNewClients] = useState(true);
 
   // Pre-fill form when profile loads.
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function DashboardProfilePage() {
       setCertifications(profile.certifications);
       setStatus(profile.status);
       setIntroConsultationRequired(profile.intro_consultation_required ?? false);
+      setAcceptingNewClients(profile.accepting_new_clients ?? true);
       setPackages(
         profile.packages.map((p: ServicePackage) => ({
           id: p.id,
@@ -105,6 +107,7 @@ export default function DashboardProfilePage() {
         years_exp: yearsExp ? parseInt(yearsExp, 10) : null,
         specialties, languages, certifications,
         intro_consultation_required: introConsultationRequired,
+        accepting_new_clients: acceptingNewClients,
       };
 
       if (!profile) {
@@ -332,6 +335,25 @@ export default function DashboardProfilePage() {
               />
               <label htmlFor="intro-consultation" style={{ fontSize: 14, color: 'var(--nc-ink)', cursor: 'pointer' }}>
                 Require an intro consultation before client access begins
+              </label>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+              <button
+                type="button"
+                id="accepting-new-clients"
+                role="switch"
+                aria-checked={acceptingNewClients}
+                className={`dash-toggle${acceptingNewClients ? ' on' : ''}`}
+                onClick={() => setAcceptingNewClients((v) => !v)}
+                disabled={saving}
+                aria-label="Aceptando nuevos clientes"
+              />
+              <label
+                htmlFor="accepting-new-clients"
+                style={{ fontSize: 14, color: 'var(--nc-ink)', cursor: 'pointer' }}
+                onClick={() => !saving && setAcceptingNewClients((v) => !v)}
+              >
+                Aceptando nuevos clientes
               </label>
             </div>
           </div>

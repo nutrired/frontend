@@ -15,6 +15,8 @@ export interface NutritionistProfile {
   tier: 'free' | 'pro' | 'premium';
   stripe_subscription_id: string;
   intro_consultation_required: boolean;
+  accepting_new_clients: boolean;
+  at_capacity: boolean;
   created_at: string;
   updated_at: string;
   packages: ServicePackage[];
@@ -41,6 +43,8 @@ export interface ProfileSummary {
   specialties: string[];
   languages: string[];
   lowest_price_cents: number | null;
+  accepting_new_clients: boolean;
+  at_capacity: boolean;
 }
 
 export interface ProfileListResponse {
