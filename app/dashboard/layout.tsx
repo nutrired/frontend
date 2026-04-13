@@ -16,6 +16,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { user, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  // Called for all users; returns null for non-nutritionists (endpoint returns 404)
+  // Slight waste for clients but avoids conditional hook calls (React rules)
   const { profile } = useMyProfile();
 
   // Redirect unauthenticated users to login.
@@ -65,7 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
               padding: '3px 8px', borderRadius: 100,
               background: profile.tier === 'free' ? 'rgba(139,115,85,0.12)' : 'rgba(74,124,89,0.12)',
-              color: profile.tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-olive)',
+              color: profile.tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-forest)',
             }}>
               {profile.tier}
             </span>

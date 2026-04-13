@@ -3,13 +3,7 @@
 
 import { useState } from 'react';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
-
-function timeSince(dateStr: string): string {
-  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
-  if (days < 30) return `${days}d`;
-  const months = Math.floor(days / 30);
-  return `${months}mo`;
-}
+import { timeSince } from '../../../lib/utils';
 
 export default function MyNutritionistPage() {
   const { relationships, isLoading } = useMyRelationships();
@@ -44,7 +38,7 @@ export default function MyNutritionistPage() {
 
   return (
     <div style={{ maxWidth: 680, padding: '32px 24px' }}>
-      <h1 style={{ fontFamily: 'var(--nc-font-serif)', fontSize: 24, color: 'var(--nc-ink)', marginBottom: 8, fontWeight: 400 }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--nc-ink)', marginBottom: 8, fontWeight: 400 }}>
         My Nutritionist
       </h1>
       <p style={{ color: 'var(--nc-stone)', fontSize: 14, marginBottom: 32, fontWeight: 300 }}>
@@ -69,7 +63,7 @@ export default function MyNutritionistPage() {
             <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
               padding: '3px 8px', borderRadius: 100,
               background: rel.nutritionist_tier === 'free' ? 'rgba(139,115,85,0.12)' : 'rgba(74,124,89,0.12)',
-              color: rel.nutritionist_tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-olive)' }}>
+              color: rel.nutritionist_tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-forest)' }}>
               {rel.nutritionist_tier}
             </span>
           </div>
@@ -86,7 +80,7 @@ export default function MyNutritionistPage() {
           <div style={{ marginBottom: 10 }}>
             {rel.nutritionist_specialties?.slice(0, 3).map(s => (
               <span key={s} style={{ fontSize: 11, padding: '2px 8px', borderRadius: 4,
-                background: 'rgba(74,124,89,0.1)', color: 'var(--nc-olive)', marginRight: 4 }}>{s}</span>
+                background: 'rgba(74,124,89,0.1)', color: 'var(--nc-forest)', marginRight: 4 }}>{s}</span>
             ))}
           </div>
           <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 12 }}>
@@ -110,7 +104,7 @@ export default function MyNutritionistPage() {
 
       {past.length > 0 && (
         <>
-          <h2 style={{ fontFamily: 'var(--nc-font-serif)', fontSize: 16, color: 'var(--nc-ink)', marginTop: 32, marginBottom: 16, fontWeight: 400 }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--nc-ink)', marginTop: 32, marginBottom: 16, fontWeight: 400 }}>
             Past programmes
           </h2>
           {past.map((rel) => (

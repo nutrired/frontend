@@ -3,6 +3,7 @@
 
 import { useNutritionistRelationships, useNutritionistWaitlist, subscribeToTier, openBillingPortal } from '@/lib/hiring';
 import { useMyProfile } from '@/lib/profile';
+import { timeSince } from '../../../lib/utils';
 import { useState } from 'react';
 
 function statusLabel(status: string): { text: string; color: string } {
@@ -12,13 +13,6 @@ function statusLabel(status: string): { text: string; color: string } {
     case 'cancelled': return { text: 'Cancelled', color: '#b94a3a' };
     default: return { text: status, color: 'var(--nc-stone)' };
   }
-}
-
-function timeSince(dateStr: string): string {
-  const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
-  if (days < 30) return `${days}d`;
-  const months = Math.floor(days / 30);
-  return `${months}mo`;
 }
 
 const tierMax: Record<string, number | string> = { free: 5, pro: 25, premium: '∞' };
@@ -57,7 +51,7 @@ export default function BillingPage() {
 
   return (
     <div style={{ maxWidth: 720, padding: '32px 24px' }}>
-      <h1 style={{ fontFamily: 'var(--nc-font-serif)', fontSize: 24, color: 'var(--nc-ink)', marginBottom: 8, fontWeight: 400 }}>
+      <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--nc-ink)', marginBottom: 8, fontWeight: 400 }}>
         Billing & Plan
       </h1>
       <p style={{ color: 'var(--nc-stone)', fontSize: 14, marginBottom: 32, fontWeight: 300 }}>
@@ -121,7 +115,7 @@ export default function BillingPage() {
 
       {/* 2b: Client list with richer info */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 16 }}>
-        <h2 style={{ fontFamily: 'var(--nc-font-serif)', fontSize: 16, color: 'var(--nc-ink)', fontWeight: 400, margin: 0 }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 16, color: 'var(--nc-ink)', fontWeight: 400, margin: 0 }}>
           All clients
         </h2>
         <span style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300 }}>
