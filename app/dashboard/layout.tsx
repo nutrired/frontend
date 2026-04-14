@@ -86,7 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               key={item.href}
               href={item.href}
-              className={`dash-nav-item${pathname === item.href ? ' active' : ''}`}
+              className={`dash-nav-item${pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ? ' active' : ''}`}
             >
               <span>{item.icon}</span> {item.label}
             </Link>

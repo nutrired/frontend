@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useNutritionistRelationships } from '@/lib/hiring';
 
-function statusBadge(status: string) {
+function StatusBadge({ status }: { status: string }) {
   if (status === 'active') {
     return (
       <span style={{
@@ -76,7 +76,7 @@ export default function MyClientsPage() {
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {statusBadge(rel.status)}
+                  <StatusBadge status={rel.status} />
                   <Link
                     href={`/dashboard/clients/${rel.client_id}`}
                     style={{
