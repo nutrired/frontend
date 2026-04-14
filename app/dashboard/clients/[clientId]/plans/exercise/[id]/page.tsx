@@ -225,6 +225,7 @@ export default function EditExercisePlanPage() {
   async function handleDelete() {
     if (!confirm('Eliminar este borrador. Esta acción no se puede deshacer.')) return;
     setDeleting(true);
+    setError('');
     try {
       await deleteExercisePlan(id);
       router.push(`/dashboard/clients/${clientId}`);

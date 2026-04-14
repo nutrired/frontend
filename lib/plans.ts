@@ -89,6 +89,7 @@ export function useNutritionPlan(id: string | null | undefined) {
   const { data, error, isLoading, mutate } = useSWR<NutritionPlan>(
     id ? `/plans/nutrition/${id}` : null,
     () => api.get<NutritionPlan>(`/plans/nutrition/${id!}`),
+    { revalidateOnFocus: false },
   );
   return { plan: data ?? null, isLoading, error, mutate };
 }
@@ -110,6 +111,7 @@ export function useExercisePlan(id: string | null | undefined) {
   const { data, error, isLoading, mutate } = useSWR<ExercisePlan>(
     id ? `/plans/exercise/${id}` : null,
     () => api.get<ExercisePlan>(`/plans/exercise/${id!}`),
+    { revalidateOnFocus: false },
   );
   return { plan: data ?? null, isLoading, error, mutate };
 }

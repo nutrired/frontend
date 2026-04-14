@@ -236,6 +236,7 @@ export default function EditNutritionPlanPage() {
   async function handleDelete() {
     if (!confirm('Eliminar este borrador. Esta acción no se puede deshacer.')) return;
     setDeleting(true);
+    setError('');
     try {
       await deleteNutritionPlan(id);
       router.push(`/dashboard/clients/${clientId}`);
