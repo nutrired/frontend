@@ -1627,5 +1627,22 @@
 }
 .dash-btn-save:hover { background: var(--nc-forest-lt); }
 
+/* ─── PRINT (My Plans PDF) ───────────────────────────────── */
+@media print {
+  .dash-sidebar,
+  .dash-nav,
+  .dash-footer,
+  .print-hide {
+    display: none !important;
+  }
+  .dash-main {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    background: white;
+  }
+}
+
 .auth-alert-error { background: rgba(196,98,45,0.08); color: var(--terracotta); }
 .auth-alert-success { background: rgba(44,74,30,0.07); color: var(--olive); }

@@ -1,0 +1,297 @@
+// frontend/app/dashboard/my-plans/page.tsx
+'use client';
+
+import { useState } from 'react';
+import { useMyActivePlans } from '@/lib/plans';
+import type { NutritionPlan, ExercisePlan, MealType } from '@/lib/types';
+
+const MEAL_TYPE_LABELS: Record<MealType, string> = {
+  breakfast:   'Desayuno',
+  mid_morning: 'Media mañana',
+  lunch:       'Almuerzo',
+  snack:       'Merienda',
+  dinner:      'Cena',
+};
+
+const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+// ─── Nutrition plan view ──────────────────────────────────────────────────────
+
+function NutritionPlanView({ plan }: { plan: NutritionPlan }) {
+  const sorted = [...plan.days].sort((a, b) => a.day_number - b.day_number);
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--nc-forest)', fontWeight: 500, marginBottom: 4 }}>
+          {plan.title}
+        </h2>
+        {plan.notes && (
+          <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.6 }}>
+            {plan.notes}
+          </p>
+        )}
+      </div>
+
+      {sorted.map((day) => (
+        <div key={day.id} style={{
+          border: '1px solid var(--nc-border)', borderRadius: 10,
+          marginBottom: 16, overflow: 'hidden',
+        }}>
+          <div style={{
+            padding: '12px 20px', background: 'var(--nc-forest-pale)',
+            borderBottom: '1px solid var(--nc-border)',
+          }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)' }}>
+              Día {day.day_number} — {DAY_LABELS[day.day_number - 1]}
+              {day.label ? ` (${day.label})` : ''}
+            </span>
+            {day.notes && (
+              <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginLeft: 12, fontWeight: 300 }}>
+                {day.notes}
+              </span>
+            )}
+          </div>
+
+          {day.meals.length === 0 ? (
+            <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+              Sin comidas programadas para este día.
+            </div>
+          ) : (
+            <div style={{ padding: '8px 20px 16px' }}>
+              {[...day.meals]
+                .sort((a, b) => a.display_order - b.display_order)
+                .map((meal) => (
+                  <div key={meal.id} style={{ marginTop: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 8 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-ink)' }}>
+                        {meal.name}
+                      </div>
+                      <span style={{
+                        fontSize: 11, padding: '1px 7px', borderRadius: 4,
+                        background: 'rgba(26,51,41,0.07)', color: 'var(--nc-forest)', fontWeight: 500,
+                      }}>
+                        {MEAL_TYPE_LABELS[meal.meal_type]}
+                      </span>
+                    </div>
+                    {[...meal.options]
+                      .sort((a, b) => a.display_order - b.display_order)
+                      .map((opt, idx) => (
+                        <div key={opt.id} style={{
+                          padding: '10px 14px',
+                          border: '1px solid rgba(139,115,85,0.12)',
+                          borderRadius: 6, marginBottom: 6, background: 'white',
+                        }}>
+                          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 2 }}>
+                            {meal.options.length > 1 ? `Opción ${String.fromCharCode(65 + idx)}: ` : ''}{opt.name}
+                          </div>
+                          {opt.description && (
+                            <div style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.5, marginBottom: 6 }}>
+                              {opt.description}
+                            </div>
+                          )}
+                          {(opt.calories !== null || opt.protein_g !== null || opt.carbs_g !== null || opt.fat_g !== null) && (
+                            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                              {opt.calories !== null && (
+                                <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                                  <strong>{opt.calories}</strong> kcal
+                                </span>
+                              )}
+                              {opt.protein_g !== null && (
+                                <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                                  Prot <strong>{opt.protein_g}g</strong>
+                                </span>
+                              )}
+                              {opt.carbs_g !== null && (
+                                <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                                  HC <strong>{opt.carbs_g}g</strong>
+                                </span>
+                              )}
+                              {opt.fat_g !== null && (
+                                <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                                  Grasas <strong>{opt.fat_g}g</strong>
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Exercise plan view ───────────────────────────────────────────────────────
+
+function ExercisePlanView({ plan }: { plan: ExercisePlan }) {
+  const sorted = [...plan.days].sort((a, b) => a.day_number - b.day_number);
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 20, color: 'var(--nc-forest)', fontWeight: 500, marginBottom: 4 }}>
+          {plan.title}
+        </h2>
+        {plan.notes && (
+          <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.6 }}>
+            {plan.notes}
+          </p>
+        )}
+      </div>
+
+      {sorted.map((day) => (
+        <div key={day.id} style={{
+          border: '1px solid var(--nc-border)', borderRadius: 10,
+          marginBottom: 16, overflow: 'hidden',
+        }}>
+          <div style={{
+            padding: '12px 20px', background: 'var(--nc-forest-pale)',
+            borderBottom: '1px solid var(--nc-border)',
+          }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)' }}>
+              Día {day.day_number} — {DAY_LABELS[day.day_number - 1]}
+              {day.label ? ` (${day.label})` : ''}
+            </span>
+            {day.notes && (
+              <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginLeft: 12, fontWeight: 300 }}>
+                {day.notes}
+              </span>
+            )}
+          </div>
+
+          {day.blocks.length === 0 ? (
+            <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+              Día de descanso.
+            </div>
+          ) : (
+            <div style={{ padding: '8px 20px 16px' }}>
+              {[...day.blocks]
+                .sort((a, b) => a.display_order - b.display_order)
+                .map((block) => (
+                  <div key={block.id} style={{ marginTop: 16 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-forest)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+                      {block.name}
+                    </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px solid var(--nc-border)' }}>
+                          <th style={{ textAlign: 'left', padding: '6px 0', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ejercicio</th>
+                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Series</th>
+                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Reps</th>
+                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Desc.</th>
+                          <th style={{ textAlign: 'left', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notas</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...block.exercises]
+                          .sort((a, b) => a.display_order - b.display_order)
+                          .map((ex) => (
+                            <tr key={ex.id} style={{ borderBottom: '1px solid rgba(139,115,85,0.08)' }}>
+                              <td style={{ padding: '8px 0', fontWeight: 500, color: 'var(--nc-ink)' }}>{ex.name}</td>
+                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.sets ?? '—'}</td>
+                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.reps ?? '—'}</td>
+                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>
+                                {ex.rest_seconds !== null ? `${ex.rest_seconds}s` : '—'}
+                              </td>
+                              <td style={{ padding: '8px', color: 'var(--nc-stone)', fontWeight: 300 }}>{ex.notes || '—'}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Page ──────────────────────────────────────────────────────────────────────
+
+type Tab = 'nutrition' | 'exercise';
+
+export default function MyPlansPage() {
+  const { nutrition, exercise, isLoading } = useMyActivePlans();
+  const [activeTab, setActiveTab] = useState<Tab>('nutrition');
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  return (
+    <>
+      <div className="dash-topbar">
+        <div className="dash-topbar-title">Mis planes</div>
+        <div className="dash-topbar-right print-hide">
+          <button
+            onClick={handlePrint}
+            className="print-hide"
+            style={{
+              height: 34, padding: '0 16px',
+              border: '1px solid var(--nc-border)', borderRadius: 6,
+              background: 'transparent', cursor: 'pointer',
+              fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--nc-stone)',
+            }}
+          >
+            Descargar PDF
+          </button>
+        </div>
+      </div>
+      <div className="dash-content">
+        {/* Tab bar */}
+        <div className="print-hide" style={{
+          display: 'flex', gap: 0, borderBottom: '1px solid var(--nc-border)', marginBottom: 24,
+        }}>
+          {(['nutrition', 'exercise'] as Tab[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: '10px 20px', background: 'transparent', border: 'none',
+                borderBottom: activeTab === tab ? '2px solid var(--nc-forest)' : '2px solid transparent',
+                fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: activeTab === tab ? 600 : 400,
+                color: activeTab === tab ? 'var(--nc-forest)' : 'var(--nc-stone)',
+                cursor: 'pointer', marginBottom: -1, transition: 'color 0.15s',
+              }}
+            >
+              {tab === 'nutrition' ? 'Nutrición' : 'Ejercicio'}
+            </button>
+          ))}
+        </div>
+
+        {isLoading ? (
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando planes…</div>
+        ) : activeTab === 'nutrition' ? (
+          nutrition ? (
+            <NutritionPlanView plan={nutrition} />
+          ) : (
+            <div style={{
+              background: 'white', border: '1px solid rgba(139,115,85,0.12)',
+              borderRadius: 8, padding: 32, textAlign: 'center',
+              color: 'var(--nc-stone)', fontWeight: 300, fontSize: 14,
+            }}>
+              No tienes un plan de nutrición activo. Tu nutricionista te asignará uno en breve.
+            </div>
+          )
+        ) : (
+          exercise ? (
+            <ExercisePlanView plan={exercise} />
+          ) : (
+            <div style={{
+              background: 'white', border: '1px solid rgba(139,115,85,0.12)',
+              borderRadius: 8, padding: 32, textAlign: 'center',
+              color: 'var(--nc-stone)', fontWeight: 300, fontSize: 14,
+            }}>
+              No tienes un plan de ejercicio activo. Tu nutricionista te asignará uno en breve.
+            </div>
+          )
+        )}
+      </div>
+    </>
+  );
+}
