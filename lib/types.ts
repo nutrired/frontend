@@ -132,3 +132,104 @@ export interface WaitlistEntryView {
   client_display_name: string;
   created_at: string;
 }
+
+// ─── Plans ────────────────────────────────────────────────────────────────────
+
+export type PlanStatus = 'draft' | 'active' | 'archived';
+export type MealType = 'breakfast' | 'mid_morning' | 'lunch' | 'snack' | 'dinner';
+
+export interface MealOption {
+  id: string;
+  meal_id: string;
+  name: string;
+  description: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  display_order: number;
+}
+
+export interface Meal {
+  id: string;
+  plan_day_id: string;
+  name: string;
+  meal_type: MealType;
+  display_order: number;
+  options: MealOption[];
+}
+
+export interface NutritionPlanDay {
+  id: string;
+  plan_id: string;
+  day_number: number;
+  label: string;
+  notes: string;
+  meals: Meal[];
+}
+
+export interface NutritionPlan {
+  id: string;
+  nutritionist_id: string;
+  client_id: string;
+  title: string;
+  notes: string;
+  status: PlanStatus;
+  days: NutritionPlanDay[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Exercise {
+  id: string;
+  block_id: string;
+  name: string;
+  sets: number | null;
+  reps: number | null;
+  rest_seconds: number | null;
+  notes: string;
+  display_order: number;
+}
+
+export interface WorkoutBlock {
+  id: string;
+  plan_day_id: string;
+  name: string;
+  display_order: number;
+  exercises: Exercise[];
+}
+
+export interface ExercisePlanDay {
+  id: string;
+  plan_id: string;
+  day_number: number;
+  label: string;
+  notes: string;
+  blocks: WorkoutBlock[];
+}
+
+export interface ExercisePlan {
+  id: string;
+  nutritionist_id: string;
+  client_id: string;
+  title: string;
+  notes: string;
+  status: PlanStatus;
+  days: ExercisePlanDay[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ClientProfileSummary {
+  id: string;
+  user_id: string;
+  display_name: string;
+  bio: string;
+  city: string;
+  birth_date: string | null;
+  height_cm: number | null;
+  activity_level: string;
+  goals: string[];
+  dietary_restrictions: string[];
+  allergies: string[];
+}
