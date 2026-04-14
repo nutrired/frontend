@@ -31,6 +31,8 @@ function initDays(): NutritionDayPayload[] {
   return Array.from({ length: 7 }, (_, i) => emptyDay(i + 1));
 }
 
+const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
 export default function NewNutritionPlanPage() {
   const router = useRouter();
   const params = useParams<{ clientId: string }>();
@@ -163,11 +165,10 @@ export default function NewNutritionPlanPage() {
       router.push(`/dashboard/clients/${clientId}/plans/nutrition/${id}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al guardar el plan.');
+    } finally {
       setSaving(false);
     }
   }
-
-  const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   return (
     <>

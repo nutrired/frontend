@@ -33,6 +33,8 @@ function emptyDay(dayNumber: number): NutritionDayPayload {
   return { day_number: dayNumber, label: '', notes: '', meals: [] };
 }
 
+const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
 function StatusPill({ status }: { status: PlanStatus }) {
   const cfg: Record<PlanStatus, { bg: string; color: string; label: string }> = {
     draft:    { bg: 'rgba(139,115,85,0.1)',  color: 'var(--nc-stone)',  label: 'Borrador'  },
@@ -239,11 +241,10 @@ export default function EditNutritionPlanPage() {
       router.push(`/dashboard/clients/${clientId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al eliminar el plan.');
+    } finally {
       setDeleting(false);
     }
   }
-
-  const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   if (isLoading) {
     return (
@@ -534,6 +535,13 @@ export default function EditNutritionPlanPage() {
         <div className="dash-save-bar">
           <span className="dash-save-hint">{saveMsg || 'Cambios sin guardar'}</span>
           <div className="dash-save-actions">
+            <Link
+              href={`/dashboard/clients/${clientId}`}
+              className="dash-btn-draft"
+              style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+            >
+              Cancelar
+            </Link>
             <button className="dash-btn-save" onClick={handleSave} disabled={saving}>
               {saving ? 'Guardando…' : 'Guardar cambios'}
             </button>
