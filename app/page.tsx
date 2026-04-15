@@ -1,22 +1,17 @@
+'use client';
+
 import LandingAnimations from '@/components/LandingAnimations';
+import { PublicNav } from '@/components/PublicNav';
+import { useAuth } from '@/lib/auth';
 
 export default function Home() {
+  const { user } = useAuth();
+
   return (
     <div className="lp-root">
       <LandingAnimations />
 
-      {/* ─────────── NAV ─────────── */}
-      <nav className="lp-nav">
-        <a href="/" className="nav-logo">
-          nutri<span>connect</span>
-        </a>
-        <ul className="nav-links">
-          <li><a href="/search">Buscar nutricionistas</a></li>
-          <li><a href="/how">Cómo funciona</a></li>
-          <li><a href="/for-nutritionists">Para nutricionistas</a></li>
-        </ul>
-        <a href="/register" className="btn-nav">Empezar gratis</a>
-      </nav>
+      <PublicNav />
 
       {/* ─────────── HERO ─────────── */}
       <section className="hero">
@@ -37,7 +32,9 @@ export default function Home() {
           </p>
 
           <div className="hero-actions">
-            <a href="/search" className="btn-primary">Explorar nutricionistas</a>
+            <a href={user ? "/dashboard" : "/register"} className="btn-primary">
+              {user ? "Ir al dashboard" : "Explorar nutricionistas"}
+            </a>
             <a href="/for-nutritionists" className="btn-ghost">Soy nutricionista →</a>
           </div>
 
@@ -286,7 +283,7 @@ export default function Home() {
         </div>
 
         <div className="see-all">
-          <a href="/search" className="btn-outline">Ver todos los nutricionistas</a>
+          <a href="/nutritionists" className="btn-outline">Ver todos los nutricionistas</a>
         </div>
       </section>
 
@@ -375,8 +372,10 @@ export default function Home() {
               Sin compromisos, sin letra pequeña.
             </p>
             <div className="cta-btns">
-              <a href="/register" className="btn-terra">Empezar gratis</a>
-              <a href="/search"   className="btn-light">Ver nutricionistas →</a>
+              <a href={user ? "/dashboard" : "/register"} className="btn-terra">
+                {user ? "Ir al dashboard" : "Empezar gratis"}
+              </a>
+              <a href="/nutritionists"   className="btn-light">Ver nutricionistas →</a>
             </div>
           </div>
         </div>
