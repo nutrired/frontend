@@ -256,3 +256,50 @@ export interface ClientProfileSummary {
   dietary_restrictions: string[];
   allergies: string[];
 }
+
+// ─── Recipes ──────────────────────────────────────────────────────────────────
+
+export type RecipeCategory = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'beverage' | 'dessert';
+
+export interface RecipeIngredient {
+  id: string;
+  recipe_id: string;
+  amount: number;
+  unit: string;
+  ingredient_name: string;
+  display_order: number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+}
+
+export interface RecipePhoto {
+  id: string;
+  recipe_id: string;
+  photo_url: string;
+  is_primary: boolean;
+  display_order: number;
+  uploaded_at: string;
+}
+
+export interface Recipe {
+  id: string;
+  nutritionist_id: string;
+  name: string;
+  description: string;
+  category: RecipeCategory;
+  base_servings: number;
+  prep_time_minutes: number | null;
+  cook_time_minutes: number | null;
+  calories_per_serving: number | null;
+  protein_g_per_serving: number | null;
+  carbs_g_per_serving: number | null;
+  fat_g_per_serving: number | null;
+  ingredients: RecipeIngredient[];
+  tags: Tag[];
+  photos: RecipePhoto[];
+  created_at: string;
+  updated_at: string;
+}
