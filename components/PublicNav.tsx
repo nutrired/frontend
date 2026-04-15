@@ -17,7 +17,7 @@ export function PublicNav() {
       </ul>
       {user ? (
         <a href="/dashboard" className="btn-nav">
-          {user.role === 'nutritionist' ? 'Mi práctica' : 'Mi dashboard'}
+          {user.role === 'nutritionist' ? 'Mi consulta' : 'Mi dashboard'}
         </a>
       ) : (
         <a href="/register" className="btn-nav">Empezar gratis</a>
