@@ -10,8 +10,15 @@ import {
   activateNutritionPlan,
   deleteNutritionPlan,
 } from '@/lib/plans';
-import type { MealOptionPayload, MealPayload, NutritionDayPayload, NutritionPlanPayload } from '@/lib/plans';
-import type { PlanStatus } from '@/lib/types';
+import type {
+  MealOptionPayload,
+  MealPayload,
+  NutritionDayPayload,
+  NutritionPlanPayload,
+  SlotOptionPayload,
+  NutritionPlanSlotPayload,
+} from '@/lib/plans';
+import type { PlanStatus, MealType } from '@/lib/types';
 
 const MEAL_TYPES = [
   { value: 'breakfast',   label: 'Desayuno'     },
@@ -20,6 +27,16 @@ const MEAL_TYPES = [
   { value: 'snack',       label: 'Merienda'     },
   { value: 'dinner',      label: 'Cena'         },
 ];
+
+const MEAL_SLOT_LABELS: Record<MealType, string> = {
+  breakfast:   'Desayuno',
+  mid_morning: 'Media mañana',
+  lunch:       'Almuerzo',
+  snack:       'Merienda',
+  dinner:      'Cena',
+};
+
+const MEAL_SLOT_ORDER: MealType[] = ['breakfast', 'mid_morning', 'lunch', 'snack', 'dinner'];
 
 function emptyOption(): MealOptionPayload {
   return { name: '', description: '', calories: null, protein_g: null, carbs_g: null, fat_g: null, display_order: 0 };
@@ -31,6 +48,14 @@ function emptyMeal(displayOrder: number): MealPayload {
 
 function emptyDay(dayNumber: number): NutritionDayPayload {
   return { day_number: dayNumber, label: '', notes: '', meals: [] };
+}
+
+function emptySlotOption(displayOrder: number): SlotOptionPayload {
+  return {
+    name: '', description: '',
+    calories: null, protein_g: null, carbs_g: null, fat_g: null,
+    display_order: displayOrder,
+  };
 }
 
 const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -59,6 +84,7 @@ export default function EditNutritionPlanPage() {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [days, setDays] = useState<NutritionDayPayload[]>([]);
+  const [slots, setSlots] = useState<NutritionPlanSlotPayload[]>([]);
   const [openDay, setOpenDay] = useState<number | null>(1);
   const [saving, setSaving] = useState(false);
   const [activating, setActivating] = useState(false);
@@ -96,6 +122,27 @@ export default function EditNutritionPlanPage() {
       };
     });
     setDays(merged);
+
+    if (plan.plan_style === 'flexible') {
+      const mergedSlots = MEAL_SLOT_ORDER.map((mealType, i) => {
+        const found = (plan.slots ?? []).find((s) => s.meal_type === mealType);
+        if (!found) return { meal_type: mealType, display_order: i, options: [] };
+        return {
+          meal_type: found.meal_type,
+          display_order: found.display_order,
+          options: found.options.map((o) => ({
+            name: o.name,
+            description: o.description,
+            calories: o.calories,
+            protein_g: o.protein_g,
+            carbs_g: o.carbs_g,
+            fat_g: o.fat_g,
+            display_order: o.display_order,
+          })),
+        };
+      });
+      setSlots(mergedSlots);
+    }
   }, [plan]);
 
   function updateDay(index: number, patch: Partial<NutritionDayPayload>) {
@@ -187,21 +234,57 @@ export default function EditNutritionPlanPage() {
     );
   }
 
+  function addSlotOption(slotIndex: number) {
+    setSlots((prev) =>
+      prev.map((s, i) =>
+        i === slotIndex
+          ? { ...s, options: [...s.options, emptySlotOption(s.options.length)] }
+          : s,
+      ),
+    );
+  }
+
+  function removeSlotOption(slotIndex: number, optIndex: number) {
+    setSlots((prev) =>
+      prev.map((s, i) =>
+        i === slotIndex ? { ...s, options: s.options.filter((_, oi) => oi !== optIndex) } : s,
+      ),
+    );
+  }
+
+  function updateSlotOption(slotIndex: number, optIndex: number, patch: Partial<SlotOptionPayload>) {
+    setSlots((prev) =>
+      prev.map((s, i) =>
+        i === slotIndex
+          ? { ...s, options: s.options.map((o, oi) => (oi === optIndex ? { ...o, ...patch } : o)) }
+          : s,
+      ),
+    );
+  }
+
   function buildPayload(): NutritionPlanPayload {
     return {
       client_id: plan?.client_id ?? '',
       title: title.trim(),
       notes,
       plan_style: plan?.plan_style ?? 'structured',
-      days: days.map((d) => ({
-        ...d,
-        meals: d.meals.map((m, mi) => ({
-          ...m,
-          display_order: mi,
-          options: m.options.map((o, oi) => ({ ...o, display_order: oi })),
-        })),
-      })),
-      slots: plan?.slots ?? [],
+      days: plan?.plan_style === 'structured'
+        ? days.filter((d) => d.meals.length > 0).map((d) => ({
+            ...d,
+            meals: d.meals.map((m, mi) => ({
+              ...m,
+              display_order: mi,
+              options: m.options.map((o, oi) => ({ ...o, display_order: oi })),
+            })),
+          }))
+        : [],
+      slots: plan?.plan_style === 'flexible'
+        ? slots.map((s, si) => ({
+            ...s,
+            display_order: si,
+            options: s.options.map((o, oi) => ({ ...o, display_order: oi })),
+          }))
+        : [],
     };
   }
 
@@ -344,8 +427,9 @@ export default function EditNutritionPlanPage() {
           </div>
         </div>
 
-        {/* Day accordion */}
-        {days.map((day, dayIndex) => (
+        {plan.plan_style === 'structured' ? (
+        /* Day accordion */
+        days.map((day, dayIndex) => (
           <div key={day.day_number} style={{
             border: '1px solid var(--nc-border)', borderRadius: 8, marginBottom: 8, overflow: 'hidden',
           }}>
@@ -529,7 +613,97 @@ export default function EditNutritionPlanPage() {
               </div>
             )}
           </div>
-        ))}
+        ))
+        ) : (
+          /* ─── Flexible slot builder ──────────────────────────────── */
+          <div className="dash-section">
+            <div className="dash-section-head">
+              <div className="dash-section-title">Opciones por franja horaria</div>
+              <div className="dash-section-sub">Añade 2–5 opciones por comida. El cliente elegirá una cada día.</div>
+            </div>
+            <div className="dash-section-body">
+              {slots.map((slot, slotIndex) => (
+                <div key={slot.meal_type} style={{ marginBottom: 24 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-forest)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>
+                    {MEAL_SLOT_LABELS[slot.meal_type]}
+                  </div>
+                  {slot.options.map((opt, optIndex) => (
+                    <div key={optIndex} style={{
+                      border: '1px solid rgba(139,115,85,0.15)', borderRadius: 6,
+                      padding: '10px 14px', marginBottom: 8, background: 'var(--nc-cream)',
+                    }}>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                        <div className="dash-field" style={{ flex: '2 1 180px' }}>
+                          <label className="dash-label">Nombre</label>
+                          <input
+                            className="dash-input"
+                            value={opt.name}
+                            onChange={(e) => updateSlotOption(slotIndex, optIndex, { name: e.target.value })}
+                            disabled={!isDraft}
+                            placeholder="ej: Avena con frutas"
+                          />
+                        </div>
+                        <div className="dash-field" style={{ flex: '3 1 220px' }}>
+                          <label className="dash-label">Descripción</label>
+                          <input
+                            className="dash-input"
+                            value={opt.description}
+                            onChange={(e) => updateSlotOption(slotIndex, optIndex, { description: e.target.value })}
+                            disabled={!isDraft}
+                            placeholder="ej: 60 g avena, 1 plátano, canela"
+                          />
+                        </div>
+                        {([
+                          { field: 'calories'  as const, label: 'kcal',   step: '1'  },
+                          { field: 'protein_g' as const, label: 'Prot(g)', step: '0.1'},
+                          { field: 'carbs_g'   as const, label: 'HC(g)',   step: '0.1'},
+                          { field: 'fat_g'     as const, label: 'Gras(g)', step: '0.1'},
+                        ] as const).map(({ field, label, step }) => (
+                          <div key={field} className="dash-field" style={{ flex: '0 0 72px' }}>
+                            <label className="dash-label">{label}</label>
+                            <input
+                              className="dash-input"
+                              type="number" min="0" step={step}
+                              value={opt[field] ?? ''}
+                              onChange={(e) =>
+                                updateSlotOption(slotIndex, optIndex, {
+                                  [field]: e.target.value === '' ? null : Number(e.target.value),
+                                })
+                              }
+                              disabled={!isDraft}
+                              placeholder="—"
+                            />
+                          </div>
+                        ))}
+                        {isDraft && (
+                          <button
+                            onClick={() => removeSlotOption(slotIndex, optIndex)}
+                            style={{
+                              marginTop: 20, width: 26, height: 26, border: '1px solid var(--nc-border)',
+                              borderRadius: 4, background: 'transparent', cursor: 'pointer',
+                              color: 'var(--nc-stone)', fontSize: 14, display: 'flex',
+                              alignItems: 'center', justifyContent: 'center',
+                            }}
+                            title="Eliminar opción"
+                          >×</button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {isDraft && (
+                    <button
+                      onClick={() => addSlotOption(slotIndex)}
+                      className="dash-btn-add-pkg"
+                      style={{ marginTop: 4 }}
+                    >
+                      + Añadir opción de {MEAL_SLOT_LABELS[slot.meal_type].toLowerCase()}
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {error && <div style={{ color: '#b94a3a', fontSize: 13, marginTop: 8 }}>{error}</div>}
       </div>
