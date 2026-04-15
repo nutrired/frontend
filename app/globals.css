@@ -1646,3 +1646,262 @@
 
 .auth-alert-error { background: rgba(196,98,45,0.08); color: var(--terracotta); }
 .auth-alert-success { background: rgba(44,74,30,0.07); color: var(--olive); }
+
+/* ─────────────────────────────────────────────────────────────────
+   CONTENT PAGES (how, for-nutritionists, about, privacy, terms)
+   ───────────────────────────────────────────────────────────────── */
+
+.content-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--nc-cream);
+}
+
+.content-main {
+  flex: 1;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.content-article {
+  background: white;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.content-article h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--nc-forest);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.content-article h2 {
+  font-size: 1.8rem;
+  color: var(--nc-ink);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.content-article h3 {
+  font-size: 1.3rem;
+  color: var(--nc-forest);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.content-article h4 {
+  font-size: 1.1rem;
+  color: var(--nc-ink);
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.content-article p {
+  line-height: 1.7;
+  color: var(--nc-stone);
+  margin-bottom: 1rem;
+}
+
+.content-article ul,
+.content-article ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  color: var(--nc-stone);
+}
+
+.content-article li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.content-article strong {
+  color: var(--nc-ink);
+  font-weight: 600;
+}
+
+.content-article em {
+  font-style: italic;
+  color: var(--nc-forest);
+}
+
+.content-article a {
+  color: var(--nc-sage);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.content-article a:hover {
+  color: var(--nc-forest);
+}
+
+/* FAQ section styling */
+.content-faq {
+  margin-top: 2rem;
+}
+
+.content-faq-item {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--nc-cream);
+}
+
+.content-faq-item:last-child {
+  border-bottom: none;
+}
+
+.content-faq-question {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--nc-ink);
+  margin-bottom: 0.5rem;
+}
+
+.content-faq-answer {
+  color: var(--nc-stone);
+  line-height: 1.6;
+}
+
+/* Step cards for /how page */
+.content-steps {
+  display: grid;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.content-step-card {
+  background: var(--nc-cream);
+  padding: 2rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--nc-sage);
+}
+
+.content-step-number {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--nc-sage);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.content-step-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--nc-forest);
+  margin-bottom: 0.75rem;
+}
+
+.content-step-desc {
+  color: var(--nc-stone);
+  line-height: 1.6;
+}
+
+/* Value prop cards for /for-nutritionists */
+.content-value-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.content-value-card {
+  background: white;
+  border: 2px solid var(--nc-cream);
+  padding: 2rem;
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+.content-value-card:hover {
+  border-color: var(--nc-sage);
+}
+
+.content-value-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--nc-forest);
+  margin-bottom: 0.75rem;
+}
+
+.content-value-desc {
+  color: var(--nc-stone);
+  line-height: 1.6;
+}
+
+/* Pricing table for /for-nutritionists */
+.content-pricing-table {
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.content-pricing-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-pricing-table th,
+.content-pricing-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--nc-cream);
+}
+
+.content-pricing-table th {
+  background: var(--nc-cream);
+  color: var(--nc-forest);
+  font-weight: 600;
+}
+
+.content-pricing-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* CTA button in content pages */
+.content-cta {
+  text-align: center;
+  margin: 3rem 0 2rem;
+}
+
+.content-cta-btn {
+  display: inline-block;
+  background: var(--nc-sage);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.content-cta-btn:hover {
+  background: var(--nc-forest);
+  color: white;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .content-main {
+    padding: 2rem 1rem;
+  }
+
+  .content-article {
+    padding: 2rem 1.5rem;
+  }
+
+  .content-article h1 {
+    font-size: 2rem;
+  }
+
+  .content-article h2 {
+    font-size: 1.5rem;
+  }
+}
