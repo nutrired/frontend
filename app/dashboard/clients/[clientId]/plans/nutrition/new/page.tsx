@@ -152,6 +152,7 @@ export default function NewNutritionPlanPage() {
         client_id: clientId,
         title: title.trim(),
         notes,
+        plan_style: 'structured',
         days: days.map((d, i) => ({
           ...d,
           meals: d.meals.map((m, mi) => ({
@@ -160,6 +161,7 @@ export default function NewNutritionPlanPage() {
             options: m.options.map((o, oi) => ({ ...o, display_order: oi })),
           })),
         })),
+        slots: [],
       };
       const { id } = await createNutritionPlan(payload);
       router.push(`/dashboard/clients/${clientId}/plans/nutrition/${id}`);

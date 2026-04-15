@@ -136,6 +136,7 @@ export interface WaitlistEntryView {
 // ─── Plans ────────────────────────────────────────────────────────────────────
 
 export type PlanStatus = 'draft' | 'active' | 'archived';
+export type PlanStyle = 'structured' | 'flexible';
 export type MealType = 'breakfast' | 'mid_morning' | 'lunch' | 'snack' | 'dinner';
 
 export interface MealOption {
@@ -148,6 +149,26 @@ export interface MealOption {
   carbs_g: number | null;
   fat_g: number | null;
   display_order: number;
+}
+
+export interface SlotOption {
+  id: string;
+  slot_id: string;
+  name: string;
+  description: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  display_order: number;
+}
+
+export interface NutritionPlanSlot {
+  id: string;
+  plan_id: string;
+  meal_type: MealType;
+  display_order: number;
+  options: SlotOption[];
 }
 
 export interface Meal {
@@ -174,8 +195,10 @@ export interface NutritionPlan {
   client_id: string;
   title: string;
   notes: string;
+  plan_style: PlanStyle;
   status: PlanStatus;
   days: NutritionPlanDay[];
+  slots: NutritionPlanSlot[];
   created_at: string;
   updated_at: string;
 }

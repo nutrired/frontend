@@ -192,6 +192,7 @@ export default function EditNutritionPlanPage() {
       client_id: plan?.client_id ?? '',
       title: title.trim(),
       notes,
+      plan_style: plan?.plan_style ?? 'structured',
       days: days.map((d) => ({
         ...d,
         meals: d.meals.map((m, mi) => ({
@@ -200,6 +201,7 @@ export default function EditNutritionPlanPage() {
           options: m.options.map((o, oi) => ({ ...o, display_order: oi })),
         })),
       })),
+      slots: plan?.slots ?? [],
     };
   }
 

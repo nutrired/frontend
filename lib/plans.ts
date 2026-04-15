@@ -22,6 +22,22 @@ export interface MealOptionPayload {
   display_order: number;
 }
 
+export interface SlotOptionPayload {
+  name: string;
+  description: string;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  display_order: number;
+}
+
+export interface NutritionPlanSlotPayload {
+  meal_type: MealType;
+  display_order: number;
+  options: SlotOptionPayload[];
+}
+
 export interface MealPayload {
   name: string;
   meal_type: MealType;
@@ -40,7 +56,9 @@ export interface NutritionPlanPayload {
   client_id: string;
   title: string;
   notes: string;
+  plan_style: 'structured' | 'flexible';
   days: NutritionDayPayload[];
+  slots: NutritionPlanSlotPayload[];
 }
 
 export interface ExercisePayload {
