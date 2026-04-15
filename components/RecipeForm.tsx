@@ -1,10 +1,10 @@
 'use client';
 // frontend/components/RecipeForm.tsx
 
-import { useState, useCallback, ChangeEvent, FormEvent } from 'react';
-import type { Recipe, RecipeCategory, RecipeIngredient, Tag } from '@/lib/types';
+import { useState, useCallback, ChangeEvent, FormEvent, useRef, DragEvent } from 'react';
+import type { Recipe, RecipeCategory, RecipeIngredient, Tag, RecipePhoto } from '@/lib/types';
 import type { RecipePayload, RecipeIngredientPayload } from '@/lib/recipes';
-import { autocompleteTags, uploadRecipePhoto } from '@/lib/recipes';
+import { autocompleteTags, uploadRecipePhoto, deleteRecipePhoto, setPrimaryPhoto } from '@/lib/recipes';
 
 const CATEGORIES: { value: RecipeCategory; label: string }[] = [
   { value: 'breakfast', label: 'Desayuno' },
@@ -88,6 +88,13 @@ export default function RecipeForm({
   const [tagInput, setTagInput] = useState('');
   const [tagSuggestions, setTagSuggestions] = useState<Tag[]>([]);
 
+  // Photo state
+  const [photos, setPhotos] = useState<RecipePhoto[]>(initialData?.photos ?? []);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string>('');
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -147,6 +154,102 @@ export default function RecipeForm({
         addTag(tagInput);
       }
     }
+  };
+
+  // ─── Photo Upload ─────────────────────────────────────────────────────────────
+
+  const handleFileSelect = async (files: FileList | null) => {
+    if (!files || files.length === 0 || !initialData) return;
+
+    const recipeId = initialData.id;
+    const currentCount = photos.length;
+    const remainingSlots = 10 - currentCount;
+
+    if (remainingSlots <= 0) {
+      setError('Has alcanzado el límite de 10 fotos por receta.');
+      return;
+    }
+
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+    setUploading(true);
+    setUploadProgress(`Subiendo ${filesToUpload.length} foto(s)...`);
+    setError('');
+
+    try {
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const file = filesToUpload[i];
+        setUploadProgress(`Subiendo foto ${i + 1} de ${filesToUpload.length}...`);
+
+        // Get presigned URL from backend
+        const { photo, presigned_url } = await uploadRecipePhoto(recipeId, file.type);
+
+        // Upload file directly to R2
+        const uploadResponse = await fetch(presigned_url, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Error al subir foto ${i + 1}`);
+        }
+
+        // Add photo to local state
+        setPhotos(prev => [...prev, photo]);
+      }
+      setUploadProgress('');
+    } catch (err: any) {
+      setError(err?.message ?? 'Error al subir las fotos.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    if (!initialData) return;
+    if (!confirm('¿Eliminar esta foto?')) return;
+
+    try {
+      await deleteRecipePhoto(initialData.id, photoId);
+      setPhotos(prev => prev.filter(p => p.id !== photoId));
+    } catch (err: any) {
+      setError(err?.message ?? 'Error al eliminar la foto.');
+    }
+  };
+
+  const handleSetPrimary = async (photoId: string) => {
+    if (!initialData) return;
+
+    try {
+      await setPrimaryPhoto(initialData.id, photoId);
+      setPhotos(prev =>
+        prev.map(p => ({
+          ...p,
+          is_primary: p.id === photoId,
+        }))
+      );
+    } catch (err: any) {
+      setError(err?.message ?? 'Error al establecer foto principal.');
+    }
+  };
+
+  const handleDrag = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    handleFileSelect(e.dataTransfer.files);
   };
 
   // ─── Submit ───────────────────────────────────────────────────────────────────
@@ -569,26 +672,195 @@ export default function RecipeForm({
           <div className="dash-section-head">
             <div className="dash-section-title">Fotos</div>
             <div className="dash-section-sub">
-              Puedes subir hasta 10 fotos. La primera será la foto principal.
+              Máximo 10 fotos. Haz clic en la estrella para establecer la foto principal.
             </div>
           </div>
           <div className="dash-section-body">
+            {/* Upload area */}
             <div
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
               style={{
-                padding: '24px',
-                border: '2px dashed var(--nc-border)',
+                padding: '32px',
+                border: `2px dashed ${dragActive ? 'var(--nc-forest)' : 'var(--nc-border)'}`,
                 borderRadius: 8,
                 textAlign: 'center',
-                background: 'var(--nc-bg-pale)',
+                background: dragActive ? 'var(--nc-forest-pale)' : 'var(--nc-bg-pale)',
+                cursor: photos.length >= 10 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s',
+                marginBottom: photos.length > 0 ? 20 : 0,
+              }}
+              onClick={() => {
+                if (photos.length < 10 && !uploading) {
+                  fileInputRef.current?.click();
+                }
               }}
             >
-              <div style={{ fontSize: 14, color: 'var(--nc-stone)', marginBottom: 8 }}>
-                La función de subida de fotos estará disponible próximamente
-              </div>
-              <div style={{ fontSize: 12, color: 'var(--nc-stone-light)' }}>
-                Podrás subir fotos de tus recetas directamente a CloudFlare R2
-              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={e => handleFileSelect(e.target.files)}
+                disabled={uploading || photos.length >= 10}
+              />
+              {uploading ? (
+                <>
+                  <div style={{ fontSize: 14, color: 'var(--nc-forest)', marginBottom: 4 }}>
+                    {uploadProgress}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--nc-stone-light)' }}>
+                    Por favor espera...
+                  </div>
+                </>
+              ) : photos.length >= 10 ? (
+                <>
+                  <div style={{ fontSize: 14, color: 'var(--nc-stone)', marginBottom: 4 }}>
+                    Límite de fotos alcanzado
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--nc-stone-light)' }}>
+                    Has subido el máximo de 10 fotos
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 14, color: 'var(--nc-forest)', marginBottom: 4 }}>
+                    Arrastra fotos aquí o haz clic para seleccionar
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--nc-stone-light)' }}>
+                    {photos.length > 0
+                      ? `${photos.length}/10 fotos subidas`
+                      : 'JPG, PNG o WebP'}
+                  </div>
+                </>
+              )}
             </div>
+
+            {/* Photo grid */}
+            {photos.length > 0 && (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                  gap: 12,
+                }}
+              >
+                {photos
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map(photo => (
+                    <div
+                      key={photo.id}
+                      style={{
+                        position: 'relative',
+                        aspectRatio: '1',
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        border: photo.is_primary
+                          ? '3px solid var(--nc-forest)'
+                          : '1px solid var(--nc-border)',
+                        boxShadow: photo.is_primary
+                          ? '0 4px 12px rgba(26,51,41,0.15)'
+                          : 'none',
+                      }}
+                    >
+                      <img
+                        src={photo.photo_url}
+                        alt=""
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+
+                      {/* Primary badge */}
+                      {photo.is_primary && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 8,
+                            left: 8,
+                            background: 'var(--nc-forest)',
+                            color: 'white',
+                            fontSize: 10,
+                            padding: '4px 8px',
+                            borderRadius: 4,
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                          }}
+                        >
+                          Principal
+                        </div>
+                      )}
+
+                      {/* Actions overlay */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: 'rgba(0,0,0,0.5)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                          opacity: 0,
+                          transition: 'opacity 0.2s',
+                        }}
+                        onMouseEnter={e => {
+                          e.currentTarget.style.opacity = '1';
+                        }}
+                        onMouseLeave={e => {
+                          e.currentTarget.style.opacity = '0';
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleSetPrimary(photo.id)}
+                          disabled={photo.is_primary}
+                          style={{
+                            background: photo.is_primary
+                              ? 'rgba(255,255,255,0.3)'
+                              : 'white',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '8px 10px',
+                            cursor: photo.is_primary ? 'default' : 'pointer',
+                            fontSize: 16,
+                            lineHeight: 1,
+                          }}
+                          title="Establecer como principal"
+                        >
+                          {photo.is_primary ? '⭐' : '☆'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          style={{
+                            background: 'var(--nc-terra)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: 4,
+                            padding: '8px 10px',
+                            cursor: 'pointer',
+                            fontSize: 16,
+                            lineHeight: 1,
+                          }}
+                          title="Eliminar"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -30,9 +30,15 @@ export interface RecipePayload {
 }
 
 export interface UploadPhotoResponse {
-  photo_id: string;
-  upload_url: string;
-  photo_url: string;
+  photo: {
+    id: string;
+    recipe_id: string;
+    photo_url: string;
+    is_primary: boolean;
+    display_order: number;
+    uploaded_at: string;
+  };
+  presigned_url: string;
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -87,7 +93,7 @@ export async function deleteRecipe(id: string): Promise<void> {
 
 export async function uploadRecipePhoto(
   recipeId: string,
-  contentType: string,
+  contentType: string = 'image/jpeg',
 ): Promise<UploadPhotoResponse> {
   return api.post<UploadPhotoResponse>(`/recipes/${recipeId}/photos`, {
     content_type: contentType,
