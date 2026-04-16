@@ -179,6 +179,46 @@ export default function RecipeForm({
     return { valid: Object.keys(errors).length === 0, errors };
   }, [name, category, baseServings]);
 
+  // ─── Build Payload ────────────────────────────────────────────────────────────
+
+  const buildPayload = useCallback((): { payload: RecipePayload | null; error: string } => {
+    const ingredientPayloads: RecipeIngredientPayload[] = [];
+    for (let i = 0; i < ingredients.length; i++) {
+      const ing = ingredients[i];
+      if (!ing.ingredient_name.trim()) continue;
+      const amount = parseFloat(ing.amount);
+      if (isNaN(amount) || amount <= 0) {
+        return { payload: null, error: `Ingrediente ${i + 1}: la cantidad debe ser un número positivo.` };
+      }
+      if (!ing.unit.trim()) {
+        return { payload: null, error: `Ingrediente ${i + 1}: la unidad es obligatoria.` };
+      }
+      ingredientPayloads.push({
+        amount,
+        unit: ing.unit.trim(),
+        ingredient_name: ing.ingredient_name.trim(),
+        display_order: i,
+      });
+    }
+
+    const payload: RecipePayload = {
+      name: name.trim(),
+      description: description.trim(),
+      category,
+      base_servings: parseFloat(baseServings),
+      prep_time_minutes: prepTime ? parseInt(prepTime, 10) : null,
+      cook_time_minutes: cookTime ? parseInt(cookTime, 10) : null,
+      calories_per_serving: calories ? parseInt(calories, 10) : null,
+      protein_g_per_serving: protein ? parseFloat(protein) : null,
+      carbs_g_per_serving: carbs ? parseFloat(carbs) : null,
+      fat_g_per_serving: fat ? parseFloat(fat) : null,
+      ingredients: ingredientPayloads,
+      tags: selectedTags,
+    };
+
+    return { payload, error: '' };
+  }, [name, description, category, baseServings, prepTime, cookTime, calories, protein, carbs, fat, ingredients, selectedTags]);
+
   // ─── Photo Upload ─────────────────────────────────────────────────────────────
 
   const handleFileSelect = async (files: FileList | null) => {
@@ -204,45 +244,13 @@ export default function RecipeForm({
       setError('');
 
       try {
-        const ingredientPayloads: RecipeIngredientPayload[] = [];
-        for (let i = 0; i < ingredients.length; i++) {
-          const ing = ingredients[i];
-          if (!ing.ingredient_name.trim()) continue;
-          const amount = parseFloat(ing.amount);
-          if (isNaN(amount) || amount <= 0) {
-            setError(`Ingrediente ${i + 1}: la cantidad debe ser un número positivo.`);
-            setUploading(false);
-            setUploadProgress('');
-            return;
-          }
-          if (!ing.unit.trim()) {
-            setError(`Ingrediente ${i + 1}: la unidad es obligatoria.`);
-            setUploading(false);
-            setUploadProgress('');
-            return;
-          }
-          ingredientPayloads.push({
-            amount,
-            unit: ing.unit.trim(),
-            ingredient_name: ing.ingredient_name.trim(),
-            display_order: i,
-          });
+        const { payload, error: buildError } = buildPayload();
+        if (!payload) {
+          setError(buildError);
+          setUploading(false);
+          setUploadProgress('');
+          return;
         }
-
-        const payload: RecipePayload = {
-          name: name.trim(),
-          description: description.trim(),
-          category,
-          base_servings: parseFloat(baseServings),
-          prep_time_minutes: prepTime ? parseInt(prepTime, 10) : null,
-          cook_time_minutes: cookTime ? parseInt(cookTime, 10) : null,
-          calories_per_serving: calories ? parseInt(calories, 10) : null,
-          protein_g_per_serving: protein ? parseFloat(protein) : null,
-          carbs_g_per_serving: carbs ? parseFloat(carbs) : null,
-          fat_g_per_serving: fat ? parseFloat(fat) : null,
-          ingredients: ingredientPayloads,
-          tags: selectedTags,
-        };
 
         const result = await onAutoSave(payload);
         setAutoSavedId(result.id);
@@ -321,11 +329,12 @@ export default function RecipeForm({
   };
 
   const handleDeletePhoto = async (photoId: string) => {
-    if (!initialData) return;
+    if (!initialData && !autoSavedId) return;
     if (!confirm('¿Eliminar esta foto?')) return;
 
+    const recipeId = initialData?.id ?? autoSavedId!;
     try {
-      await deleteRecipePhoto(initialData.id, photoId);
+      await deleteRecipePhoto(recipeId, photoId);
       setPhotos(prev => prev.filter(p => p.id !== photoId));
     } catch (err: any) {
       setError(err?.message ?? 'Error al eliminar la foto.');
@@ -333,10 +342,11 @@ export default function RecipeForm({
   };
 
   const handleSetPrimary = async (photoId: string) => {
-    if (!initialData) return;
+    if (!initialData && !autoSavedId) return;
 
+    const recipeId = initialData?.id ?? autoSavedId!;
     try {
-      await setPrimaryPhoto(initialData.id, photoId);
+      await setPrimaryPhoto(recipeId, photoId);
       setPhotos(prev =>
         prev.map(p => ({
           ...p,
@@ -376,52 +386,22 @@ export default function RecipeForm({
       setError('El nombre de la receta es obligatorio.');
       return;
     }
-    const servings = parseInt(baseServings, 10);
-    if (isNaN(servings) || servings < 1) {
+    const servings = parseFloat(baseServings);
+    if (isNaN(servings) || servings <= 0) {
       setError('Las porciones deben ser un número mayor a 0.');
       return;
     }
 
-    const ingredientPayloads: RecipeIngredientPayload[] = [];
-    for (let i = 0; i < ingredients.length; i++) {
-      const ing = ingredients[i];
-      if (!ing.ingredient_name.trim()) continue;
-      const amount = parseFloat(ing.amount);
-      if (isNaN(amount) || amount <= 0) {
-        setError(`Ingrediente ${i + 1}: la cantidad debe ser un número positivo.`);
-        return;
-      }
-      if (!ing.unit.trim()) {
-        setError(`Ingrediente ${i + 1}: la unidad es obligatoria.`);
-        return;
-      }
-      ingredientPayloads.push({
-        amount,
-        unit: ing.unit.trim(),
-        ingredient_name: ing.ingredient_name.trim(),
-        display_order: i,
-      });
-    }
-
-    if (ingredientPayloads.length === 0) {
-      setError('Debes agregar al menos un ingrediente.');
+    const { payload, error: buildError } = buildPayload();
+    if (!payload) {
+      setError(buildError);
       return;
     }
 
-    const payload: RecipePayload = {
-      name: name.trim(),
-      description: description.trim(),
-      category,
-      base_servings: servings,
-      prep_time_minutes: prepTime ? parseInt(prepTime, 10) : null,
-      cook_time_minutes: cookTime ? parseInt(cookTime, 10) : null,
-      calories_per_serving: calories ? parseInt(calories, 10) : null,
-      protein_g_per_serving: protein ? parseFloat(protein) : null,
-      carbs_g_per_serving: carbs ? parseFloat(carbs) : null,
-      fat_g_per_serving: fat ? parseFloat(fat) : null,
-      ingredients: ingredientPayloads,
-      tags: selectedTags,
-    };
+    if (payload.ingredients.length === 0) {
+      setError('Debes agregar al menos un ingrediente.');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -822,7 +802,7 @@ export default function RecipeForm({
       </div>
 
       {/* Photos section - only show for edit mode when recipe exists */}
-      {initialData && (
+      {(initialData || autoSavedId) && (
         <div className="dash-section">
           <div className="dash-section-head">
             <div className="dash-section-title">Fotos</div>
