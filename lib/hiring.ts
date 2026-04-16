@@ -73,8 +73,8 @@ export async function openBillingPortal(): Promise<string> {
 
 export function useBusinessDashboard() {
   const { data, error, isLoading } = useSWR<BusinessDashboardData>(
-    '/nutritionist/business-dashboard',
-    () => api.get<BusinessDashboardData>('/nutritionist/business-dashboard'),
+    '/hiring/business-dashboard',
+    () => api.get<BusinessDashboardData>('/hiring/business-dashboard'),
   );
   return {
     data: data ?? null,
