@@ -17,7 +17,7 @@ function emptyBlock(displayOrder: number): WorkoutBlockPayload {
 }
 
 function emptyDay(dayNumber: number): ExerciseDayPayload {
-  return { day_number: dayNumber, label: '', notes: '', blocks: [] };
+  return { day_number: dayNumber, label: '', notes: '', day_type: 'strength', blocks: [], activities: [] };
 }
 
 function initDays(): ExerciseDayPayload[] {

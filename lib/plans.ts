@@ -70,6 +70,14 @@ export interface ExercisePayload {
   display_order: number;
 }
 
+export interface CardioActivityPayload {
+  name: string;
+  duration_minutes: number | null;
+  distance_km: number | null;
+  notes: string;
+  display_order: number;
+}
+
 export interface WorkoutBlockPayload {
   name: string;
   display_order: number;
@@ -80,7 +88,9 @@ export interface ExerciseDayPayload {
   day_number: number;
   label: string;
   notes: string;
+  day_type: 'strength' | 'cardio' | 'rest';
   blocks: WorkoutBlockPayload[];
+  activities: CardioActivityPayload[];
 }
 
 export interface ExercisePlanPayload {

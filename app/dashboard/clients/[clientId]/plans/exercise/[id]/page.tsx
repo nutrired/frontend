@@ -25,7 +25,7 @@ function emptyBlock(displayOrder: number): WorkoutBlockPayload {
 }
 
 function emptyDay(dayNumber: number): ExerciseDayPayload {
-  return { day_number: dayNumber, label: '', notes: '', blocks: [] };
+  return { day_number: dayNumber, label: '', notes: '', day_type: 'strength', blocks: [], activities: [] };
 }
 
 function StatusPill({ status }: { status: PlanStatus }) {
@@ -72,6 +72,7 @@ export default function EditExercisePlanPage() {
         day_number: found.day_number,
         label: found.label,
         notes: found.notes,
+        day_type: found.day_type,
         blocks: found.blocks.map((b) => ({
           name: b.name,
           display_order: b.display_order,
@@ -83,6 +84,13 @@ export default function EditExercisePlanPage() {
             notes: e.notes,
             display_order: e.display_order,
           })),
+        })),
+        activities: found.activities.map((a) => ({
+          name: a.name,
+          duration_minutes: a.duration_minutes,
+          distance_km: a.distance_km,
+          notes: a.notes,
+          display_order: a.display_order,
         })),
       };
     });

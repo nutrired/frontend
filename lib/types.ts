@@ -138,6 +138,7 @@ export interface WaitlistEntryView {
 export type PlanStatus = 'draft' | 'active' | 'archived';
 export type PlanStyle = 'structured' | 'flexible';
 export type MealType = 'breakfast' | 'mid_morning' | 'lunch' | 'snack' | 'dinner';
+export type DayType = 'strength' | 'cardio' | 'rest';
 
 export interface MealOption {
   id: string;
@@ -214,6 +215,16 @@ export interface Exercise {
   display_order: number;
 }
 
+export interface CardioActivity {
+  id: string;
+  plan_day_id: string;
+  name: string;
+  duration_minutes: number | null;
+  distance_km: number | null;
+  notes: string;
+  display_order: number;
+}
+
 export interface WorkoutBlock {
   id: string;
   plan_day_id: string;
@@ -228,7 +239,9 @@ export interface ExercisePlanDay {
   day_number: number;
   label: string;
   notes: string;
+  day_type: DayType;
   blocks: WorkoutBlock[];
+  activities: CardioActivity[];
 }
 
 export interface ExercisePlan {
