@@ -239,3 +239,23 @@ export async function activateExercisePlan(id: string): Promise<void> {
 export async function deleteExercisePlan(id: string): Promise<void> {
   await api.del<void>(`/plans/exercise/${id}`);
 }
+
+// ─── Mutations: Duplicate plans ───────────────────────────────────────────────
+
+export async function duplicatePlans(
+  clientId: string,
+  nutritionPlanId?: string,
+  exercisePlanId?: string,
+): Promise<{
+  nutrition_plan?: { id: string };
+  exercise_plan?: { id: string };
+}> {
+  return api.post<{
+    nutrition_plan?: { id: string };
+    exercise_plan?: { id: string };
+  }>('/plans/duplicate', {
+    client_id: clientId,
+    nutrition_plan_id: nutritionPlanId ?? null,
+    exercise_plan_id: exercisePlanId ?? null,
+  });
+}
