@@ -303,3 +303,43 @@ export interface Recipe {
   created_at: string;
   updated_at: string;
 }
+
+// ─── Business Dashboard ───────────────────────────────────────────────────────
+
+export interface PackageRevenue {
+  package_name: string;
+  price_cents: number;
+  client_count: number;
+  billing_cycle: 'monthly' | 'one_time';
+}
+
+export interface RevenueByType {
+  total_cents: number;
+  client_count: number;
+  packages: PackageRevenue[];
+}
+
+export interface ContractItem {
+  client_name: string;
+  package_name: string;
+  price_cents: number;
+  billing_cycle: 'monthly' | 'one_time';
+  starts_at: string;
+  status: 'active' | 'pending_intro' | 'cancelled';
+}
+
+export interface BusinessDashboardData {
+  mrr_cents: number;
+  mrr_client_count: number;
+  one_time_revenue_this_month_cents: number;
+  one_time_client_count: number;
+  total_active_contracts: number;
+  avg_contract_value_cents: number;
+  revenue_monthly: RevenueByType;
+  revenue_one_time: RevenueByType;
+  contracts: ContractItem[];
+  nutritionist_tier: 'free' | 'pro' | 'premium';
+  tier_cost_cents: number;
+  tier_capacity: number;
+  active_clients_count: number;
+}

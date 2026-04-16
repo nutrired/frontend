@@ -64,6 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/my-nutritionist', label: 'My nutritionist', icon: '◉', roles: ['client'] },
     { href: '/dashboard/my-plans', label: 'Mis planes', icon: '◈', roles: ['client'] },
     { href: '/dashboard/billing', label: 'Billing & Earnings', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/business', label: 'Business Dashboard', icon: '◈', roles: ['nutritionist'] },
   ].filter((item) => item.roles.includes(user.role));
 
   const settingsItems = [

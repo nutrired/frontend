@@ -3,7 +3,7 @@
 
 import useSWR, { mutate } from 'swr';
 import { api } from './api';
-import type { ClientRelationshipView, NutritionistRelationshipView, WaitlistEntryView } from './types';
+import type { ClientRelationshipView, NutritionistRelationshipView, WaitlistEntryView, BusinessDashboardData } from './types';
 
 // ─── Client hooks ─────────────────────────────────────────────────────────────
 
@@ -69,4 +69,16 @@ export async function subscribeToTier(tier: 'pro' | 'premium'): Promise<string> 
 export async function openBillingPortal(): Promise<string> {
   const res = await api.post<{ portal_url: string }>('/hiring/billing-portal', {});
   return res.portal_url;
+}
+
+export function useBusinessDashboard() {
+  const { data, error, isLoading } = useSWR<BusinessDashboardData>(
+    '/nutritionist/business-dashboard',
+    () => api.get<BusinessDashboardData>('/nutritionist/business-dashboard'),
+  );
+  return {
+    data: data ?? null,
+    isLoading,
+    error,
+  };
 }
