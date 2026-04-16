@@ -68,7 +68,6 @@ export default function RecipePickerModal({ isOpen, onClose, onSelect }: RecipeP
   // Confirm selection with adjusted macros
   const handleConfirm = () => {
     if (!selectedRecipe) return;
-    const ratio = servings / selectedRecipe.base_servings;
     onSelect({
       name: `${selectedRecipe.name} (${servings} ${servings === 1 ? 'porción' : 'porciones'})`,
       description: selectedRecipe.description,
@@ -185,7 +184,7 @@ export default function RecipePickerModal({ isOpen, onClose, onSelect }: RecipeP
           {isLoading ? (
             <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando recetas...</div>
           ) : error ? (
-            <div style={{ color: 'var(--nc-terra)', fontSize: 14 }}>Error al cargar recetas</div>
+            <div style={{ color: 'var(--nc-terra)', fontSize: 14 }}>Error al cargar recetas. Intenta de nuevo.</div>
           ) : recipes.length === 0 ? (
             <div
               style={{
@@ -195,15 +194,29 @@ export default function RecipePickerModal({ isOpen, onClose, onSelect }: RecipeP
                 fontSize: 14,
               }}
             >
-              {debouncedSearch || category !== 'all'
-                ? 'No se encontraron recetas con esos filtros.'
-                : 'No tienes recetas aún.'}
+              {debouncedSearch || category !== 'all' ? (
+                'No se encontraron recetas con esos filtros.'
+              ) : (
+                <>
+                  No tienes recetas aún.{' '}
+                  <a
+                    href="/dashboard/my-recipes/new"
+                    style={{
+                      color: 'var(--nc-forest)',
+                      textDecoration: 'none',
+                      fontWeight: 500,
+                    }}
+                  >
+                    Crear mi primera receta →
+                  </a>
+                </>
+              )}
             </div>
           ) : (
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
                 gap: 16,
               }}
             >
@@ -239,17 +252,38 @@ export default function RecipePickerModal({ isOpen, onClose, onSelect }: RecipeP
                     {/* Photo */}
                     <div
                       style={{
-                        height: 140,
-                        background: primaryPhoto
-                          ? `url(${primaryPhoto.photo_url}) center/cover`
-                          : 'linear-gradient(135deg, var(--nc-forest-pale), var(--nc-cream))',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
+                        padding: 12,
+                        background: 'var(--nc-cream)',
                       }}
                     >
-                      {!primaryPhoto && (
-                        <span style={{ fontSize: 36, opacity: 0.3 }}>🍽️</span>
+                      {primaryPhoto ? (
+                        <img
+                          src={primaryPhoto.photo_url}
+                          alt={recipe.name}
+                          style={{
+                            width: 80,
+                            height: 80,
+                            objectFit: 'cover',
+                            borderRadius: 8,
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: 8,
+                            background: 'linear-gradient(135deg, var(--nc-forest-pale), var(--nc-cream))',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <span style={{ fontSize: 36, opacity: 0.3 }}>🍽️</span>
+                        </div>
                       )}
                     </div>
 
@@ -386,11 +420,11 @@ export default function RecipePickerModal({ isOpen, onClose, onSelect }: RecipeP
           </button>
           <button
             onClick={handleConfirm}
-            disabled={!selectedRecipe}
+            disabled={!selectedRecipe || servings < 0.1 || servings > 99.9}
             className="btn-primary"
             style={{
-              opacity: selectedRecipe ? 1 : 0.5,
-              cursor: selectedRecipe ? 'pointer' : 'not-allowed',
+              opacity: selectedRecipe && servings >= 0.1 && servings <= 99.9 ? 1 : 0.5,
+              cursor: selectedRecipe && servings >= 0.1 && servings <= 99.9 ? 'pointer' : 'not-allowed',
             }}
           >
             Confirmar
