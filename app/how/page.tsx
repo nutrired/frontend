@@ -11,7 +11,7 @@ export default function HowItWorks() {
           <h1>Tu camino hacia una mejor alimentación</h1>
           <p>
             Encontrar el nutricionista adecuado y empezar tu proceso de transformación
-            es más simple de lo que piensas. En NutriConnect, todo está diseñado para que
+            es más simple de lo que piensas. En Nutri Red, todo está diseñado para que
             te centres en lo importante: tu salud y tus objetivos.
           </p>
 
@@ -79,7 +79,7 @@ export default function HowItWorks() {
             <div className="content-faq-item">
               <div className="content-faq-question">¿Cuánto cuesta para mí como cliente?</div>
               <div className="content-faq-answer">
-                Usar NutriConnect es <strong>completamente gratis</strong> para clientes.
+                Usar Nutri Red es <strong>completamente gratis</strong> para clientes.
                 No hay cargos por registrarte, buscar nutricionistas o conectar con ellos.
                 El nutricionista establece su propia tarifa por sus servicios profesionales,
                 que pagas directamente a ellos — no hay comisiones ocultas ni cargos adicionales
@@ -109,7 +109,7 @@ export default function HowItWorks() {
             <div className="content-faq-item">
               <div className="content-faq-question">¿Los nutricionistas están certificados?</div>
               <div className="content-faq-answer">
-                Sí. Todos los nutricionistas en NutriConnect son profesionales certificados y licenciados.
+                Sí. Todos los nutricionistas en Nutri Red son profesionales certificados y licenciados.
                 Verificamos sus credenciales antes de aprobar sus perfiles en la plataforma.
               </div>
             </div>

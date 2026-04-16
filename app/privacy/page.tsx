@@ -13,13 +13,13 @@ export default function Privacy() {
 
           <h2>1. Introducción</h2>
           <p>
-            Bienvenido a NutriConnect ("nosotros", "nuestro" o "la plataforma"). Estamos comprometidos
+            Bienvenido a Nutri Red ("nosotros", "nuestro" o "la plataforma"). Estamos comprometidos
             con la protección de tu privacidad y tus datos personales. Esta política de privacidad
             explica qué datos recopilamos, cómo los usamos, con quién los compartimos, y cuáles
             son tus derechos.
           </p>
           <p>
-            NutriConnect es una plataforma con sede en España que conecta clientes con nutricionistas
+            Nutri Red es una plataforma con sede en España que conecta clientes con nutricionistas
             certificados. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.
           </p>
 
@@ -121,7 +121,7 @@ export default function Privacy() {
           </ul>
           <p>
             Para ejercer estos derechos, envía un email a{' '}
-            <a href="mailto:privacy@nutriconnect.com">privacy@nutriconnect.com</a>.
+            <a href="mailto:privacy@nutri.red">privacy@nutri.red</a>.
             Responderemos en un plazo de 30 días.
           </p>
 
@@ -161,14 +161,14 @@ export default function Privacy() {
 
           <h2>9. Internacional y GDPR</h2>
           <p>
-            NutriConnect está diseñado para cumplir con el <strong>Reglamento General de Protección de Datos (GDPR)</strong>
+            Nutri Red está diseñado para cumplir con el <strong>Reglamento General de Protección de Datos (GDPR)</strong>
             de la Unión Europea. Si nuestros servidores están ubicados fuera de la UE, garantizamos
             que las transferencias internacionales cumplen con las salvaguardas apropiadas.
           </p>
 
           <h2>10. Menores de Edad</h2>
           <p>
-            NutriConnect es un servicio para <strong>mayores de 18 años</strong>. No recopilamos
+            Nutri Red es un servicio para <strong>mayores de 18 años</strong>. No recopilamos
             intencionalmente datos de menores. Si descubrimos que un menor se ha registrado,
             eliminaremos su cuenta de inmediato.
           </p>
@@ -189,7 +189,7 @@ export default function Privacy() {
             contáctanos en:
           </p>
           <p>
-            <strong>Email:</strong> <a href="mailto:privacy@nutriconnect.com">privacy@nutriconnect.com</a>
+            <strong>Email:</strong> <a href="mailto:privacy@nutri.red">privacy@nutri.red</a>
           </p>
 
         </article>

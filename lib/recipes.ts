@@ -38,7 +38,6 @@ export interface UploadPhotoResponse {
     display_order: number;
     uploaded_at: string;
   };
-  presigned_url: string;
 }
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
@@ -93,11 +92,25 @@ export async function deleteRecipe(id: string): Promise<void> {
 
 export async function uploadRecipePhoto(
   recipeId: string,
-  contentType: string = 'image/jpeg',
+  file: File,
 ): Promise<UploadPhotoResponse> {
-  return api.post<UploadPhotoResponse>(`/recipes/${recipeId}/photos`, {
-    content_type: contentType,
+  const formData = new FormData();
+  formData.append('photo', file);
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+  const response = await fetch(`${BASE_URL}/recipes/${recipeId}/photos`, {
+    method: 'POST',
+    credentials: 'include', // Include cookies for authentication
+    body: formData,
+    // Don't set Content-Type - browser will set it with boundary for multipart/form-data
   });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Upload failed: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
 }
 
 export async function deleteRecipePhoto(

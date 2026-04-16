@@ -1,4 +1,4 @@
-// frontend/app/dashboard/business/nutriconnect-costs-panel.tsx
+// frontend/app/dashboard/business/nutri-red-costs-panel.tsx
 'use client';
 
 import type { BusinessDashboardData } from '@/lib/types';
@@ -11,7 +11,7 @@ function formatCurrency(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`;
 }
 
-export function NutriConnectCostsPanel({ data }: Props) {
+export function NutriRedCostsPanel({ data }: Props) {
   const effectiveCostPerClient = data.active_clients_count > 0
     ? data.tier_cost_cents / data.active_clients_count
     : 0;
@@ -26,7 +26,7 @@ export function NutriConnectCostsPanel({ data }: Props) {
   return (
     <div style={{ background: 'white', borderRadius: 8, padding: 24 }}>
       <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: 'var(--nc-stone)' }}>
-        Your NutriConnect Costs
+        Your Nutri Red Costs
       </h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>

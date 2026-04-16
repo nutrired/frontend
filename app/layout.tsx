@@ -16,7 +16,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Nutriconnect — Tu nutricionista, a un clic",
+  title: "Nutri Red — Tu nutricionista, a un clic",
   description:
     "Conectamos a personas que quieren cuidar su alimentación con nutricionistas certificados.",
 };

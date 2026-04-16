@@ -15,7 +15,7 @@ export default function ForNutritionists() {
             su alimentación y su salud.
           </p>
 
-          <h2>¿Por qué elegir NutriConnect?</h2>
+          <h2>¿Por qué elegir Nutri Red?</h2>
 
           <div className="content-value-grid">
 
@@ -163,7 +163,7 @@ export default function ForNutritionists() {
               <div className="content-faq-question">¿Hay comisiones por las sesiones con clientes?</div>
               <div className="content-faq-answer">
                 No. Tú estableces tus precios y cobras directamente a tus clientes. No tomamos ninguna
-                comisión. Solo pagas tu suscripción mensual fija a NutriConnect.
+                comisión. Solo pagas tu suscripción mensual fija a Nutri Red.
               </div>
             </div>
 

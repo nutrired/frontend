@@ -283,39 +283,8 @@ export default function RecipeForm({
         const file = filesToUpload[i];
         setUploadProgress(`Subiendo foto ${i + 1} de ${filesToUpload.length}...`);
 
-        console.log(`[Photo Upload] Starting upload for file ${i + 1}:`, {
-          name: file.name,
-          type: file.type,
-          size: file.size,
-        });
-
-        // Get presigned URL from backend
-        const { photo, presigned_url } = await uploadRecipePhoto(recipeId, file.type);
-        console.log(`[Photo Upload] Got presigned URL:`, { photo_id: photo.id, presigned_url });
-
-        // Upload file directly to R2
-        console.log(`[Photo Upload] Uploading to R2...`);
-        const uploadResponse = await fetch(presigned_url, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-
-        console.log(`[Photo Upload] R2 upload response:`, {
-          status: uploadResponse.status,
-          statusText: uploadResponse.statusText,
-          ok: uploadResponse.ok,
-        });
-
-        if (!uploadResponse.ok) {
-          const errorText = await uploadResponse.text();
-          console.error(`[Photo Upload] R2 upload failed:`, errorText);
-          throw new Error(`Error al subir foto ${i + 1}: ${uploadResponse.status} ${uploadResponse.statusText}`);
-        }
-
-        console.log(`[Photo Upload] Success! Photo URL:`, photo.photo_url);
+        // Upload via backend (server-side upload to R2)
+        const { photo } = await uploadRecipePhoto(recipeId, file);
 
         // Add photo to local state
         setPhotos(prev => [...prev, photo]);
@@ -801,9 +770,8 @@ export default function RecipeForm({
         </div>
       </div>
 
-      {/* Photos section - only show for edit mode when recipe exists */}
-      {(initialData || autoSavedId) && (
-        <div className="dash-section">
+      {/* Photos section */}
+      <div className="dash-section">
           <div className="dash-section-head">
             <div className="dash-section-title">Fotos</div>
             <div className="dash-section-sub">
@@ -998,7 +966,6 @@ export default function RecipeForm({
             )}
           </div>
         </div>
-      )}
 
       {/* Submit */}
       <div

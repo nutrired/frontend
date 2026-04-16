@@ -243,7 +243,7 @@ export default function EditExercisePlanPage() {
   async function handleDuplicate() {
     if (!plan) return;
     const activeNutritionPlan = nutritionPlans.find((p) => p.status === 'active');
-    if (!confirm(`Duplicar este plan de ejercicios${activeNutritionPlan ? ' y el plan nutricional activo' : ''} para otro cliente?`)) return;
+    if (!confirm(`Duplicar este plan de ejercicios${activeNutritionPlan ? ' y el plan nutricional activo' : ''} como borrador?`)) return;
     setDuplicating(true);
     setError('');
     try {

@@ -391,7 +391,7 @@ export default function EditNutritionPlanPage() {
   async function handleDuplicate() {
     if (!plan) return;
     const activeExercisePlan = exercisePlans.find((p) => p.status === 'active');
-    if (!confirm(`Duplicar este plan nutricional${activeExercisePlan ? ' y el plan de ejercicios activo' : ''} para otro cliente?`)) return;
+    if (!confirm(`Duplicar este plan nutricional${activeExercisePlan ? ' y el plan de ejercicios activo' : ''} como borrador?`)) return;
     setDuplicating(true);
     setError('');
     try {
@@ -444,8 +444,48 @@ export default function EditNutritionPlanPage() {
           <div className="dash-topbar-title">{plan.title}</div>
           <StatusPill status={plan.status} />
         </div>
-        {isDraft && (
-          <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {isDraft && (
+            <>
+              <button
+                onClick={handleDuplicate}
+                disabled={duplicating}
+                style={{
+                  height: 34, padding: '0 16px',
+                  background: 'rgba(139,115,85,0.1)', border: '1px solid rgba(139,115,85,0.3)',
+                  borderRadius: 6, color: 'var(--nc-stone)', fontFamily: 'var(--font-body)',
+                  fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                }}
+              >
+                {duplicating ? 'Duplicando…' : 'Duplicar plan'}
+              </button>
+              <button
+                onClick={handleActivate}
+                disabled={activating}
+                style={{
+                  height: 34, padding: '0 16px',
+                  background: 'rgba(74,124,89,0.1)', border: '1px solid rgba(74,124,89,0.3)',
+                  borderRadius: 6, color: '#4a7c59', fontFamily: 'var(--font-body)',
+                  fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                }}
+              >
+                {activating ? 'Activando…' : 'Activar plan'}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  height: 34, padding: '0 16px',
+                  background: 'transparent', border: '1px solid rgba(185,74,58,0.3)',
+                  borderRadius: 6, color: '#b94a3a', fontFamily: 'var(--font-body)',
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {deleting ? 'Eliminando…' : 'Eliminar borrador'}
+              </button>
+            </>
+          )}
+          {!isDraft && (
             <button
               onClick={handleDuplicate}
               disabled={duplicating}
@@ -456,34 +496,10 @@ export default function EditNutritionPlanPage() {
                 fontSize: 13, fontWeight: 500, cursor: 'pointer',
               }}
             >
-              {duplicating ? 'Duplicando…' : 'Duplicar plan'}
+              {duplicating ? 'Duplicando…' : 'Duplicar plan como borrador'}
             </button>
-            <button
-              onClick={handleActivate}
-              disabled={activating}
-              style={{
-                height: 34, padding: '0 16px',
-                background: 'rgba(74,124,89,0.1)', border: '1px solid rgba(74,124,89,0.3)',
-                borderRadius: 6, color: '#4a7c59', fontFamily: 'var(--font-body)',
-                fontSize: 13, fontWeight: 500, cursor: 'pointer',
-              }}
-            >
-              {activating ? 'Activando…' : 'Activar plan'}
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              style={{
-                height: 34, padding: '0 16px',
-                background: 'transparent', border: '1px solid rgba(185,74,58,0.3)',
-                borderRadius: 6, color: '#b94a3a', fontFamily: 'var(--font-body)',
-                fontSize: 13, cursor: 'pointer',
-              }}
-            >
-              {deleting ? 'Eliminando…' : 'Eliminar borrador'}
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
       <div className="dash-content">
         {/* Header fields */}

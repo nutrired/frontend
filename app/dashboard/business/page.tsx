@@ -5,7 +5,7 @@ import { useBusinessDashboard } from '@/lib/hiring';
 import { ContractedValueOverview } from './contracted-value-overview';
 import { RevenueBreakdown } from './revenue-breakdown';
 import { ContractHistoryTable } from './contract-history-table';
-import { NutriConnectCostsPanel } from './nutriconnect-costs-panel';
+import { NutriRedCostsPanel } from './nutri-red-costs-panel';
 
 export default function BusinessDashboardPage() {
   const { data, isLoading, error } = useBusinessDashboard();
@@ -44,7 +44,7 @@ export default function BusinessDashboardPage() {
       <ContractedValueOverview data={data} />
       <RevenueBreakdown data={data} />
       <ContractHistoryTable contracts={data.contracts} />
-      <NutriConnectCostsPanel data={data} />
+      <NutriRedCostsPanel data={data} />
     </div>
   );
 }

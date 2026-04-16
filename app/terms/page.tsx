@@ -13,14 +13,14 @@ export default function Terms() {
 
           <h2>1. Aceptación de Términos</h2>
           <p>
-            Al acceder o usar NutriConnect ("la plataforma", "nosotros", "nuestro"),
+            Al acceder o usar Nutri Red ("la plataforma", "nosotros", "nuestro"),
             aceptas estar vinculado por estos Términos de Servicio. Si no estás de acuerdo
             con alguna parte de estos términos, no puedes usar la plataforma.
           </p>
 
           <h2>2. Elegibilidad</h2>
           <ul>
-            <li>Debes tener al menos <strong>18 años</strong> para usar NutriConnect</li>
+            <li>Debes tener al menos <strong>18 años</strong> para usar Nutri Red</li>
             <li>Debes proporcionar información veraz, completa y actualizada al registrarte</li>
             <li>No puedes usar el servicio para fines ilegales o no autorizados</li>
             <li>No puedes violar ninguna ley en tu jurisdicción al usar la plataforma</li>
@@ -50,7 +50,7 @@ export default function Terms() {
             <li>Eres un profesional <strong>certificado o licenciado</strong> en nutrición</li>
             <li>Eres responsable de todo el consejo profesional que das a tus clientes</li>
             <li>Debes mantener una suscripción activa para acceder a funciones de gestión de clientes</li>
-            <li><strong>No puedes ofrecer servicios fuera de la plataforma</strong> a clientes que conociste en NutriConnect (cláusula anticompetencia durante la relación activa)</li>
+            <li><strong>No puedes ofrecer servicios fuera de la plataforma</strong> a clientes que conociste en Nutri Red (cláusula anticompetencia durante la relación activa)</li>
             <li>Debes responder a tus clientes en un tiempo razonable según lo indicado en tu perfil</li>
             <li>No puedes garantizar resultados de salud específicos</li>
           </ul>
@@ -58,7 +58,7 @@ export default function Terms() {
           <h2>5. Responsabilidades de Clientes</h2>
           <p>Si te registras como cliente, aceptas que:</p>
           <ul>
-            <li>NutriConnect es una <strong>plataforma</strong>, no un proveedor de consejo médico o nutricional</li>
+            <li>Nutri Red es una <strong>plataforma</strong>, no un proveedor de consejo médico o nutricional</li>
             <li>El consejo nutricional proviene directamente de tu nutricionista contratado</li>
             <li>Debes consultar a un médico antes de realizar cambios dietéticos significativos</li>
             <li>Eres responsable de seguir (o no) el consejo de tu nutricionista</li>
@@ -117,19 +117,19 @@ export default function Terms() {
           <h3>Contenido de Usuarios</h3>
           <ul>
             <li>Tú posees el contenido que creas: planes de nutrición, planes de ejercicio, mensajes, fotos de perfil</li>
-            <li>Al usar la plataforma, otorgas a NutriConnect una <strong>licencia no exclusiva</strong> para mostrar, almacenar y usar ese contenido dentro de la plataforma</li>
+            <li>Al usar la plataforma, otorgas a Nutri Red una <strong>licencia no exclusiva</strong> para mostrar, almacenar y usar ese contenido dentro de la plataforma</li>
             <li>Esta licencia termina cuando eliminas el contenido o tu cuenta</li>
           </ul>
 
           <h3>Plataforma</h3>
           <ul>
-            <li>NutriConnect posee todo el código, diseño, marca, logos y funcionalidad de la plataforma</li>
+            <li>Nutri Red posee todo el código, diseño, marca, logos y funcionalidad de la plataforma</li>
             <li>Está prohibido copiar, modificar, distribuir o crear servicios derivados sin autorización</li>
           </ul>
 
           <h2>9. Limitación de Responsabilidad</h2>
           <p>
-            NutriConnect proporciona la plataforma "tal cual" (<em>as-is</em>). No garantizamos:
+            Nutri Red proporciona la plataforma "tal cual" (<em>as-is</em>). No garantizamos:
           </p>
           <ul>
             <li>Resultados de salud específicos por usar el servicio</li>
@@ -138,12 +138,12 @@ export default function Terms() {
             <li>Que los outcomes de salud serán positivos</li>
           </ul>
           <p>
-            <strong>Los nutricionistas son contratistas independientes.</strong> NutriConnect no es
+            <strong>Los nutricionistas son contratistas independientes.</strong> Nutri Red no es
             responsable del consejo profesional, errores, omisiones o negligencia de los nutricionistas.
           </p>
           <p>
             <strong>Límite de responsabilidad:</strong> En la máxima medida permitida por la ley,
-            nuestra responsabilidad total no excederá la cantidad que hayas pagado a NutriConnect
+            nuestra responsabilidad total no excederá la cantidad que hayas pagado a Nutri Red
             en los últimos 12 meses (para nutricionistas) o €0 (para clientes).
           </p>
 
@@ -186,7 +186,7 @@ export default function Terms() {
 
           <h2>13. Resolución de Disputas</h2>
           <ul>
-            <li>Si tienes un problema, intenta resolverlo primero contactándonos por email: <a href="mailto:legal@nutriconnect.com">legal@nutriconnect.com</a></li>
+            <li>Si tienes un problema, intenta resolverlo primero contactándonos por email: <a href="mailto:legal@nutri.red">legal@nutri.red</a></li>
             <li>Si no se resuelve por email: consideraremos <strong>mediación</strong> antes de litigio</li>
             <li>Como último recurso: tribunales competentes según la sección 12</li>
           </ul>
@@ -211,7 +211,7 @@ export default function Terms() {
           <h2>16. Acuerdo Completo</h2>
           <p>
             Estos Términos de Servicio, junto con nuestra <a href="/privacy">Política de Privacidad</a>,
-            constituyen el acuerdo completo entre tú y NutriConnect. Sustituyen cualquier acuerdo
+            constituyen el acuerdo completo entre tú y Nutri Red. Sustituyen cualquier acuerdo
             previo, verbal o escrito.
           </p>
 
@@ -220,7 +220,7 @@ export default function Terms() {
             Para preguntas o dudas sobre estos Términos de Servicio, contáctanos en:
           </p>
           <p>
-            <strong>Email:</strong> <a href="mailto:legal@nutriconnect.com">legal@nutriconnect.com</a>
+            <strong>Email:</strong> <a href="mailto:legal@nutri.red">legal@nutri.red</a>
           </p>
 
         </article>

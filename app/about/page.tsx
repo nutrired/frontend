@@ -8,7 +8,7 @@ export default function About() {
       <main className="content-main">
         <article className="content-article">
 
-          <h1>Sobre NutriConnect</h1>
+          <h1>Sobre Nutri Red</h1>
 
           <h2>El problema que estamos resolviendo</h2>
           <p>
@@ -33,7 +33,7 @@ export default function About() {
 
           <h2>Nuestra solución</h2>
           <p>
-            NutriConnect conecta personas con nutricionistas certificados de forma transparente
+            Nutri Red conecta personas con nutricionistas certificados de forma transparente
             y segura. Somos la plataforma todo-en-uno para descubrir, conectar y trabajar con
             nutricionistas profesionales.
           </p>
@@ -116,22 +116,22 @@ export default function About() {
             autonomía profesional.
           </p>
 
-          <h2>¿Quién está construyendo NutriConnect?</h2>
+          <h2>¿Quién está construyendo Nutri Red?</h2>
           <p>
             Somos un equipo pequeño de profesionales apasionados por la nutrición y la tecnología.
             Creemos que la tecnología debe servir a las personas, no al revés. Por eso construimos
-            NutriConnect con transparencia, simplicidad y respeto tanto para clientes como para
+            Nutri Red con transparencia, simplicidad y respeto tanto para clientes como para
             profesionales.
           </p>
           <p>
             Estamos en fase inicial (MVP) y mejorando constantemente. Si tienes preguntas,
             sugerencias o feedback, nos encantaría escucharte en{' '}
-            <a href="mailto:hola@nutriconnect.com">hola@nutriconnect.com</a>.
+            <a href="mailto:hola@nutri.red">hola@nutri.red</a>.
           </p>
 
           <div className="content-cta">
             <a href="/register" className="content-cta-btn">
-              Únete a NutriConnect
+              Únete a Nutri Red
             </a>
           </div>
 

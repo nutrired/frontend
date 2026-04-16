@@ -218,7 +218,7 @@ export default function DashboardProfilePage() {
                 <input className="dash-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your full name" />
                 {profile && (
                   <span style={{ fontSize: 11, color: 'var(--nc-stone)', fontFamily: 'monospace', background: 'rgba(139,115,85,0.08)', padding: '4px 10px', borderRadius: 4, border: '1px solid rgba(139,115,85,0.15)' }}>
-                    nutriconnect.com/nutritionists/<strong style={{ color: 'var(--nc-terra)' }}>{profile.slug}</strong>
+                    nutri.red/nutritionists/<strong style={{ color: 'var(--nc-terra)' }}>{profile.slug}</strong>
                   </span>
                 )}
               </div>
