@@ -112,12 +112,55 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <span>{item.icon}</span> {item.label}
             </Link>
           ))}
-          <span className="dash-nav-section">Account</span>
+          <span
+            className="dash-nav-section"
+            onClick={toggleSettings}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 16px',
+              marginTop: 4,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(0,0,0,0.03)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+            }}
+          >
+            Settings
+            <span style={{ fontSize: 12, marginLeft: 8 }}>
+              {settingsOpen ? '▼' : '▶'}
+            </span>
+          </span>
+
+          <div
+            style={{
+              overflow: 'hidden',
+              maxHeight: settingsOpen ? '500px' : '0',
+              transition: 'max-height 200ms ease-in-out',
+            }}
+          >
+            {settingsItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`dash-nav-item${pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ? ' active' : ''}`}
+                style={{ paddingLeft: 24 }}
+              >
+                <span>{item.icon}</span> {item.label}
+              </Link>
+            ))}
+          </div>
+
           {user.role === 'nutritionist' && (
             <Link
               href="/nutritionists"
               className="dash-nav-item"
               target="_blank"
+              style={{ marginTop: 8 }}
             >
               <span>↗</span> View public directory
             </Link>
