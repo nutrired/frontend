@@ -102,20 +102,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </a>
               )}
             </div>
-            <Link
-              href="/nutritionists"
-              target="_blank"
-              style={{
-                fontSize: 11,
-                color: 'var(--nc-stone)',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <span style={{ fontSize: 10 }}>↗</span> View public profile
-            </Link>
+            {profile.slug && (
+              <Link
+                href={`/nutritionists/${profile.slug}`}
+                target="_blank"
+                style={{
+                  fontSize: 11,
+                  color: 'var(--nc-stone)',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                }}
+              >
+                <span style={{ fontSize: 10 }}>↗</span> View public profile
+              </Link>
+            )}
           </div>
         )}
         <nav className="dash-nav">
