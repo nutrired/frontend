@@ -98,6 +98,11 @@ export default function EditNutritionPlanPage() {
     mealIndex: number;
     optionIndex: number;
   } | null>(null);
+  const [slotRecipeModalOpen, setSlotRecipeModalOpen] = useState(false);
+  const [slotRecipeModalTarget, setSlotRecipeModalTarget] = useState<{
+    slotIndex: number;
+    optionIndex: number;
+  } | null>(null);
 
   useEffect(() => {
     if (!plan) return;
@@ -287,6 +292,26 @@ export default function EditNutritionPlanPage() {
     updateOption(dayIndex, mealIndex, optionIndex, optionData);
     setRecipeModalOpen(false);
     setRecipeModalTarget(null);
+  }
+
+  function openSlotRecipeModal(slotIndex: number, optionIndex: number) {
+    setSlotRecipeModalTarget({ slotIndex, optionIndex });
+    setSlotRecipeModalOpen(true);
+  }
+
+  function handleSlotRecipeSelect(optionData: {
+    name: string;
+    description: string;
+    calories: number | null;
+    protein_g: number | null;
+    carbs_g: number | null;
+    fat_g: number | null;
+  }) {
+    if (!slotRecipeModalTarget) return;
+    const { slotIndex, optionIndex } = slotRecipeModalTarget;
+    updateSlotOption(slotIndex, optionIndex, optionData);
+    setSlotRecipeModalOpen(false);
+    setSlotRecipeModalTarget(null);
   }
 
   function buildPayload(): NutritionPlanPayload {
@@ -668,6 +693,15 @@ export default function EditNutritionPlanPage() {
                       border: '1px solid rgba(139,115,85,0.15)', borderRadius: 6,
                       padding: '10px 14px', marginBottom: 8, background: 'var(--nc-cream)',
                     }}>
+                      {isDraft && (
+                        <button
+                          onClick={() => openSlotRecipeModal(slotIndex, optIndex)}
+                          className="dash-btn-add-pkg"
+                          style={{ marginBottom: 8, fontSize: 12, height: 28 }}
+                        >
+                          🍴 Seleccionar receta
+                        </button>
+                      )}
                       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                         <div className="dash-field" style={{ flex: '2 1 180px' }}>
                           <label className="dash-label">Nombre</label>
@@ -770,6 +804,17 @@ export default function EditNutritionPlanPage() {
             setRecipeModalTarget(null);
           }}
           onSelect={handleRecipeSelect}
+        />
+      )}
+
+      {isDraft && (
+        <RecipePickerModal
+          isOpen={slotRecipeModalOpen}
+          onClose={() => {
+            setSlotRecipeModalOpen(false);
+            setSlotRecipeModalTarget(null);
+          }}
+          onSelect={handleSlotRecipeSelect}
         />
       )}
     </>
