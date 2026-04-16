@@ -4,7 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createExercisePlan } from '@/lib/plans';
-import type { ExercisePayload, WorkoutBlockPayload, ExerciseDayPayload, ExercisePlanPayload } from '@/lib/plans';
+import type {
+  ExercisePayload,
+  WorkoutBlockPayload,
+  ExerciseDayPayload,
+  CardioActivityPayload,
+  ExercisePlanPayload,
+} from '@/lib/plans';
 
 const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
@@ -14,6 +20,10 @@ function emptyExercise(displayOrder: number): ExercisePayload {
 
 function emptyBlock(displayOrder: number): WorkoutBlockPayload {
   return { name: '', display_order: displayOrder, exercises: [emptyExercise(0)] };
+}
+
+function emptyActivity(displayOrder: number): CardioActivityPayload {
+  return { name: '', duration_minutes: null, distance_km: null, notes: '', display_order: displayOrder };
 }
 
 function emptyDay(dayNumber: number): ExerciseDayPayload {
@@ -39,6 +49,8 @@ export default function NewExercisePlanPage() {
   function updateDay(index: number, patch: Partial<ExerciseDayPayload>) {
     setDays((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
   }
+
+  // ─── Strength helpers ───────────────────────────────────────────────────────
 
   function addBlock(dayIndex: number) {
     setDays((prev) =>
@@ -127,6 +139,36 @@ export default function NewExercisePlanPage() {
     );
   }
 
+  // ─── Cardio helpers ─────────────────────────────────────────────────────────
+
+  function addActivity(dayIndex: number) {
+    setDays((prev) =>
+      prev.map((d, i) =>
+        i === dayIndex ? { ...d, activities: [...d.activities, emptyActivity(d.activities.length)] } : d,
+      ),
+    );
+  }
+
+  function removeActivity(dayIndex: number, actIndex: number) {
+    setDays((prev) =>
+      prev.map((d, i) =>
+        i === dayIndex ? { ...d, activities: d.activities.filter((_, ai) => ai !== actIndex) } : d,
+      ),
+    );
+  }
+
+  function updateActivity(dayIndex: number, actIndex: number, patch: Partial<CardioActivityPayload>) {
+    setDays((prev) =>
+      prev.map((d, i) =>
+        i === dayIndex
+          ? { ...d, activities: d.activities.map((a, ai) => (ai === actIndex ? { ...a, ...patch } : a)) }
+          : d,
+      ),
+    );
+  }
+
+  // ─── Save ────────────────────────────────────────────────────────────────────
+
   async function handleSave() {
     if (!title.trim()) { setError('El título es obligatorio.'); return; }
     setSaving(true);
@@ -143,6 +185,7 @@ export default function NewExercisePlanPage() {
             display_order: bi,
             exercises: b.exercises.map((e, ei) => ({ ...e, display_order: ei })),
           })),
+          activities: d.activities.map((a, ai) => ({ ...a, display_order: ai })),
         })),
       };
       const { id } = await createExercisePlan(payload);
@@ -202,6 +245,7 @@ export default function NewExercisePlanPage() {
           <div key={day.day_number} style={{
             border: '1px solid var(--nc-border)', borderRadius: 8, marginBottom: 8, overflow: 'hidden',
           }}>
+            {/* Accordion header */}
             <button
               onClick={() => setOpenDay(openDay === day.day_number ? null : day.day_number)}
               style={{
@@ -215,14 +259,37 @@ export default function NewExercisePlanPage() {
                 Día {day.day_number} — {DAY_LABELS[dayIndex]}
               </span>
               <span style={{ fontSize: 12, color: 'var(--nc-stone)' }}>
-                {day.blocks.length} bloque{day.blocks.length !== 1 ? 's' : ''}
+                {day.day_type === 'rest'
+                  ? 'Descanso'
+                  : day.day_type === 'cardio'
+                  ? `${day.activities.length} actividad${day.activities.length !== 1 ? 'es' : ''}`
+                  : `${day.blocks.length} bloque${day.blocks.length !== 1 ? 's' : ''}`}
                 {openDay === day.day_number ? ' ▲' : ' ▼'}
               </span>
             </button>
 
             {openDay === day.day_number && (
               <div style={{ padding: '16px 20px', borderTop: '1px solid var(--nc-border)', background: 'white' }}>
-                <div className="dash-row" style={{ marginBottom: 12 }}>
+                {/* Day metadata row */}
+                <div className="dash-row" style={{ marginBottom: 16 }}>
+                  <div className="dash-field" style={{ flex: '0 0 180px' }}>
+                    <label className="dash-label">Tipo de día</label>
+                    <select
+                      className="dash-input"
+                      value={day.day_type}
+                      onChange={(e) =>
+                        updateDay(dayIndex, {
+                          day_type: e.target.value as ExerciseDayPayload['day_type'],
+                          blocks: [],
+                          activities: [],
+                        })
+                      }
+                    >
+                      <option value="strength">Fuerza / musculación</option>
+                      <option value="cardio">Cardio / actividad</option>
+                      <option value="rest">Descanso</option>
+                    </select>
+                  </div>
                   <div className="dash-field">
                     <label className="dash-label">Etiqueta del día</label>
                     <input
@@ -243,7 +310,10 @@ export default function NewExercisePlanPage() {
                   </div>
                 </div>
 
-                {day.blocks.map((block, blockIndex) => (
+                {/* ─── Strength: blocks + exercises ─────────────────────── */}
+                {day.day_type === 'strength' && (
+                  <>
+                    {day.blocks.map((block, blockIndex) => (
                   <div key={blockIndex} style={{
                     border: '1px solid var(--nc-border)', borderRadius: 6,
                     padding: '12px 16px', marginBottom: 8, background: 'var(--nc-cream)',
@@ -344,18 +414,99 @@ export default function NewExercisePlanPage() {
                     </div>
                   </div>
                 ))}
-
-                <button
-                  onClick={() => addBlock(dayIndex)}
-                  className="dash-btn-add-pkg"
-                  style={{ marginTop: 4 }}
-                >
+                <button onClick={() => addBlock(dayIndex)} className="dash-btn-add-pkg" style={{ marginTop: 4 }}>
                   + Añadir bloque
                 </button>
-              </div>
+              </>
+            )}
+
+            {/* ─── Cardio: activity list ─────────────────────────────── */}
+            {day.day_type === 'cardio' && (
+              <>
+                {day.activities.map((act, actIndex) => (
+                  <div key={actIndex} style={{
+                    border: '1px solid rgba(139,115,85,0.15)', borderRadius: 4,
+                    padding: '8px 10px', marginBottom: 6, background: 'var(--nc-cream)',
+                  }}>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                      <div className="dash-field" style={{ flex: '2 1 160px' }}>
+                        <label className="dash-label">Actividad</label>
+                        <input
+                          className="dash-input"
+                          value={act.name}
+                          onChange={(e) => updateActivity(dayIndex, actIndex, { name: e.target.value })}
+                          placeholder="ej: Caminar, Bicicleta, Natación"
+                        />
+                      </div>
+                      <div className="dash-field" style={{ flex: '0 0 110px' }}>
+                        <label className="dash-label">Duración (min)</label>
+                        <input
+                          className="dash-input"
+                          type="number"
+                          min="0"
+                          value={act.duration_minutes ?? ''}
+                          onChange={(e) =>
+                            updateActivity(dayIndex, actIndex, {
+                              duration_minutes: e.target.value === '' ? null : Number(e.target.value),
+                            })
+                          }
+                          placeholder="—"
+                        />
+                      </div>
+                      <div className="dash-field" style={{ flex: '0 0 110px' }}>
+                        <label className="dash-label">Distancia (km)</label>
+                        <input
+                          className="dash-input"
+                          type="number"
+                          min="0"
+                          step="0.1"
+                          value={act.distance_km ?? ''}
+                          onChange={(e) =>
+                            updateActivity(dayIndex, actIndex, {
+                              distance_km: e.target.value === '' ? null : Number(e.target.value),
+                            })
+                          }
+                          placeholder="—"
+                        />
+                      </div>
+                      <div className="dash-field" style={{ flex: '2 1 120px' }}>
+                        <label className="dash-label">Notas</label>
+                        <input
+                          className="dash-input"
+                          value={act.notes}
+                          onChange={(e) => updateActivity(dayIndex, actIndex, { notes: e.target.value })}
+                          placeholder="ej: Ritmo moderado, zona 2"
+                        />
+                      </div>
+                      <button
+                        onClick={() => removeActivity(dayIndex, actIndex)}
+                        style={{
+                          marginTop: 20, width: 26, height: 26, border: '1px solid var(--nc-border)',
+                          borderRadius: 4, background: 'transparent', cursor: 'pointer',
+                          color: 'var(--nc-stone)', fontSize: 14, display: 'flex',
+                          alignItems: 'center', justifyContent: 'center',
+                        }}
+                        title="Eliminar actividad"
+                      >×</button>
+                    </div>
+                  </div>
+                ))}
+                <button onClick={() => addActivity(dayIndex)} className="dash-btn-add-pkg" style={{ marginTop: 4 }}>
+                  + Añadir actividad
+                </button>
+              </>
+            )}
+
+            {/* ─── Rest: informational note ──────────────────────────── */}
+            {day.day_type === 'rest' && (
+              <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontStyle: 'italic', margin: 0 }}>
+                Día de descanso activo o completo. No se añaden ejercicios ni actividades.
+              </p>
             )}
           </div>
-        ))}
+        )}
+      </div>
+    ))}
 
         {error && <div style={{ color: '#b94a3a', fontSize: 13, marginTop: 8 }}>{error}</div>}
       </div>
