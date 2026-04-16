@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { useMyActivePlans } from '@/lib/plans';
-import type { NutritionPlan, ExercisePlan, MealType } from '@/lib/types';
+import type { NutritionPlan, ExercisePlan, MealType, DayType } from '@/lib/types';
 
 const MEAL_TYPE_LABELS: Record<MealType, string> = {
   breakfast:   'Desayuno',
@@ -147,63 +147,114 @@ function ExercisePlanView({ plan }: { plan: ExercisePlan }) {
           border: '1px solid var(--nc-border)', borderRadius: 10,
           marginBottom: 16, overflow: 'hidden',
         }}>
+          {/* Day header */}
           <div style={{
             padding: '12px 20px', background: 'var(--nc-forest-pale)',
             borderBottom: '1px solid var(--nc-border)',
+            display: 'flex', alignItems: 'baseline', gap: 12,
           }}>
             <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)' }}>
               Día {day.day_number} — {DAY_LABELS[day.day_number - 1]}
               {day.label ? ` (${day.label})` : ''}
             </span>
             {day.notes && (
-              <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginLeft: 12, fontWeight: 300 }}>
+              <span style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300 }}>
                 {day.notes}
               </span>
             )}
           </div>
 
-          {day.blocks.length === 0 ? (
-            <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+          {/* ─── Rest day ──────────────────────────────────────── */}
+          {day.day_type === 'rest' && (
+            <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, fontStyle: 'italic' }}>
               Día de descanso.
             </div>
-          ) : (
+          )}
+
+          {/* ─── Cardio day ────────────────────────────────────── */}
+          {day.day_type === 'cardio' && (
             <div style={{ padding: '8px 20px 16px' }}>
-              {[...day.blocks]
-                .sort((a, b) => a.display_order - b.display_order)
-                .map((block) => (
-                  <div key={block.id} style={{ marginTop: 16 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-forest)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
-                      {block.name}
+              {(day.activities ?? []).length === 0 ? (
+                <div style={{ padding: '8px 0', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+                  Sin actividades programadas.
+                </div>
+              ) : (
+                [...(day.activities ?? [])].sort((a, b) => a.display_order - b.display_order).map((act) => (
+                  <div key={act.id} style={{
+                    padding: '10px 14px', border: '1px solid rgba(139,115,85,0.12)',
+                    borderRadius: 6, marginBottom: 8, background: 'white', marginTop: 8,
+                  }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 4 }}>
+                      {act.name}
                     </div>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-                      <thead>
-                        <tr style={{ borderBottom: '1px solid var(--nc-border)' }}>
-                          <th style={{ textAlign: 'left', padding: '6px 0', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ejercicio</th>
-                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Series</th>
-                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Reps</th>
-                          <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Desc.</th>
-                          <th style={{ textAlign: 'left', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notas</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {[...block.exercises]
-                          .sort((a, b) => a.display_order - b.display_order)
-                          .map((ex) => (
-                            <tr key={ex.id} style={{ borderBottom: '1px solid rgba(139,115,85,0.08)' }}>
-                              <td style={{ padding: '8px 0', fontWeight: 500, color: 'var(--nc-ink)' }}>{ex.name}</td>
-                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.sets ?? '—'}</td>
-                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.reps ?? '—'}</td>
-                              <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>
-                                {ex.rest_seconds !== null ? `${ex.rest_seconds}s` : '—'}
-                              </td>
-                              <td style={{ padding: '8px', color: 'var(--nc-stone)', fontWeight: 300 }}>{ex.notes || '—'}</td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                      {act.duration_minutes !== null && (
+                        <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                          <strong>{act.duration_minutes}</strong> min
+                        </span>
+                      )}
+                      {act.distance_km !== null && (
+                        <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                          <strong>{act.distance_km}</strong> km
+                        </span>
+                      )}
+                      {act.notes && (
+                        <span style={{ fontSize: 11, color: 'var(--nc-stone)', fontWeight: 300 }}>
+                          {act.notes}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                ))}
+                ))
+              )}
             </div>
+          )}
+
+          {/* ─── Strength day ──────────────────────────────────── */}
+          {(day.day_type === 'strength' || !day.day_type) && (
+            day.blocks.length === 0 ? (
+              <div style={{ padding: '16px 20px', fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+                Sin bloques programados para este día.
+              </div>
+            ) : (
+              <div style={{ padding: '8px 20px 16px' }}>
+                {[...day.blocks]
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map((block) => (
+                    <div key={block.id} style={{ marginTop: 16 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-forest)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+                        {block.name}
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid var(--nc-border)' }}>
+                            <th style={{ textAlign: 'left', padding: '6px 0', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Ejercicio</th>
+                            <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Series</th>
+                            <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Reps</th>
+                            <th style={{ textAlign: 'center', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Desc.</th>
+                            <th style={{ textAlign: 'left', padding: '6px 8px', color: 'var(--nc-stone)', fontWeight: 500, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notas</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[...block.exercises]
+                            .sort((a, b) => a.display_order - b.display_order)
+                            .map((ex) => (
+                              <tr key={ex.id} style={{ borderBottom: '1px solid rgba(139,115,85,0.08)' }}>
+                                <td style={{ padding: '8px 0', fontWeight: 500, color: 'var(--nc-ink)' }}>{ex.name}</td>
+                                <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.sets ?? '—'}</td>
+                                <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>{ex.reps ?? '—'}</td>
+                                <td style={{ padding: '8px', textAlign: 'center', color: 'var(--nc-stone)' }}>
+                                  {ex.rest_seconds !== null ? `${ex.rest_seconds}s` : '—'}
+                                </td>
+                                <td style={{ padding: '8px', color: 'var(--nc-stone)', fontWeight: 300 }}>{ex.notes || '—'}</td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ))}
+              </div>
+            )
           )}
         </div>
       ))}
