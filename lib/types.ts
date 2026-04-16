@@ -343,3 +343,26 @@ export interface BusinessDashboardData {
   tier_capacity: number;
   active_clients_count: number;
 }
+
+export interface EnhancedClient {
+  relationship_id: string;
+  client_id: string;
+  client_display_name: string;
+  client_email: string;
+  client_goal: string;
+  status: 'pending_intro' | 'active' | 'cancelled';
+  package_id: string;
+  package_name: string;
+  package_price_cents: number;
+  package_billing_type: 'one_time' | 'monthly';
+  active_nutrition_plans_count: number;
+  active_exercise_plans_count: number;
+  created_at: string;
+}
+
+export interface QuickStats {
+  mrr_cents: number;
+  active_clients_count: number;
+  pending_intros_count: number;
+  one_time_revenue_this_month_cents: number;
+}
