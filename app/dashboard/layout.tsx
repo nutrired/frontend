@@ -63,13 +63,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/my-recipes', label: 'Mis recetas', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard/my-nutritionist', label: 'My nutritionist', icon: '◉', roles: ['client'] },
     { href: '/dashboard/my-plans', label: 'Mis planes', icon: '◈', roles: ['client'] },
-    { href: '/dashboard/billing', label: 'Billing & Earnings', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard/business', label: 'Business Dashboard', icon: '◈', roles: ['nutritionist'] },
   ].filter((item) => item.roles.includes(user.role));
 
   const settingsItems = [
     { href: '/dashboard/profile', label: 'My profile', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard/client-profile', label: 'My profile', icon: '◈', roles: ['client'] },
+    { href: '/dashboard/billing', label: 'Billing & Earnings', icon: '◈', roles: ['nutritionist'] },
   ].filter((item) => item.roles.includes(user.role));
 
   return (
@@ -86,20 +86,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
         {user.role === 'nutritionist' && profile && (
-          <div style={{ padding: '8px 16px 0' }}>
-            <span style={{
-              fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
-              padding: '3px 8px', borderRadius: 100,
-              background: profile.tier === 'free' ? 'rgba(139,115,85,0.12)' : 'rgba(74,124,89,0.12)',
-              color: profile.tier === 'free' ? 'var(--nc-stone)' : 'var(--nc-forest)',
-            }}>
-              {profile.tier}
-            </span>
-            {profile.tier === 'free' && (
-              <a href="/dashboard/billing" style={{ fontSize: 11, color: 'var(--nc-terra)', marginLeft: 8, textDecoration: 'none' }}>
-                Upgrade →
-              </a>
-            )}
+          <div style={{ padding: '8px 16px 12px' }}>
+            <div style={{ marginBottom: 8 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase',
+                padding: '4px 10px', borderRadius: 100,
+                background: profile.tier === 'premium' ? '#4a7c59' : (profile.tier === 'pro' ? '#c4622d' : 'rgba(139,115,85,0.12)'),
+                color: profile.tier === 'free' ? 'var(--nc-stone)' : 'white',
+              }}>
+                {profile.tier}
+              </span>
+              {profile.tier === 'free' && (
+                <a href="/dashboard/billing" style={{ fontSize: 11, color: 'var(--nc-terra)', marginLeft: 8, textDecoration: 'none' }}>
+                  Upgrade →
+                </a>
+              )}
+            </div>
+            <Link
+              href="/nutritionists"
+              target="_blank"
+              style={{
+                fontSize: 11,
+                color: 'var(--nc-stone)',
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <span style={{ fontSize: 10 }}>↗</span> View public profile
+            </Link>
           </div>
         )}
         <nav className="dash-nav">
@@ -155,17 +171,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </Link>
             ))}
           </div>
-
-          {user.role === 'nutritionist' && (
-            <Link
-              href="/nutritionists"
-              className="dash-nav-item"
-              target="_blank"
-              style={{ marginTop: 8 }}
-            >
-              <span>↗</span> View public directory
-            </Link>
-          )}
         </nav>
         <div className="dash-footer">
           <button onClick={handleSignOut} className="dash-nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
