@@ -2,10 +2,8 @@
 
 import LandingAnimations from '@/components/LandingAnimations';
 import { PublicNav } from '@/components/PublicNav';
-import { useAuth } from '@/lib/auth';
 
 export default function Home() {
-  const { user } = useAuth();
 
   return (
     <div className="lp-root">
@@ -32,8 +30,8 @@ export default function Home() {
           </p>
 
           <div className="hero-actions">
-            <a href={user ? "/dashboard" : "/register"} className="btn-primary">
-              {user ? "Ir al dashboard" : "Explorar nutricionistas"}
+            <a href="/nutritionists" className="btn-primary">
+              Explorar nutricionistas
             </a>
             <a href="/for-nutritionists" className="btn-ghost">Soy nutricionista →</a>
           </div>
@@ -372,10 +370,10 @@ export default function Home() {
               Sin compromisos, sin letra pequeña.
             </p>
             <div className="cta-btns">
-              <a href={user ? "/dashboard" : "/register"} className="btn-terra">
-                {user ? "Ir al dashboard" : "Empezar gratis"}
+              <a href="/register" className="btn-terra">
+                Empezar gratis
               </a>
-              <a href="/nutritionists"   className="btn-light">Ver nutricionistas →</a>
+              <a href="/nutritionists" className="btn-light">Ver nutricionistas →</a>
             </div>
           </div>
         </div>
@@ -383,14 +381,14 @@ export default function Home() {
 
       {/* ─────────── FOOTER ─────────── */}
       <footer className="lp-footer">
-        <div className="ft-logo">nutri<span>connect</span></div>
+        <div className="ft-logo">nutri<span>red</span></div>
         <ul className="ft-links">
           <li><a href="/about">Sobre nosotros</a></li>
           <li><a href="/for-nutritionists">Para nutricionistas</a></li>
           <li><a href="/privacy">Privacidad</a></li>
           <li><a href="/terms">Términos</a></li>
         </ul>
-        <span className="ft-copy">© 2026 Nutriconnect</span>
+        <span className="ft-copy">© 2026 Nutri Red</span>
       </footer>
 
     </div>
