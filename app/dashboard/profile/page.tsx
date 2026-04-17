@@ -378,24 +378,40 @@ export default function DashboardProfilePage() {
                 Require an intro consultation before client access begins
               </label>
             </div>
-            <div className="dash-field" style={{ marginTop: 16 }}>
-              <label className="dash-label" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <input type="checkbox" checked={acceptingNewClients}
-                       onChange={(e) => {
-                         if (e.target.checked && !isProfileComplete()) {
-                           setSaveMsg('Completa tu perfil (nombre, bio, especialidad, ciudad si es presencial) antes de aceptar clientes');
-                           return;
-                         }
-                         setAcceptingNewClients(e.target.checked);
-                       }}
-                       disabled={!isProfileComplete()}
-                       style={{ cursor: isProfileComplete() ? 'pointer' : 'not-allowed' }} />
-                <span>Aceptando nuevos clientes</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
+              <button
+                role="switch"
+                aria-checked={acceptingNewClients}
+                className={`dash-toggle${acceptingNewClients ? ' on' : ''}`}
+                onClick={() => {
+                  if (!acceptingNewClients && !isProfileComplete()) {
+                    setSaveMsg('Completa tu perfil (nombre, bio, especialidad, ciudad si es presencial) antes de aceptar clientes');
+                    return;
+                  }
+                  setAcceptingNewClients((v) => !v);
+                }}
+                disabled={!isProfileComplete()}
+                aria-label="Aceptando nuevos clientes"
+                style={{ opacity: !isProfileComplete() ? 0.5 : 1, cursor: isProfileComplete() ? 'pointer' : 'not-allowed' }}
+              />
+              <label
+                htmlFor="accepting-new-clients"
+                style={{ fontSize: 14, color: 'var(--nc-ink)', cursor: isProfileComplete() ? 'pointer' : 'not-allowed' }}
+                onClick={() => {
+                  if (!isProfileComplete()) return;
+                  if (!acceptingNewClients && !isProfileComplete()) {
+                    setSaveMsg('Completa tu perfil (nombre, bio, especialidad, ciudad si es presencial) antes de aceptar clientes');
+                    return;
+                  }
+                  setAcceptingNewClients((v) => !v);
+                }}
+              >
+                Aceptando nuevos clientes
               </label>
               {!isProfileComplete() && (
-                <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginTop: 4 }}>
-                  Completa tu perfil antes de aceptar clientes
-                </div>
+                <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginLeft: 'auto' }}>
+                  Completa tu perfil primero
+                </span>
               )}
             </div>
           </div>
