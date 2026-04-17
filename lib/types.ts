@@ -7,6 +7,7 @@ export interface NutritionistProfile {
   display_name: string;
   bio: string;
   city: string;
+  consultation_type: 'in_person' | 'online' | 'both';
   years_exp: number | null;
   specialties: string[];
   languages: string[];
