@@ -379,3 +379,31 @@ export interface QuickStats {
   pending_intros_count: number;
   one_time_revenue_this_month_cents: number;
 }
+
+// ─── Exercise Templates ───────────────────────────────────────────────────────
+
+export type ExerciseCategory = 'strength' | 'cardio' | 'flexibility' | 'balance';
+
+export interface ExerciseTemplate {
+  id: string;
+  nutritionist_id: string;
+  name: string;
+  description: string;
+  category: ExerciseCategory;
+  muscle_groups: string;
+  equipment: string;
+  instructions: string;
+  demo_video_url: string | null;
+  photos: ExerciseTemplatePhoto[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExerciseTemplatePhoto {
+  id: string;
+  template_id: string;
+  photo_url: string;
+  is_primary: boolean;
+  display_order: number;
+  uploaded_at: string;
+}
