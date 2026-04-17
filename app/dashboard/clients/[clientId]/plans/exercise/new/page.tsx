@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { createExercisePlan } from '@/lib/plans';
+import ExerciseTemplatePicker from '@/components/ExerciseTemplatePicker';
+import type { ExerciseTemplate } from '@/lib/types';
 import type {
   ExercisePayload,
   WorkoutBlockPayload,
@@ -45,6 +47,7 @@ export default function NewExercisePlanPage() {
   const [openDay, setOpenDay] = useState<number | null>(1);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [pickerOpen, setPickerOpen] = useState<{ dayIndex: number; blockIndex: number; exIndex: number } | null>(null);
 
   function updateDay(index: number, patch: Partial<ExerciseDayPayload>) {
     setDays((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
@@ -165,6 +168,21 @@ export default function NewExercisePlanPage() {
           : d,
       ),
     );
+  }
+
+  // ─── Template picker ─────────────────────────────────────────────────────────
+
+  function handleTemplateSelect(template: ExerciseTemplate) {
+    if (!pickerOpen) return;
+    const { dayIndex, blockIndex, exIndex } = pickerOpen;
+
+    // Copy template fields to exercise form as defaults
+    updateExercise(dayIndex, blockIndex, exIndex, {
+      name: template.name,
+      notes: template.instructions || '',
+    });
+
+    setPickerOpen(null);
   }
 
   // ─── Save ────────────────────────────────────────────────────────────────────
@@ -353,12 +371,35 @@ export default function NewExercisePlanPage() {
                           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', flexWrap: 'wrap' }}>
                             <div className="dash-field" style={{ flex: '2 1 160px' }}>
                               <label className="dash-label">Ejercicio</label>
-                              <input
-                                className="dash-input"
-                                value={ex.name}
-                                onChange={(e) => updateExercise(dayIndex, blockIndex, exIndex, { name: e.target.value })}
-                                placeholder="ej: Press de banca"
-                              />
+                              <div style={{ display: 'flex', gap: 4 }}>
+                                <input
+                                  className="dash-input"
+                                  value={ex.name}
+                                  onChange={(e) => updateExercise(dayIndex, blockIndex, exIndex, { name: e.target.value })}
+                                  placeholder="ej: Press de banca"
+                                  style={{ flex: 1 }}
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setPickerOpen({ dayIndex, blockIndex, exIndex })}
+                                  style={{
+                                    width: 32,
+                                    height: 32,
+                                    border: '1px solid var(--nc-border)',
+                                    borderRadius: 4,
+                                    background: 'white',
+                                    cursor: 'pointer',
+                                    color: 'var(--nc-forest)',
+                                    fontSize: 18,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                  }}
+                                  title="Seleccionar de la biblioteca"
+                                >
+                                  +
+                                </button>
+                              </div>
                             </div>
                             {[
                               { field: 'sets' as const,         label: 'Series'   },
@@ -526,6 +567,14 @@ export default function NewExercisePlanPage() {
           </button>
         </div>
       </div>
+
+      {/* Exercise template picker modal */}
+      {pickerOpen && (
+        <ExerciseTemplatePicker
+          onSelect={handleTemplateSelect}
+          onClose={() => setPickerOpen(null)}
+        />
+      )}
     </>
   );
 }
