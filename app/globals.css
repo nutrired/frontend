@@ -1336,8 +1336,7 @@
   position: relative; overflow: hidden;
 }
 .nc-profile-hero-inner {
-  max-width: 900px; display: grid;
-  grid-template-columns: 1fr auto; gap: 40px; align-items: end;
+  max-width: 900px;
   position: relative; z-index: 1;
 }
 .nc-profile-badge {

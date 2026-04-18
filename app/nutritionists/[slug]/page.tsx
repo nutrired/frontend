@@ -84,7 +84,7 @@ export default function PublicProfilePage() {
   return (
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
-        <Link href="/nutritionists" className="nc-nav-logo">Nutri<span>Connect</span></Link>
+        <Link href="/nutritionists" className="nc-nav-logo">Nutri<span>Red</span></Link>
         <Link href="/nutritionists" style={{ color: 'rgba(245,240,232,0.65)', textDecoration: 'none', fontSize: 13 }}>← Back to nutritionists</Link>
       </nav>
 
@@ -94,21 +94,22 @@ export default function PublicProfilePage() {
             {isAvailable && <div className="nc-profile-badge">Available</div>}
             {isAtCapacity && <div className="nc-profile-badge" style={{ background: 'rgba(180,140,60,0.15)', color: '#b48c3c' }}>Lista de espera</div>}
             {isClosed && <div className="nc-profile-badge" style={{ background: 'rgba(139,115,85,0.12)', color: 'var(--nc-stone)' }}>No acepta nuevos clientes</div>}
-            <h1 className="nc-profile-name">
-              {firstName}
-              {rest && <><br /><em>{rest}</em></>}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '16px' }}>
+              <Avatar
+                avatarUrl={profile.avatar_url}
+                displayName={profile.display_name}
+                size="large"
+              />
+              <h1 className="nc-profile-name" style={{ margin: 0 }}>
+                {firstName}
+                {rest && <><br /><em>{rest}</em></>}
+              </h1>
+            </div>
             <div className="nc-profile-pills">
               {profile.city && <span className="nc-pill">📍 {profile.city}</span>}
               {profile.years_exp !== null && <span className="nc-pill">{profile.years_exp} years experience</span>}
             </div>
           </div>
-          <Avatar
-            avatarUrl={profile.avatar_url}
-            displayName={profile.display_name}
-            size="large"
-            className="nc-hero-avatar"
-          />
         </div>
         <div className="nc-hero-tabs">
           <div className="nc-hero-tab active">About</div>
