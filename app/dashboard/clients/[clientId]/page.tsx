@@ -1,9 +1,12 @@
 // frontend/app/dashboard/clients/[clientId]/page.tsx
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useClientProfile, useNutritionPlans, useExercisePlans } from '@/lib/plans';
+import { useEnhancedClient } from '@/lib/enhanced-clients';
+import { completeRelationship, reactivateRelationship, activateRelationship } from '@/lib/hiring';
 import type { NutritionPlan, ExercisePlan, PlanStatus } from '@/lib/types';
 
 function PlanStatusBadge({ status }: { status: PlanStatus }) {
@@ -20,6 +23,213 @@ function PlanStatusBadge({ status }: { status: PlanStatus }) {
     }}>
       {s.label}
     </span>
+  );
+}
+
+function RelationshipStatusBadge({ status }: { status: string }) {
+  const styles: Record<string, { bg: string; color: string; label: string }> = {
+    pending_intro: { bg: 'rgba(184,134,11,0.1)', color: '#b8860b', label: 'Pendiente' },
+    active: { bg: 'rgba(74,124,89,0.1)', color: '#4a7c59', label: 'Activo' },
+    completed: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', label: 'Completado' },
+    cancelled: { bg: 'rgba(139,115,85,0.1)', color: 'var(--nc-stone)', label: 'Cancelado' },
+  };
+  const s = styles[status] || styles.pending_intro;
+  return (
+    <span style={{
+      fontSize: 12, fontWeight: 600, padding: '4px 10px', borderRadius: 4,
+      background: s.bg, color: s.color,
+    }}>
+      {s.label}
+    </span>
+  );
+}
+
+function StatusManagementSection({ relationshipId, status, completionNotes, onStatusChange }: {
+  relationshipId: string;
+  status: string;
+  completionNotes: string;
+  onStatusChange: () => void;
+}) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [notes, setNotes] = useState('');
+  const [showNotesInput, setShowNotesInput] = useState(false);
+
+  const handleComplete = async () => {
+    if (!notes.trim()) {
+      setError('Por favor, añade notas de finalización');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      await completeRelationship(relationshipId, notes);
+      onStatusChange();
+      setShowNotesInput(false);
+      setNotes('');
+    } catch (err) {
+      setError('Error al completar la relación. Por favor, intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReactivate = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await reactivateRelationship(relationshipId);
+      onStatusChange();
+    } catch (err) {
+      setError('Error al reactivar la relación. Por favor, intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleActivate = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await activateRelationship(relationshipId);
+      onStatusChange();
+    } catch (err) {
+      setError('Error al activar la relación. Por favor, intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="dash-section">
+      <div className="dash-section-head">
+        <div className="dash-section-title">Estado de la relación</div>
+        <div className="dash-section-sub">Gestiona el estado de la relación con este cliente</div>
+      </div>
+      <div className="dash-section-body">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)' }}>
+            Estado actual:
+          </div>
+          <RelationshipStatusBadge status={status} />
+        </div>
+
+        {completionNotes && status === 'completed' && (
+          <div style={{
+            background: 'rgba(59,130,246,0.05)', border: '1px solid rgba(59,130,246,0.2)',
+            borderRadius: 6, padding: 12, marginBottom: 16,
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#3b82f6', marginBottom: 6 }}>
+              Notas de finalización
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--nc-ink)', fontWeight: 300, lineHeight: 1.5 }}>
+              {completionNotes}
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div style={{
+            background: 'rgba(205,92,92,0.1)', border: '1px solid rgba(205,92,92,0.2)',
+            borderRadius: 6, padding: 12, marginBottom: 16, fontSize: 13, color: '#cd5c5c',
+          }}>
+            {error}
+          </div>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {status === 'pending_intro' && (
+            <button
+              onClick={handleActivate}
+              disabled={isLoading}
+              style={{
+                padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                color: 'white', background: '#4a7c59',
+                border: 'none', borderRadius: 6, cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.6 : 1,
+              }}
+            >
+              {isLoading ? 'Activando…' : 'Activar relación'}
+            </button>
+          )}
+
+          {status === 'active' && !showNotesInput && (
+            <button
+              onClick={() => setShowNotesInput(true)}
+              disabled={isLoading}
+              style={{
+                padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                color: 'white', background: '#3b82f6',
+                border: 'none', borderRadius: 6, cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.6 : 1,
+              }}
+            >
+              Completar relación
+            </button>
+          )}
+
+          {status === 'active' && showNotesInput && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Añade notas sobre la finalización de la relación (ej: objetivos alcanzados, recomendaciones finales…)"
+                rows={4}
+                style={{
+                  width: '100%', padding: 10, fontSize: 13, fontFamily: 'inherit',
+                  border: '1px solid var(--nc-border)', borderRadius: 6,
+                  resize: 'vertical',
+                }}
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={handleComplete}
+                  disabled={isLoading || !notes.trim()}
+                  style={{
+                    padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                    color: 'white', background: '#3b82f6',
+                    border: 'none', borderRadius: 6, cursor: (isLoading || !notes.trim()) ? 'not-allowed' : 'pointer',
+                    opacity: (isLoading || !notes.trim()) ? 0.6 : 1,
+                  }}
+                >
+                  {isLoading ? 'Completando…' : 'Confirmar finalización'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNotesInput(false);
+                    setNotes('');
+                    setError(null);
+                  }}
+                  disabled={isLoading}
+                  style={{
+                    padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                    color: 'var(--nc-stone)', background: 'white',
+                    border: '1px solid var(--nc-border)', borderRadius: 6, cursor: isLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {status === 'completed' && (
+            <button
+              onClick={handleReactivate}
+              disabled={isLoading}
+              style={{
+                padding: '10px 16px', fontSize: 13, fontWeight: 500,
+                color: 'white', background: '#4a7c59',
+                border: 'none', borderRadius: 6, cursor: isLoading ? 'not-allowed' : 'pointer',
+                opacity: isLoading ? 0.6 : 1,
+              }}
+            >
+              {isLoading ? 'Reactivando…' : 'Reactivar relación'}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -146,6 +356,7 @@ export default function ClientDetailPage() {
   const { profile, isLoading: profileLoading } = useClientProfile(clientId);
   const { plans: nutritionPlans, isLoading: nutritionLoading } = useNutritionPlans(clientId);
   const { plans: exercisePlans, isLoading: exerciseLoading } = useExercisePlans(clientId);
+  const { client, isLoading: clientLoading, mutate: mutateClient } = useEnhancedClient(clientId);
 
   return (
     <>
@@ -240,6 +451,15 @@ export default function ClientDetailPage() {
               )}
             </div>
           </div>
+        )}
+
+        {!clientLoading && client && (
+          <StatusManagementSection
+            relationshipId={client.relationship_id}
+            status={client.status}
+            completionNotes={client.completion_notes}
+            onStatusChange={mutateClient}
+          />
         )}
 
         <NutritionSection clientId={clientId} plans={nutritionPlans} isLoading={nutritionLoading} />

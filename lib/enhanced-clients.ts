@@ -24,6 +24,10 @@ export async function getQuickStats(): Promise<QuickStats> {
   return api.get<QuickStats>('/nutritionist/stats');
 }
 
+export async function getEnhancedClient(clientId: string): Promise<EnhancedClient> {
+  return api.get<EnhancedClient>(`/nutritionist/clients/${clientId}`);
+}
+
 export function useEnhancedClients(params: EnhancedClientsParams) {
   const queryParams = new URLSearchParams();
   if (params.search) queryParams.set('search', params.search);
@@ -57,5 +61,20 @@ export function useQuickStats() {
     stats: data || null,
     isLoading,
     error,
+  };
+}
+
+export function useEnhancedClient(clientId: string) {
+  const { data, error, isLoading, mutate } = useSWR(
+    `/nutritionist/clients/${clientId}`,
+    () => getEnhancedClient(clientId),
+    { revalidateOnFocus: false }
+  );
+
+  return {
+    client: data || null,
+    isLoading,
+    error,
+    mutate,
   };
 }
