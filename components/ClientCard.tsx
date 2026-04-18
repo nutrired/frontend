@@ -8,20 +8,14 @@ interface ClientCardProps {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === 'active') {
-    return (
-      <span style={{
-        fontSize: 11,
-        fontWeight: 600,
-        padding: '4px 10px',
-        borderRadius: 4,
-        background: 'rgba(74,124,89,0.1)',
-        color: '#4a7c59',
-      }}>
-        Activo
-      </span>
-    );
-  }
+  const styles: Record<string, { bg: string; color: string; label: string }> = {
+    pending_intro: { bg: 'rgba(184,134,11,0.1)', color: '#b8860b', label: 'Pendiente' },
+    active: { bg: 'rgba(74,124,89,0.1)', color: '#4a7c59', label: 'Activo' },
+    completed: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', label: 'Completado' },
+    cancelled: { bg: 'rgba(139,115,85,0.1)', color: 'var(--nc-stone)', label: 'Cancelado' },
+  };
+
+  const s = styles[status] || styles.pending_intro;
 
   return (
     <span style={{
@@ -29,10 +23,10 @@ function StatusBadge({ status }: { status: string }) {
       fontWeight: 600,
       padding: '4px 10px',
       borderRadius: 4,
-      background: 'rgba(184,134,11,0.1)',
-      color: '#b8860b',
+      background: s.bg,
+      color: s.color,
     }}>
-      Pendiente
+      {s.label}
     </span>
   );
 }
