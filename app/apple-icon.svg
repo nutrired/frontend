@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <rect width="180" height="180" fill="#f8f6f1" rx="40"/>
+
+  <!-- Avocado outer skin (dark green) -->
+  <ellipse cx="90" cy="95" rx="50" ry="60" fill="#3a5b3f"/>
+
+  <!-- Avocado flesh (light green/yellow) -->
+  <ellipse cx="90" cy="95" rx="37.5" ry="45" fill="#b8d4a0"/>
+
+  <!-- Avocado pit (brown) -->
+  <ellipse cx="90" cy="95" rx="20" ry="25" fill="#6b4423"/>
+
+  <!-- Pit highlight -->
+  <ellipse cx="85" cy="87" rx="8" ry="10" fill="#8b6334" opacity="0.6"/>
+
+  <!-- Stem (brown) -->
+  <rect x="85" y="35" width="10" height="20" rx="5" fill="#6b4423"/>
+
+  <!-- Leaf (green) -->
+  <path d="M 98 35 Q 118 30 125 45 Q 120 50 110 50 Q 105 45 98 40 Z" fill="#4a7c59"/>
+
+  <!-- Shadow -->
+  <ellipse cx="90" cy="140" rx="35" ry="8" fill="#000000" opacity="0.1"/>
+</svg>
