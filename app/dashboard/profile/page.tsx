@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useMyProfile } from '@/lib/profile';
 import { api, ApiRequestError } from '@/lib/api';
 import type { ServicePackage } from '@/lib/types';
+import { AvatarUpload } from '@/components/AvatarUpload';
 
 interface PkgDraft {
   id?: string;
@@ -219,6 +220,26 @@ export default function DashboardProfilePage() {
       </div>
 
       <div className="dash-content">
+        {/* Profile Photo */}
+        <div className="dash-section">
+          <div className="dash-section-head">
+            <div className="dash-section-title">Profile Photo</div>
+            <div className="dash-section-sub">Your profile picture helps clients recognize you</div>
+          </div>
+          <div className="dash-section-body">
+            <AvatarUpload
+              currentAvatarUrl={profile?.avatar_url ?? null}
+              displayName={displayName}
+              onUploadSuccess={(url) => {
+                mutate();
+              }}
+              onDeleteSuccess={() => {
+                mutate();
+              }}
+            />
+          </div>
+        </div>
+
         {/* Basic info */}
         <div className="dash-section">
           <div className="dash-section-head">

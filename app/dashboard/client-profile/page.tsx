@@ -5,6 +5,7 @@ import { useState, useEffect, KeyboardEvent } from 'react';
 import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
 import { api, ApiRequestError } from '@/lib/api';
+import { AvatarUpload } from '@/components/AvatarUpload';
 
 // ─── TagInput ─────────────────────────────────────────────────────────────────
 
@@ -392,6 +393,26 @@ export default function ClientProfilePage() {
       </div>
 
       <div className="dash-content">
+        {/* Profile Photo */}
+        <div className="dash-section">
+          <div className="dash-section-head">
+            <div className="dash-section-title">Foto de perfil</div>
+            <div className="dash-section-sub">Tu foto ayuda a tu nutricionista a reconocerte</div>
+          </div>
+          <div className="dash-section-body">
+            <AvatarUpload
+              currentAvatarUrl={profile?.avatar_url ?? null}
+              displayName={displayName}
+              onUploadSuccess={(url) => {
+                mutate();
+              }}
+              onDeleteSuccess={() => {
+                mutate();
+              }}
+            />
+          </div>
+        </div>
+
         {/* Info básica */}
         <div className="dash-section">
           <div className="dash-section-head">
