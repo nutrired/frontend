@@ -34,6 +34,33 @@ export async function cancelRelationship(relationshipID: string): Promise<void> 
   mutate('/hiring/relationships');
 }
 
+export async function completeRelationship(relationshipID: string, notes: string): Promise<void> {
+  await api.post(`/hiring/relationships/${relationshipID}/complete`, { notes });
+  mutate('/hiring/relationships');
+  mutate('/hiring/relationships/nutritionist');
+  mutate('/nutritionist/clients');
+  mutate('/nutritionist/stats');
+  mutate('/hiring/business-dashboard');
+}
+
+export async function reactivateRelationship(relationshipID: string): Promise<void> {
+  await api.post(`/hiring/relationships/${relationshipID}/reactivate`, {});
+  mutate('/hiring/relationships');
+  mutate('/hiring/relationships/nutritionist');
+  mutate('/nutritionist/clients');
+  mutate('/nutritionist/stats');
+  mutate('/hiring/business-dashboard');
+}
+
+export async function activateRelationship(relationshipID: string): Promise<void> {
+  await api.post(`/hiring/relationships/${relationshipID}/activate`, {});
+  mutate('/hiring/relationships');
+  mutate('/hiring/relationships/nutritionist');
+  mutate('/nutritionist/clients');
+  mutate('/nutritionist/stats');
+  mutate('/hiring/business-dashboard');
+}
+
 // ─── Nutritionist hooks ───────────────────────────────────────────────────────
 
 export function useNutritionistRelationships() {
