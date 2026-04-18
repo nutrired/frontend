@@ -6,9 +6,18 @@ export async function uploadAvatar(file: File): Promise<{ avatar_url: string }> 
   const formData = new FormData();
   formData.append('file', file);
 
+  // Get token from cookie
+  const token = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('access_token='))
+    ?.split('=')[1];
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me/avatar`, {
     method: 'POST',
     credentials: 'include',
+    headers: {
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+    },
     body: formData,
   });
 
