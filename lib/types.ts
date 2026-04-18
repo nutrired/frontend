@@ -414,3 +414,25 @@ export interface ExerciseTemplatePhoto {
   display_order: number;
   uploaded_at: string;
 }
+
+// ─── Appointments & Availability ──────────────────────────────────────────
+
+export interface AppointmentType {
+  id: string;
+  nutritionist_id: string;
+  name: string;
+  duration_minutes: number;
+  description: string;
+  video_link: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AvailabilityRule {
+  id: string;
+  nutritionist_id: string;
+  day_of_week: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+  start_time: string; // Time only, e.g., "09:00:00"
+  end_time: string;
+  created_at: string;
+}
