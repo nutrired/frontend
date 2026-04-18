@@ -96,7 +96,7 @@ export interface Relationship {
   client_id: string;
   nutritionist_id: string;
   package_id: string;
-  status: 'pending_intro' | 'active' | 'cancelled';
+  status: 'pending_intro' | 'active' | 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
 }
@@ -106,7 +106,7 @@ export interface ClientRelationshipView {
   client_id: string;
   nutritionist_id: string;
   package_id: string;
-  status: 'pending_intro' | 'active' | 'cancelled';
+  status: 'pending_intro' | 'active' | 'completed' | 'cancelled';
   client_display_name: string;
   client_email: string;
   created_at: string;
@@ -118,7 +118,7 @@ export interface NutritionistRelationshipView {
   client_id: string;
   nutritionist_id: string;
   package_id: string;
-  status: 'pending_intro' | 'active' | 'cancelled';
+  status: 'pending_intro' | 'active' | 'completed' | 'cancelled';
   nutritionist_display_name: string;
   nutritionist_slug: string;
   nutritionist_bio: string;
@@ -342,7 +342,7 @@ export interface ContractItem {
   price_cents: number;
   billing_cycle: 'monthly' | 'one_time';
   starts_at: string;
-  status: 'active' | 'pending_intro' | 'cancelled';
+  status: 'active' | 'pending_intro' | 'completed' | 'cancelled';
 }
 
 export interface BusinessDashboardData {
@@ -368,13 +368,15 @@ export interface EnhancedClient {
   client_email: string;
   client_goal: string;
   client_avatar_url: string | null;
-  status: 'pending_intro' | 'active' | 'cancelled';
+  status: 'pending_intro' | 'active' | 'completed' | 'cancelled';
   package_id: string;
   package_name: string;
   package_price_cents: number;
   package_billing_type: 'one_time' | 'monthly';
   active_nutrition_plans_count: number;
   active_exercise_plans_count: number;
+  completed_at: string | null;
+  completion_notes: string;
   created_at: string;
 }
 
