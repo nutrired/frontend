@@ -2,6 +2,8 @@
 
 import { api } from './api';
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+
 export async function uploadAvatar(file: File): Promise<{ avatar_url: string }> {
   const formData = new FormData();
   formData.append('file', file);
@@ -12,7 +14,7 @@ export async function uploadAvatar(file: File): Promise<{ avatar_url: string }> 
     .find(row => row.startsWith('access_token='))
     ?.split('=')[1];
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/profile/me/avatar`, {
+  const response = await fetch(`${BASE_URL}/profile/me/avatar`, {
     method: 'POST',
     credentials: 'include',
     headers: {
