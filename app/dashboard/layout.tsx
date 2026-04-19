@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { useMyProfile } from '@/lib/profile';
+import { useConversations } from '@/lib/chat';
 import { Avatar } from '@/components/Avatar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Called for all users; returns null for non-nutritionists (endpoint returns 404)
   // Slight waste for clients but avoids conditional hook calls (React rules)
   const { profile } = useMyProfile();
+  const { conversations } = useConversations();
 
   // Settings section state (persisted to localStorage)
   const [settingsOpen, setSettingsOpen] = useState(true);
@@ -54,6 +56,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push('/login');
   };
 
+  const totalUnreadCount = conversations.reduce((sum, c) => sum + c.unread_count, 0);
+
   const navItems = [
     { href: '/dashboard', label: 'Overview', icon: '◎', roles: ['client', 'nutritionist'] },
     { href: '/dashboard/clients', label: 'Mis clientes', icon: '◉', roles: ['nutritionist'] },
@@ -62,6 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/appointment-types', label: 'Tipos de Cita', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard/availability', label: 'Disponibilidad', icon: '◈', roles: ['nutritionist'] },
     { href: '/dashboard/calendar', label: 'Calendario', icon: '◈', roles: ['client', 'nutritionist'] },
+    { href: '/dashboard/messages', label: 'Mensajes', icon: '◈', roles: ['client', 'nutritionist'] },
     { href: '/dashboard/my-nutritionist', label: 'My nutritionist', icon: '◉', roles: ['client'] },
     { href: '/dashboard/my-plans', label: 'Mis planes', icon: '◈', roles: ['client'] },
     { href: '/dashboard/business', label: 'Business Dashboard', icon: '◈', roles: ['nutritionist'] },
@@ -140,8 +145,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               key={item.href}
               href={item.href}
               className={`dash-nav-item${pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ? ' active' : ''}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative',
+              }}
             >
               <span>{item.icon}</span> {item.label}
+              {item.href === '/dashboard/messages' && totalUnreadCount > 0 && (
+                <span
+                  style={{
+                    marginLeft: 'auto',
+                    background: 'var(--nc-terra)',
+                    color: 'white',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: '2px 6px',
+                    borderRadius: 10,
+                    minWidth: 18,
+                    textAlign: 'center',
+                  }}
+                >
+                  {totalUnreadCount}
+                </span>
+              )}
             </Link>
           ))}
           <span
