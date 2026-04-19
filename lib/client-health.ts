@@ -6,7 +6,7 @@ import type { WeightEntry, ActivityEntry } from './types';
 
 export function useClientWeight(clientId: string | null, days?: number) {
   const daysParam = days !== undefined ? `?days=${days}` : '?days=30';
-  const key = clientId ? `/nutritionists/clients/${clientId}/weight${daysParam}` : null;
+  const key = clientId ? `/clients/${clientId}/weight${daysParam}` : null;
 
   const { data, error, isLoading, mutate } = useSWR<WeightEntry[]>(
     key,
@@ -23,7 +23,7 @@ export function useClientWeight(clientId: string | null, days?: number) {
 
 export function useClientActivity(clientId: string | null, days?: number) {
   const daysParam = days !== undefined ? `?days=${days}` : '?days=30';
-  const key = clientId ? `/nutritionists/clients/${clientId}/activity${daysParam}` : null;
+  const key = clientId ? `/clients/${clientId}/activity${daysParam}` : null;
 
   const { data, error, isLoading, mutate } = useSWR<ActivityEntry[]>(
     key,
