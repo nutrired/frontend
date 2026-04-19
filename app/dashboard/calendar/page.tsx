@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth';
 import { useCalendar, cancelAppointment, completeAppointment, markNoShow } from '@/lib/calendar';
 import { format, startOfWeek, endOfWeek, addWeeks } from 'date-fns';
 import { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import type { Appointment } from '@/lib/types';
 
@@ -47,6 +48,11 @@ export default function CalendarPage() {
             >
               Siguiente →
             </button>
+            {user.role === 'client' && (
+              <Link href="/dashboard/my-nutritionist" className="dash-btn-publish">
+                Agendar Cita
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -104,8 +110,8 @@ function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
 
       {/* Time slots */}
       {hours.map((hour) => (
-        <>
-          <div key={`hour-${hour}`} style={{
+        <React.Fragment key={`hour-${hour}`}>
+          <div style={{
             background: 'white',
             padding: '8px',
             fontSize: 12,
@@ -134,7 +140,7 @@ function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
               </div>
             );
           })}
-        </>
+        </React.Fragment>
       ))}
     </div>
   );
