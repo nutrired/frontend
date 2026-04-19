@@ -62,6 +62,15 @@ function emptySlotOption(displayOrder: number): SlotOptionPayload {
   };
 }
 
+function emptySupplement(displayOrder: number): SupplementPayload {
+  return {
+    name: '',
+    dosage: '',
+    timing: 'morning',
+    display_order: displayOrder,
+  };
+}
+
 const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 function StatusPill({ status }: { status: PlanStatus }) {
@@ -428,6 +437,29 @@ export default function EditNutritionPlanPage() {
     } finally {
       setDuplicating(false);
     }
+  }
+
+  function handleAddSupplement() {
+    setSupplements([...supplements, emptySupplement(supplements.length)]);
+  }
+
+  function handleDeleteSupplement(index: number) {
+    setSupplements(supplements.filter((_, i) => i !== index));
+  }
+
+  function handleMoveSupplement(index: number, direction: number) {
+    if (index + direction < 0 || index + direction >= supplements.length) return;
+    const newSupps = [...supplements];
+    [newSupps[index], newSupps[index + direction]] = [newSupps[index + direction], newSupps[index]];
+    // Update display_order
+    newSupps.forEach((s, i) => (s.display_order = i));
+    setSupplements(newSupps);
+  }
+
+  function updateSupplement(index: number, updates: Partial<SupplementPayload>) {
+    const newSupps = [...supplements];
+    newSupps[index] = { ...newSupps[index], ...updates };
+    setSupplements(newSupps);
   }
 
   if (isLoading) {
@@ -857,6 +889,58 @@ export default function EditNutritionPlanPage() {
                   )}
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {includeSupplements && (
+          <div className="dash-section" style={{ marginTop: '2rem' }}>
+            <div className="dash-section-head">
+              <div className="dash-section-title">Suplementos</div>
+              <button
+                type="button"
+                className="btn-link"
+                onClick={handleAddSupplement}
+              >
+                + Agregar suplemento
+              </button>
+            </div>
+            <div className="dash-section-body">
+              {supplements.length === 0 ? (
+                <p style={{ color: 'var(--nc-stone)', fontSize: 14 }}>
+                  No hay suplementos agregados todavía.
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {supplements.map((supp, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        border: '1px solid var(--nc-border)',
+                        borderRadius: '8px',
+                        padding: '1rem',
+                        background: 'white',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--nc-forest)' }}>
+                          Suplemento {idx + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSupplement(idx)}
+                          style={{ color: '#b94a3a', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                      <p style={{ fontSize: 13, color: 'var(--nc-stone)' }}>
+                        {supp.name || '(Sin nombre)'}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
