@@ -143,6 +143,15 @@ export type PlanStatus = 'draft' | 'active' | 'archived';
 export type PlanStyle = 'structured' | 'flexible';
 export type MealType = 'breakfast' | 'mid_morning' | 'lunch' | 'snack' | 'dinner';
 export type DayType = 'strength' | 'cardio' | 'rest';
+export type SupplementTiming =
+  | 'morning'
+  | 'with_breakfast'
+  | 'pre_workout'
+  | 'post_workout'
+  | 'with_lunch'
+  | 'afternoon'
+  | 'with_dinner'
+  | 'before_bed';
 
 export interface MealOption {
   id: string;
@@ -194,6 +203,24 @@ export interface NutritionPlanDay {
   meals: Meal[];
 }
 
+export interface NutritionPlanSupplement {
+  id: string;
+  plan_id: string;
+  name: string;
+  brand: string | null;
+  dosage: string;
+  timing: SupplementTiming;
+  linked_meal_id: string | null;
+  notes: string | null;
+  calories: number | null;
+  protein_g: number | null;
+  carbs_g: number | null;
+  fat_g: number | null;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface NutritionPlan {
   id: string;
   nutritionist_id: string;
@@ -204,6 +231,8 @@ export interface NutritionPlan {
   status: PlanStatus;
   days: NutritionPlanDay[];
   slots: NutritionPlanSlot[];
+  include_supplements: boolean;
+  supplements: NutritionPlanSupplement[];
   created_at: string;
   updated_at: string;
 }
