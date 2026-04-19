@@ -83,97 +83,112 @@ function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
   });
 
   const hours = Array.from({ length: 13 }, (_, i) => i + 8); // 8am - 8pm
-
-  // Calculate grid row placement for each appointment
-  const getAppointmentStyle = (appt: Appointment, dayIndex: number) => {
-    const start = new Date(appt.start_time);
-    const end = new Date(appt.end_time);
-    const startHour = start.getHours();
-    const startMinute = start.getMinutes();
-    const durationMs = end.getTime() - start.getTime();
-    const durationHours = durationMs / (1000 * 60 * 60);
-
-    // Grid row starts at 2 (after header), each hour is one row
-    const rowStart = 2 + (startHour - 8); // 8am is row 2
-    const rowSpan = Math.ceil(durationHours);
-
-    // Column: 2 = first day (Monday), etc
-    const colStart = 2 + dayIndex;
-
-    return {
-      gridColumn: colStart,
-      gridRow: `${rowStart} / span ${rowSpan}`,
-      marginTop: `${(startMinute / 60) * 60}px`, // Offset within the hour
-    };
-  };
+  const HOUR_HEIGHT = 80; // pixels per hour
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '60px repeat(7, 1fr)',
-      gridTemplateRows: 'auto repeat(13, 60px)', // Header + 13 hour rows
-      gap: 1,
-      background: 'var(--nc-border)',
-      border: '1px solid var(--nc-border)',
-      borderRadius: 8,
-      overflow: 'hidden',
-      position: 'relative',
-    }}>
-      {/* Header row */}
-      <div style={{ background: 'white', padding: '12px 8px' }} />
-      {days.map((day, i) => (
-        <div key={i} style={{
-          background: 'var(--nc-forest-pale)',
-          padding: '12px 8px',
-          textAlign: 'center',
-          fontSize: 13,
-          fontWeight: 500,
-        }}>
-          {format(day, 'EEE dd')}
-        </div>
-      ))}
-
-      {/* Time labels */}
-      {hours.map((hour) => (
-        <div key={`time-${hour}`} style={{
-          background: 'white',
-          padding: '8px',
-          fontSize: 12,
-          color: 'var(--nc-stone)',
-          textAlign: 'right',
-          gridColumn: 1,
-        }}>
-          {hour}:00
-        </div>
-      ))}
-
-      {/* Empty cells for grid structure */}
-      {hours.map((hour) =>
-        days.map((_, dayIndex) => (
-          <div key={`cell-${hour}-${dayIndex}`} style={{
-            background: 'white',
-            minHeight: 60,
-          }} />
-        ))
-      )}
-
-      {/* Appointments positioned absolutely over grid */}
-      {days.map((day, dayIndex) => {
-        const dayAppointments = appointments.filter((a: Appointment) => {
-          const apptDate = new Date(a.start_time);
-          return apptDate.toDateString() === day.toDateString();
-        });
-
-        return dayAppointments.map((appt: Appointment) => (
-          <div key={appt.id} style={{
-            ...getAppointmentStyle(appt, dayIndex),
-            padding: 4,
-            zIndex: 1,
+    <div style={{ position: 'relative' }}>
+      {/* Header */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '60px repeat(7, 1fr)',
+        gap: 1,
+        background: 'var(--nc-border)',
+        border: '1px solid var(--nc-border)',
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+        overflow: 'hidden',
+      }}>
+        <div style={{ background: 'white', padding: '12px 8px' }} />
+        {days.map((day, i) => (
+          <div key={i} style={{
+            background: 'var(--nc-forest-pale)',
+            padding: '12px 8px',
+            textAlign: 'center',
+            fontSize: 13,
+            fontWeight: 500,
           }}>
-            <AppointmentCard appointment={appt} isNutritionist={true} />
+            {format(day, 'EEE dd')}
           </div>
-        ));
-      })}
+        ))}
+      </div>
+
+      {/* Grid with time slots */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '60px repeat(7, 1fr)',
+        border: '1px solid var(--nc-border)',
+        borderTop: 'none',
+        borderBottomLeftRadius: 8,
+        borderBottomRightRadius: 8,
+        overflow: 'hidden',
+        position: 'relative',
+      }}>
+        {/* Hour rows */}
+        {hours.map((hour, hourIndex) => (
+          <React.Fragment key={`hour-${hour}`}>
+            {/* Time label */}
+            <div style={{
+              background: 'white',
+              padding: '8px',
+              fontSize: 12,
+              color: 'var(--nc-stone)',
+              textAlign: 'right',
+              height: HOUR_HEIGHT,
+              borderTop: hourIndex > 0 ? '1px solid var(--nc-border)' : 'none',
+            }}>
+              {hour}:00
+            </div>
+            {/* Day columns */}
+            {days.map((day, dayIndex) => (
+              <div key={`cell-${hour}-${dayIndex}`} style={{
+                background: 'white',
+                height: HOUR_HEIGHT,
+                borderLeft: '1px solid var(--nc-border)',
+                borderTop: hourIndex > 0 ? '1px solid var(--nc-border)' : 'none',
+                position: 'relative',
+              }} />
+            ))}
+          </React.Fragment>
+        ))}
+
+        {/* Appointments positioned absolutely */}
+        {days.map((day, dayIndex) => {
+          const dayAppointments = appointments.filter((a: Appointment) => {
+            const apptDate = new Date(a.start_time);
+            return apptDate.toDateString() === day.toDateString();
+          });
+
+          return dayAppointments.map((appt: Appointment) => {
+            const start = new Date(appt.start_time);
+            const end = new Date(appt.end_time);
+            const startHour = start.getHours();
+            const startMinute = start.getMinutes();
+            const durationMs = end.getTime() - start.getTime();
+            const durationHours = durationMs / (1000 * 60 * 60);
+
+            // Calculate position from 8am
+            const topOffset = ((startHour - 8) * HOUR_HEIGHT) + ((startMinute / 60) * HOUR_HEIGHT);
+            const height = durationHours * HOUR_HEIGHT;
+
+            // Calculate left position (60px for time column + dayIndex * column width)
+            const leftOffset = 61 + (dayIndex * (100 / 7)); // Approximate column positioning
+
+            return (
+              <div key={appt.id} style={{
+                position: 'absolute',
+                top: topOffset,
+                left: `calc(60px + ${dayIndex} * (100% - 60px) / 7 + 2px)`,
+                width: `calc((100% - 60px) / 7 - 4px)`,
+                height: height - 4,
+                padding: 4,
+                zIndex: 2,
+              }}>
+                <AppointmentCard appointment={appt} isNutritionist={true} />
+              </div>
+            );
+          });
+        })}
+      </div>
     </div>
   );
 }
