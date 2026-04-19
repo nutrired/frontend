@@ -12,6 +12,7 @@ import type { Appointment } from '@/lib/types';
 export default function CalendarPage() {
   const { user } = useAuth();
   const [weekOffset, setWeekOffset] = useState(0);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
   const today = new Date();
   const weekStart = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
@@ -61,11 +62,19 @@ export default function CalendarPage() {
         {isLoading ? (
           <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando calendario...</div>
         ) : user.role === 'nutritionist' ? (
-          <NutritionistWeekView appointments={appointments} weekStart={weekStart} />
+          <NutritionistWeekView appointments={appointments} weekStart={weekStart} onAppointmentClick={setSelectedAppointment} />
         ) : (
-          <ClientListView appointments={appointments} />
+          <ClientListView appointments={appointments} onAppointmentClick={setSelectedAppointment} />
         )}
       </div>
+
+      {selectedAppointment && (
+        <AppointmentModal
+          appointment={selectedAppointment}
+          isNutritionist={user.role === 'nutritionist'}
+          onClose={() => setSelectedAppointment(null)}
+        />
+      )}
     </>
   );
 }
@@ -73,9 +82,10 @@ export default function CalendarPage() {
 interface WeekViewProps {
   appointments: Appointment[];
   weekStart: Date;
+  onAppointmentClick: (appointment: Appointment) => void;
 }
 
-function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
+function NutritionistWeekView({ appointments, weekStart, onAppointmentClick }: WeekViewProps) {
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + i);
@@ -183,7 +193,7 @@ function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
                 padding: 4,
                 zIndex: 2,
               }}>
-                <AppointmentCard appointment={appt} isNutritionist={true} />
+                <AppointmentCard appointment={appt} isNutritionist={true} onClick={() => onAppointmentClick(appt)} />
               </div>
             );
           });
@@ -195,9 +205,10 @@ function NutritionistWeekView({ appointments, weekStart }: WeekViewProps) {
 
 interface ListViewProps {
   appointments: Appointment[];
+  onAppointmentClick: (appointment: Appointment) => void;
 }
 
-function ClientListView({ appointments }: ListViewProps) {
+function ClientListView({ appointments, onAppointmentClick }: ListViewProps) {
   if (appointments.length === 0) {
     return (
       <div style={{
@@ -228,7 +239,10 @@ function ClientListView({ appointments }: ListViewProps) {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'start',
-        }}>
+          cursor: 'pointer',
+        }}
+        onClick={() => onAppointmentClick(appt)}
+        >
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--nc-ink)', marginBottom: 4 }}>
               {appt.appointment_type.name}
@@ -260,9 +274,10 @@ function ClientListView({ appointments }: ListViewProps) {
 interface AppointmentCardProps {
   appointment: Appointment;
   isNutritionist: boolean;
+  onClick: () => void;
 }
 
-function AppointmentCard({ appointment, isNutritionist }: AppointmentCardProps) {
+function AppointmentCard({ appointment, isNutritionist, onClick }: AppointmentCardProps) {
   const [showActions, setShowActions] = useState(false);
   const startTime = new Date(appointment.start_time);
   const endTime = new Date(appointment.end_time);
@@ -283,6 +298,10 @@ function AppointmentCard({ appointment, isNutritionist }: AppointmentCardProps) 
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
       }}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
@@ -563,5 +582,236 @@ function CancelButton({ appointmentId, startTime }: CancelButtonProps) {
         </div>
       )}
     </>
+  );
+}
+
+interface AppointmentModalProps {
+  appointment: Appointment;
+  isNutritionist: boolean;
+  onClose: () => void;
+}
+
+function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentModalProps) {
+  const [processing, setProcessing] = useState(false);
+  const startTime = new Date(appointment.start_time);
+  const endTime = new Date(appointment.end_time);
+  const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+
+  const handleComplete = async () => {
+    setProcessing(true);
+    try {
+      await completeAppointment(appointment.id);
+      onClose();
+    } catch (err) {
+      alert('Error marking as completed');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleNoShow = async () => {
+    if (!window.confirm('¿Marcar como no asistido?')) return;
+    setProcessing(true);
+    try {
+      await markNoShow(appointment.id);
+      onClose();
+    } catch (err) {
+      alert('Error marking as no-show');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    const reason = window.prompt('Motivo de cancelación:');
+    if (!reason) return;
+    setProcessing(true);
+    try {
+      await cancelAppointment(appointment.id, reason);
+      onClose();
+    } catch (err: any) {
+      alert(err.message || 'Error cancelando cita');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleReschedule = () => {
+    // TODO: Implement reschedule flow - for now just alert
+    alert('Función de reprogramación próximamente. Por ahora, cancela y crea una nueva cita.');
+  };
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: 'white',
+          borderRadius: 12,
+          maxWidth: 500,
+          width: '90%',
+          padding: 32,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 20, fontWeight: 600, color: 'var(--nc-ink)', marginBottom: 8 }}>
+            {appointment.appointment_type.name}
+          </div>
+          <StatusBadge status={appointment.status} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 24 }}>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+              {isNutritionist ? 'Cliente' : 'Nutricionista'}
+            </div>
+            <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+              {isNutritionist ? appointment.client_name : appointment.nutritionist_name}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+              Fecha y hora
+            </div>
+            <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+              {format(startTime, 'PPP')} • {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')} ({durationMinutes}min)
+            </div>
+          </div>
+
+          {appointment.appointment_type.description && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+                Descripción
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+                {appointment.appointment_type.description}
+              </div>
+            </div>
+          )}
+
+          {appointment.appointment_type.video_link && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+                Enlace de videollamada
+              </div>
+              <a
+                href={appointment.appointment_type.video_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 14, color: 'var(--nc-forest)', textDecoration: 'none' }}
+              >
+                {appointment.appointment_type.video_link}
+              </a>
+            </div>
+          )}
+
+          {appointment.notes && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+                Notas
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+                {appointment.notes}
+              </div>
+            </div>
+          )}
+
+          {appointment.cancellation_reason && (
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
+                Motivo de cancelación
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+                {appointment.cancellation_reason}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {appointment.status === 'scheduled' && (
+            <>
+              {isNutritionist && (
+                <>
+                  <button
+                    onClick={handleComplete}
+                    disabled={processing}
+                    className="dash-btn-publish"
+                    style={{ flex: 1 }}
+                  >
+                    Completar
+                  </button>
+                  <button
+                    onClick={handleNoShow}
+                    disabled={processing}
+                    style={{
+                      flex: 1,
+                      padding: '10px 16px',
+                      background: 'var(--nc-terra)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    No asistió
+                  </button>
+                </>
+              )}
+              <button
+                onClick={handleReschedule}
+                disabled={processing}
+                className="dash-btn-plain"
+                style={{ flex: 1 }}
+              >
+                Reprogramar
+              </button>
+              <button
+                onClick={handleCancel}
+                disabled={processing}
+                style={{
+                  flex: 1,
+                  padding: '10px 16px',
+                  background: '#666',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancelar cita
+              </button>
+            </>
+          )}
+          <button
+            onClick={onClose}
+            className="dash-btn-plain"
+            style={{ flex: appointment.status === 'scheduled' ? 'none' : 1 }}
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
