@@ -29,13 +29,18 @@ export default function BookAppointmentPage() {
   );
 
   // Check if nutritionist has no appointment types configured
-  const hasNoAppointmentTypes = slotsError?.message?.includes('NO_APPOINTMENT_TYPES') ||
-                                  slotsError?.message?.includes('no ha configurado tipos de cita');
+  const hasNoAppointmentTypes = !typesLoading && types.length === 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!relationshipID || !selectedTypeID || !selectedSlot) {
-      setError('Please complete all fields');
+
+    // Validation with helpful messages
+    if (!selectedTypeID) {
+      setError('Por favor selecciona un tipo de cita');
+      return;
+    }
+    if (!selectedSlot) {
+      setError('Por favor selecciona una hora disponible');
       return;
     }
 
@@ -100,20 +105,26 @@ export default function BookAppointmentPage() {
 
           <div className="dash-field">
             <label className="dash-label">Tipo de cita</label>
-            <select
-              className="dash-input"
-              value={selectedTypeID}
-              onChange={(e) => setSelectedTypeID(e.target.value)}
-              required
-              disabled={hasNoAppointmentTypes}
-            >
-              <option value="">Seleccionar...</option>
-              {types.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name} ({type.duration_minutes} min)
-                </option>
-              ))}
-            </select>
+            {typesLoading ? (
+              <div style={{ fontSize: 13, color: 'var(--nc-stone)', padding: '12px 16px' }}>
+                Cargando tipos de cita...
+              </div>
+            ) : (
+              <select
+                className="dash-input"
+                value={selectedTypeID}
+                onChange={(e) => setSelectedTypeID(e.target.value)}
+                required
+                disabled={hasNoAppointmentTypes}
+              >
+                <option value="">Seleccionar...</option>
+                {types.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name} ({type.duration_minutes} min)
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
 
           <div className="dash-field">
