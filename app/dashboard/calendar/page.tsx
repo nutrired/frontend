@@ -680,8 +680,26 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 4 }}>
               {isNutritionist ? 'Cliente' : 'Nutricionista'}
             </div>
-            <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
-              {isNutritionist ? appointment.client_name : appointment.nutritionist_name}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ fontSize: 14, color: 'var(--nc-ink)' }}>
+                {isNutritionist ? appointment.client_name : appointment.nutritionist_name}
+              </div>
+              {isNutritionist && (
+                <Link
+                  href={`/dashboard/clients/${appointment.relationship_id}`}
+                  style={{
+                    fontSize: 12,
+                    color: 'var(--nc-forest)',
+                    textDecoration: 'none',
+                    padding: '4px 10px',
+                    background: 'var(--nc-forest-pale)',
+                    borderRadius: 6,
+                    fontWeight: 500,
+                  }}
+                >
+                  Ver perfil →
+                </Link>
+              )}
             </div>
           </div>
 
@@ -782,18 +800,31 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
               <button
                 onClick={handleReschedule}
                 disabled={processing}
-                className="dash-btn-plain"
+                style={{
+                  padding: '10px 16px',
+                  background: 'linear-gradient(135deg, #4a7c59 0%, #5a9268 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(74, 124, 89, 0.25)',
+                  transition: 'transform 0.1s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
-                Reprogramar
+                🔄 Reprogramar
               </button>
               <button
                 onClick={handleCancel}
                 disabled={processing}
                 style={{
                   padding: '10px 16px',
-                  background: '#888',
-                  color: 'white',
-                  border: 'none',
+                  background: 'white',
+                  color: '#666',
+                  border: '1px solid #ddd',
                   borderRadius: 8,
                   fontSize: 13,
                   fontWeight: 500,
@@ -806,8 +837,17 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
           )}
           <button
             onClick={onClose}
-            className="dash-btn-plain"
-            style={{ gridColumn: appointment.status === 'scheduled' ? '1 / -1' : 'auto' }}
+            style={{
+              gridColumn: appointment.status === 'scheduled' ? '1 / -1' : 'auto',
+              padding: '10px 16px',
+              background: 'white',
+              color: 'var(--nc-stone)',
+              border: '1px solid var(--nc-border)',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
           >
             Cerrar
           </button>
