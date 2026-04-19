@@ -23,6 +23,7 @@ import type {
 } from '@/lib/plans';
 import type { PlanStatus, MealType } from '@/lib/types';
 import RecipePickerModal from '@/components/RecipePickerModal';
+import SupplementItem from './components/SupplementItem';
 
 const MEAL_TYPES = [
   { value: 'breakfast',   label: 'Desayuno'     },
@@ -447,10 +448,19 @@ export default function EditNutritionPlanPage() {
     setSupplements(supplements.filter((_, i) => i !== index));
   }
 
-  function handleMoveSupplement(index: number, direction: number) {
-    if (index + direction < 0 || index + direction >= supplements.length) return;
+  function handleMoveSupplementUp(index: number) {
+    if (index <= 0) return;
     const newSupps = [...supplements];
-    [newSupps[index], newSupps[index + direction]] = [newSupps[index + direction], newSupps[index]];
+    [newSupps[index], newSupps[index - 1]] = [newSupps[index - 1], newSupps[index]];
+    // Update display_order
+    newSupps.forEach((s, i) => (s.display_order = i));
+    setSupplements(newSupps);
+  }
+
+  function handleMoveSupplementDown(index: number) {
+    if (index >= supplements.length - 1) return;
+    const newSupps = [...supplements];
+    [newSupps[index], newSupps[index + 1]] = [newSupps[index + 1], newSupps[index]];
     // Update display_order
     newSupps.forEach((s, i) => (s.display_order = i));
     setSupplements(newSupps);
@@ -897,13 +907,15 @@ export default function EditNutritionPlanPage() {
           <div className="dash-section" style={{ marginTop: '2rem' }}>
             <div className="dash-section-head">
               <div className="dash-section-title">Suplementos</div>
-              <button
-                type="button"
-                className="btn-link"
-                onClick={handleAddSupplement}
-              >
-                + Agregar suplemento
-              </button>
+              {isDraft && (
+                <button
+                  type="button"
+                  className="btn-link"
+                  onClick={handleAddSupplement}
+                >
+                  + Agregar suplemento
+                </button>
+              )}
             </div>
             <div className="dash-section-body">
               {supplements.length === 0 ? (
@@ -913,31 +925,17 @@ export default function EditNutritionPlanPage() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {supplements.map((supp, idx) => (
-                    <div
+                    <SupplementItem
                       key={idx}
-                      style={{
-                        border: '1px solid var(--nc-border)',
-                        borderRadius: '8px',
-                        padding: '1rem',
-                        background: 'white',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                        <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--nc-forest)' }}>
-                          Suplemento {idx + 1}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteSupplement(idx)}
-                          style={{ color: '#b94a3a', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer' }}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                      <p style={{ fontSize: 13, color: 'var(--nc-stone)' }}>
-                        {supp.name || '(Sin nombre)'}
-                      </p>
-                    </div>
+                      supplement={supp}
+                      index={idx}
+                      onUpdate={updateSupplement}
+                      onDelete={handleDeleteSupplement}
+                      onMoveUp={handleMoveSupplementUp}
+                      onMoveDown={handleMoveSupplementDown}
+                      isFirst={idx === 0}
+                      isLast={idx === supplements.length - 1}
+                    />
                   ))}
                 </div>
               )}
