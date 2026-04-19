@@ -99,13 +99,31 @@ export default function CalendarPage() {
               </button>
             </div>
 
-            {/* Today button */}
+            {/* Today button - more prominent when away from current week */}
             {!isCurrentWeek && (
               <button
                 onClick={() => setWeekOffset(0)}
-                className="dash-btn-plain"
+                style={{
+                  background: 'var(--nc-forest)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = 'var(--nc-forest-dark)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'var(--nc-forest)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
               >
-                Hoy
+                • Hoy
               </button>
             )}
 
