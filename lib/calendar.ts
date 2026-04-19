@@ -3,7 +3,7 @@
 
 import useSWR, { mutate } from 'swr';
 import { api } from './api';
-import type { AppointmentType, AvailabilityRule } from './types';
+import type { AppointmentType, AvailabilityRule, Appointment } from './types';
 
 // ─── Appointment Types ────────────────────────────────────────────────────────
 
@@ -81,4 +81,51 @@ export async function createAvailabilityRule(params: CreateAvailabilityRuleParam
 export async function deleteAvailabilityRule(id: string): Promise<void> {
   await api.del(`/calendar/availability/${id}`);
   mutate('/calendar/availability');
+}
+
+// ─── Appointments ─────────────────────────────────────────────────────────────
+
+export function useCalendar(from: string, to: string) {
+  const { data, error, isLoading, mutate: revalidate } = useSWR<{ appointments: Appointment[] }>(
+    `/calendar?from=${from}&to=${to}`,
+    () => api.get<{ appointments: Appointment[] }>(`/calendar?from=${from}&to=${to}`)
+  );
+  return { appointments: data?.appointments ?? [], isLoading, error, mutate: revalidate };
+}
+
+export function useAvailableSlots(nutritionistID: string, date: string, duration: number) {
+  const { data, error, isLoading } = useSWR<{ slots: string[] }>(
+    nutritionistID && date && duration
+      ? `/calendar/available-slots?nutritionist_id=${nutritionistID}&date=${date}&duration=${duration}`
+      : null,
+    () => api.get<{ slots: string[] }>(
+      `/calendar/available-slots?nutritionist_id=${nutritionistID}&date=${date}&duration=${duration}`
+    )
+  );
+  return { slots: data?.slots ?? [], isLoading, error };
+}
+
+export async function createAppointment(params: {
+  relationship_id: string;
+  appointment_type_id: string;
+  start_time: string;
+  notes?: string;
+}): Promise<void> {
+  await api.post('/calendar/appointments', params);
+  mutate((key) => typeof key === 'string' && key.startsWith('/calendar'));
+}
+
+export async function cancelAppointment(id: string, reason: string): Promise<void> {
+  await api.post(`/calendar/appointments/${id}/cancel`, { reason });
+  mutate((key) => typeof key === 'string' && key.startsWith('/calendar'));
+}
+
+export async function completeAppointment(id: string, notes?: string): Promise<void> {
+  await api.post(`/calendar/appointments/${id}/complete`, { notes });
+  mutate((key) => typeof key === 'string' && key.startsWith('/calendar'));
+}
+
+export async function markNoShow(id: string): Promise<void> {
+  await api.post(`/calendar/appointments/${id}/no-show`, {});
+  mutate((key) => typeof key === 'string' && key.startsWith('/calendar'));
 }
