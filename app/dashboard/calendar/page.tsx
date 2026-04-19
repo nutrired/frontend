@@ -744,43 +744,45 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
           )}
         </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {appointment.status === 'scheduled' && (
+          <div style={{ display: 'grid', gridTemplateColumns: isNutritionist ? '1fr 1fr' : '1fr', gap: 12, marginBottom: 12 }}>
+            {isNutritionist && (
+              <>
+                <button
+                  onClick={handleComplete}
+                  disabled={processing}
+                  className="dash-btn-publish"
+                >
+                  Completar
+                </button>
+                <button
+                  onClick={handleNoShow}
+                  disabled={processing}
+                  style={{
+                    padding: '10px 16px',
+                    background: 'var(--nc-terra)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 13,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  No asistió
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: appointment.status === 'scheduled' ? '1fr 1fr' : '1fr', gap: 12 }}>
           {appointment.status === 'scheduled' && (
             <>
-              {isNutritionist && (
-                <>
-                  <button
-                    onClick={handleComplete}
-                    disabled={processing}
-                    className="dash-btn-publish"
-                    style={{ flex: 1 }}
-                  >
-                    Completar
-                  </button>
-                  <button
-                    onClick={handleNoShow}
-                    disabled={processing}
-                    style={{
-                      flex: 1,
-                      padding: '10px 16px',
-                      background: 'var(--nc-terra)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    No asistió
-                  </button>
-                </>
-              )}
               <button
                 onClick={handleReschedule}
                 disabled={processing}
                 className="dash-btn-plain"
-                style={{ flex: 1 }}
               >
                 Reprogramar
               </button>
@@ -788,9 +790,8 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
                 onClick={handleCancel}
                 disabled={processing}
                 style={{
-                  flex: 1,
                   padding: '10px 16px',
-                  background: '#666',
+                  background: '#888',
                   color: 'white',
                   border: 'none',
                   borderRadius: 8,
@@ -806,7 +807,7 @@ function AppointmentModal({ appointment, isNutritionist, onClose }: AppointmentM
           <button
             onClick={onClose}
             className="dash-btn-plain"
-            style={{ flex: appointment.status === 'scheduled' ? 'none' : 1 }}
+            style={{ gridColumn: appointment.status === 'scheduled' ? '1 / -1' : 'auto' }}
           >
             Cerrar
           </button>
