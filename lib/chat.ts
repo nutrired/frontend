@@ -1,4 +1,5 @@
 // frontend/lib/chat.ts
+import { useEffect, useRef, useState, useCallback } from 'react';
 import useSWR from 'swr';
 import { api } from './api';
 import type { ChatMessage, Conversation, UploadAttachmentResponse } from './types';
@@ -92,5 +93,153 @@ export function useChatMessages(relationshipId: string | null) {
     isLoading: !error && !data,
     error,
     mutate,
+  };
+}
+
+// ─── WebSocket Hook ───────────────────────────────────────────────────────────
+
+type ConnectionStatus = 'connecting' | 'connected' | 'disconnected';
+
+interface UseWebSocketReturn {
+  status: ConnectionStatus;
+  messages: ChatMessage[];
+  onlineUsers: Set<string>;
+  sendMessage: (text?: string, attachment?: UploadAttachmentResponse) => void;
+}
+
+export function useWebSocket(relationshipId: string | null): UseWebSocketReturn {
+  const [status, setStatus] = useState<ConnectionStatus>('disconnected');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectAttempts = useRef(0);
+
+  const connect = useCallback(() => {
+    if (!relationshipId) return;
+
+    setStatus('connecting');
+
+    // Get access token from cookie
+    const token = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('access_token='))
+      ?.split('=')[1];
+
+    if (!token) {
+      console.error('No access token found');
+      setStatus('disconnected');
+      return;
+    }
+
+    const ws = new WebSocket(`${WS_URL}/ws/chat/${relationshipId}?token=${token}`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setStatus('connected');
+      reconnectAttempts.current = 0;
+      console.log('WebSocket connected');
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const serverMsg = JSON.parse(event.data);
+
+        switch (serverMsg.type) {
+          case 'connected':
+            console.log('Connected to chat:', serverMsg.data);
+            break;
+
+          case 'message':
+            setMessages((prev) => [...prev, serverMsg.data]);
+            break;
+
+          case 'presence':
+            const { user_id, status: presenceStatus } = serverMsg.data;
+            setOnlineUsers((prev) => {
+              const next = new Set(prev);
+              if (presenceStatus === 'online') {
+                next.add(user_id);
+              } else {
+                next.delete(user_id);
+              }
+              return next;
+            });
+            break;
+
+          case 'error':
+            console.error('WebSocket error:', serverMsg.message);
+            break;
+        }
+      } catch (err) {
+        console.error('Failed to parse WebSocket message:', err);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event.code, event.reason);
+      setStatus('disconnected');
+      wsRef.current = null;
+
+      // Reconnect with exponential backoff
+      if (event.code !== 1000) {
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), 30000);
+        reconnectAttempts.current++;
+        console.log(`Reconnecting in ${delay}ms...`);
+        reconnectTimeoutRef.current = setTimeout(connect, delay);
+      }
+    };
+  }, [relationshipId]);
+
+  useEffect(() => {
+    connect();
+
+    return () => {
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close(1000, 'Component unmounted');
+      }
+    };
+  }, [connect]);
+
+  const sendMessage = useCallback(
+    (text?: string, attachment?: UploadAttachmentResponse) => {
+      if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        console.error('WebSocket not connected');
+        return;
+      }
+
+      const message: any = {
+        type: 'message',
+      };
+
+      if (text) {
+        message.message_text = text;
+      }
+
+      if (attachment) {
+        message.attachment_url = attachment.url;
+        message.attachment_filename = attachment.filename;
+        message.attachment_size_bytes = attachment.size_bytes;
+        message.attachment_content_type = attachment.content_type;
+      }
+
+      wsRef.current.send(JSON.stringify(message));
+    },
+    [],
+  );
+
+  return {
+    status,
+    messages,
+    onlineUsers,
+    sendMessage,
   };
 }
