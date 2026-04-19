@@ -8,20 +8,28 @@ import { useState } from 'react';
 import React from 'react';
 import Link from 'next/link';
 import type { Appointment } from '@/lib/types';
+import { SeriesDetailModal } from './components/SeriesDetailModal';
 
 export default function CalendarPage() {
   const { user } = useAuth();
   const [weekOffset, setWeekOffset] = useState(0);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [seriesModalOpen, setSeriesModalOpen] = useState(false);
+  const [selectedSeriesId, setSelectedSeriesId] = useState('');
 
   const today = new Date();
   const weekStart = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
   const weekEnd = endOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
 
-  const { appointments, isLoading } = useCalendar(
+  const { appointments, isLoading, mutate } = useCalendar(
     weekStart.toISOString(),
     weekEnd.toISOString()
   );
+
+  const handleViewSeries = (seriesId: string) => {
+    setSelectedSeriesId(seriesId);
+    setSeriesModalOpen(true);
+  };
 
   if (!user) return null;
 
@@ -62,7 +70,7 @@ export default function CalendarPage() {
         {isLoading ? (
           <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando calendario...</div>
         ) : user.role === 'nutritionist' ? (
-          <NutritionistWeekView appointments={appointments} weekStart={weekStart} onAppointmentClick={setSelectedAppointment} />
+          <NutritionistWeekView appointments={appointments} weekStart={weekStart} onAppointmentClick={setSelectedAppointment} onViewSeries={handleViewSeries} />
         ) : (
           <ClientListView appointments={appointments} onAppointmentClick={setSelectedAppointment} />
         )}
@@ -75,6 +83,15 @@ export default function CalendarPage() {
           onClose={() => setSelectedAppointment(null)}
         />
       )}
+
+      <SeriesDetailModal
+        open={seriesModalOpen}
+        onClose={() => setSeriesModalOpen(false)}
+        seriesId={selectedSeriesId}
+        onSuccess={() => {
+          mutate();
+        }}
+      />
     </>
   );
 }
@@ -83,9 +100,10 @@ interface WeekViewProps {
   appointments: Appointment[];
   weekStart: Date;
   onAppointmentClick: (appointment: Appointment) => void;
+  onViewSeries?: (seriesId: string) => void;
 }
 
-function NutritionistWeekView({ appointments, weekStart, onAppointmentClick }: WeekViewProps) {
+function NutritionistWeekView({ appointments, weekStart, onAppointmentClick, onViewSeries }: WeekViewProps) {
   const days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(weekStart);
     date.setDate(weekStart.getDate() + i);
@@ -193,7 +211,7 @@ function NutritionistWeekView({ appointments, weekStart, onAppointmentClick }: W
                 padding: 4,
                 zIndex: 2,
               }}>
-                <AppointmentCard appointment={appt} isNutritionist={true} onClick={() => onAppointmentClick(appt)} />
+                <AppointmentCard appointment={appt} isNutritionist={true} onClick={() => onAppointmentClick(appt)} onViewSeries={onViewSeries} />
               </div>
             );
           });
@@ -275,9 +293,10 @@ interface AppointmentCardProps {
   appointment: Appointment;
   isNutritionist: boolean;
   onClick: () => void;
+  onViewSeries?: (seriesId: string) => void;
 }
 
-function AppointmentCard({ appointment, isNutritionist, onClick }: AppointmentCardProps) {
+function AppointmentCard({ appointment, isNutritionist, onClick, onViewSeries }: AppointmentCardProps) {
   const [showActions, setShowActions] = useState(false);
   const startTime = new Date(appointment.start_time);
   const endTime = new Date(appointment.end_time);
@@ -334,8 +353,11 @@ function AppointmentCard({ appointment, isNutritionist, onClick }: AppointmentCa
       }}>
         {appointment.appointment_type.name} • {durationMinutes}min
       </div>
+      {appointment.series_id && (
+        <span style={{ fontSize: 9, color: 'var(--nc-stone)' }}>📅 Part of series</span>
+      )}
       {isNutritionist && showActions && appointment.status === 'scheduled' && (
-        <NutritionistActions appointmentId={appointment.id} />
+        <NutritionistActions appointmentId={appointment.id} seriesId={appointment.series_id} onViewSeries={onViewSeries} />
       )}
     </div>
   );
@@ -343,9 +365,11 @@ function AppointmentCard({ appointment, isNutritionist, onClick }: AppointmentCa
 
 interface NutritionistActionsProps {
   appointmentId: string;
+  seriesId?: string;
+  onViewSeries?: (seriesId: string) => void;
 }
 
-function NutritionistActions({ appointmentId }: NutritionistActionsProps) {
+function NutritionistActions({ appointmentId, seriesId, onViewSeries }: NutritionistActionsProps) {
   const [processing, setProcessing] = useState(false);
 
   const handleComplete = async () => {
@@ -401,6 +425,25 @@ function NutritionistActions({ appointmentId }: NutritionistActionsProps) {
       zIndex: 10,
       boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     }}>
+      {seriesId && onViewSeries && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewSeries(seriesId);
+          }}
+          style={{
+            padding: '4px 8px',
+            fontSize: 11,
+            background: '#4a7c59',
+            color: 'white',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+          }}
+        >
+          Ver serie
+        </button>
+      )}
       <button
         onClick={handleComplete}
         disabled={processing}
