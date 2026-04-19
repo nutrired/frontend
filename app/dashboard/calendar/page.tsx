@@ -115,7 +115,7 @@ export default function CalendarPage() {
                   transition: 'all 0.2s ease',
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = 'var(--nc-forest-dark)';
+                  e.currentTarget.style.background = '#1A3329';
                   e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseOut={(e) => {
