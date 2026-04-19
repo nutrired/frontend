@@ -43,7 +43,7 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Thread */}
-        <div style={{ background: '#FAFAF9' }}>
+        <div style={{ background: '#FAFAF9', height: '100%' }}>
           {activeConversation ? (
             <ChatThread
               relationshipId={activeConversation.relationship_id}
