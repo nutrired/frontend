@@ -272,26 +272,48 @@ function AppointmentCard({ appointment, isNutritionist }: AppointmentCardProps) 
     <div
       style={{
         background: appointment.status === 'scheduled' ? 'var(--nc-forest-pale)' : '#f0f0f0',
-        border: `1px solid ${appointment.status === 'scheduled' ? 'var(--nc-forest)' : '#ccc'}`,
-        borderRadius: 4,
-        padding: '4px 6px',
+        border: `2px solid ${appointment.status === 'scheduled' ? 'var(--nc-forest)' : '#ccc'}`,
+        borderRadius: 6,
+        padding: '6px 8px',
         fontSize: 11,
         cursor: 'pointer',
         position: 'relative',
         height: '100%',
         overflow: 'visible',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
       }}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+      <div style={{
+        fontWeight: 600,
+        fontSize: 12,
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        color: 'var(--nc-forest)',
+      }}>
         {isNutritionist ? appointment.client_name : appointment.nutritionist_name}
       </div>
-      <div style={{ color: 'var(--nc-stone)', whiteSpace: 'nowrap' }}>
-        {format(startTime, 'HH:mm')}-{format(endTime, 'HH:mm')} ({durationMinutes}min)
+      <div style={{
+        fontWeight: 600,
+        fontSize: 11,
+        color: 'var(--nc-forest)',
+        lineHeight: 1.2,
+      }}>
+        {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
       </div>
-      <div style={{ fontSize: 10, color: 'var(--nc-stone)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {appointment.appointment_type.name}
+      <div style={{
+        fontSize: 10,
+        color: 'var(--nc-stone)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        lineHeight: 1.3,
+      }}>
+        {appointment.appointment_type.name} • {durationMinutes}min
       </div>
       {isNutritionist && showActions && appointment.status === 'scheduled' && (
         <NutritionistActions appointmentId={appointment.id} />
