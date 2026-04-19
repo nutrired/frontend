@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/lib/auth';
 import { useCalendar, cancelAppointment, completeAppointment, markNoShow } from '@/lib/calendar';
-import { format, startOfWeek, endOfWeek, addWeeks, isSameDay, parseISO } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addWeeks, isSameDay, parseISO, isSameWeek } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useState } from 'react';
 import React from 'react';
@@ -19,13 +19,18 @@ export default function CalendarPage() {
   const [selectedSeriesId, setSelectedSeriesId] = useState('');
 
   const today = new Date();
-  const weekStart = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
+  const currentWeekStart = startOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
+  const weekStart = currentWeekStart;
   const weekEnd = endOfWeek(addWeeks(today, weekOffset), { weekStartsOn: 1 });
+  const isCurrentWeek = isSameWeek(currentWeekStart, today, { weekStartsOn: 1 });
 
   const { appointments, isLoading, mutate } = useCalendar(
     weekStart.toISOString(),
     weekEnd.toISOString()
   );
+
+  // Format week range display
+  const weekRangeText = `${format(weekStart, 'd MMM', { locale: es })} - ${format(weekEnd, 'd MMM yyyy', { locale: es })}`;
 
   const handleViewSeries = (seriesId: string) => {
     setSelectedSeriesId(seriesId);
@@ -39,25 +44,72 @@ export default function CalendarPage() {
       <div className="dash-topbar">
         <div className="dash-topbar-title">Calendario</div>
         <div className="dash-topbar-right">
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button
-              onClick={() => setWeekOffset(weekOffset - 1)}
-              className="dash-btn-plain"
-            >
-              ← Anterior
-            </button>
-            <button
-              onClick={() => setWeekOffset(0)}
-              className="dash-btn-plain"
-            >
-              Hoy
-            </button>
-            <button
-              onClick={() => setWeekOffset(weekOffset + 1)}
-              className="dash-btn-plain"
-            >
-              Siguiente →
-            </button>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            {/* Week navigation */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'white',
+              border: '1px solid var(--nc-border)',
+              borderRadius: 8,
+              padding: '4px 6px',
+            }}>
+              <button
+                onClick={() => setWeekOffset(weekOffset - 1)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '6px 10px',
+                  fontSize: 16,
+                  color: 'var(--nc-stone)',
+                  borderRadius: 4,
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = 'var(--nc-forest-pale)'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                ←
+              </button>
+              <div style={{
+                fontSize: 13,
+                fontWeight: 500,
+                color: 'var(--nc-ink)',
+                minWidth: 140,
+                textAlign: 'center',
+                padding: '0 8px',
+              }}>
+                {weekRangeText}
+              </div>
+              <button
+                onClick={() => setWeekOffset(weekOffset + 1)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '6px 10px',
+                  fontSize: 16,
+                  color: 'var(--nc-stone)',
+                  borderRadius: 4,
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = 'var(--nc-forest-pale)'}
+                onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+              >
+                →
+              </button>
+            </div>
+
+            {/* Today button */}
+            {!isCurrentWeek && (
+              <button
+                onClick={() => setWeekOffset(0)}
+                className="dash-btn-plain"
+              >
+                Hoy
+              </button>
+            )}
+
+            {/* Action button */}
             {user.role === 'client' && (
               <Link href="/dashboard/my-nutritionist" className="dash-btn-publish">
                 Agendar Cita

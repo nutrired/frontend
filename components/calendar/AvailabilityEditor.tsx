@@ -9,7 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2 } from 'lucide-react';
 
+// Backend uses 0=Sunday, but we display Monday first (Spanish convention)
 const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const DAYS_DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday to Sunday
 
 export function AvailabilityEditor() {
   const { rules, isLoading, mutate } = useAvailabilityRules();
@@ -61,9 +63,9 @@ export function AvailabilityEditor() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {DAYS.map((day, i) => (
-                  <SelectItem key={i} value={i.toString()}>
-                    {day}
+                {DAYS_DISPLAY_ORDER.map((dayIndex) => (
+                  <SelectItem key={dayIndex} value={dayIndex.toString()}>
+                    {DAYS[dayIndex]}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -96,12 +98,12 @@ export function AvailabilityEditor() {
 
       <div className="space-y-4">
         <h3 className="font-semibold">Disponibilidad Actual</h3>
-        {DAYS.map((day, i) => {
-          const dayRules = rulesByDay[i] || [];
+        {DAYS_DISPLAY_ORDER.map((dayIndex) => {
+          const dayRules = rulesByDay[dayIndex] || [];
           if (dayRules.length === 0) return null;
           return (
-            <div key={i} className="border rounded-lg p-4">
-              <h4 className="font-medium mb-2">{day}</h4>
+            <div key={dayIndex} className="border rounded-lg p-4">
+              <h4 className="font-medium mb-2">{DAYS[dayIndex]}</h4>
               <div className="space-y-2">
                 {dayRules.map((rule) => (
                   <div key={rule.id} className="flex justify-between items-center text-sm">
