@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 import { useMyProfile } from '@/lib/profile';
 import { useConversations } from '@/lib/chat';
 import { Avatar } from '@/components/Avatar';
+import useSWR from 'swr';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -18,6 +19,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Slight waste for clients but avoids conditional hook calls (React rules)
   const { profile } = useMyProfile();
   const { conversations } = useConversations();
+  const { data: version } = useSWR<{ version: string; commit: string; buildTime: string }>(
+    '/api/version',
+    () => fetch('/api/version').then(r => r.json()),
+    { revalidateOnFocus: false }
+  );
 
   // Settings section state (persisted to localStorage)
   const [settingsOpen, setSettingsOpen] = useState(true);
@@ -218,6 +224,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button onClick={handleSignOut} className="dash-nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
             <span>←</span> Sign out
           </button>
+          {version && (
+            <div
+              style={{
+                fontSize: 10,
+                color: 'rgba(139,115,85,0.5)',
+                padding: '8px 16px',
+                textAlign: 'center',
+              }}
+              title={`Commit: ${version.commit}\nBuild: ${version.buildTime}`}
+            >
+              v{version.version}
+            </div>
+          )}
         </div>
       </aside>
       <main className="dash-main">{children}</main>
