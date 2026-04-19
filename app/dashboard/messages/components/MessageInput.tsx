@@ -2,7 +2,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { uploadChatAttachment, type UploadAttachmentResponse } from '@/lib/chat';
+import { uploadChatAttachment } from '@/lib/chat';
+import type { UploadAttachmentResponse } from '@/lib/types';
 import { Paperclip, Send } from 'lucide-react';
 
 interface MessageInputProps {

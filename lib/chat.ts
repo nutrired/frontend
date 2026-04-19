@@ -117,7 +117,7 @@ export function useWebSocket(relationshipId: string | null): UseWebSocketReturn 
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
 
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const reconnectAttempts = useRef(0);
 
   const connect = useCallback(() => {
