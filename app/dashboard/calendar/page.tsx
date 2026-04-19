@@ -279,18 +279,18 @@ function AppointmentCard({ appointment, isNutritionist }: AppointmentCardProps) 
         cursor: 'pointer',
         position: 'relative',
         height: '100%',
-        overflow: 'hidden',
+        overflow: 'visible',
       }}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
-      <div style={{ fontWeight: 500 }}>
+      <div style={{ fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {isNutritionist ? appointment.client_name : appointment.nutritionist_name}
       </div>
-      <div style={{ color: 'var(--nc-stone)' }}>
+      <div style={{ color: 'var(--nc-stone)', whiteSpace: 'nowrap' }}>
         {format(startTime, 'HH:mm')}-{format(endTime, 'HH:mm')} ({durationMinutes}min)
       </div>
-      <div style={{ fontSize: 10, color: 'var(--nc-stone)' }}>
+      <div style={{ fontSize: 10, color: 'var(--nc-stone)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
         {appointment.appointment_type.name}
       </div>
       {isNutritionist && showActions && appointment.status === 'scheduled' && (
