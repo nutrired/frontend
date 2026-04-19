@@ -7,10 +7,14 @@ import type { AppointmentType, AvailabilityRule, Appointment } from './types';
 
 // ─── Appointment Types ────────────────────────────────────────────────────────
 
-export function useAppointmentTypes() {
+export function useAppointmentTypes(nutritionistID?: string) {
+  const url = nutritionistID
+    ? `/calendar/appointment-types?nutritionist_id=${nutritionistID}`
+    : '/calendar/appointment-types';
+
   const { data, error, isLoading, mutate: revalidate } = useSWR<{ types: AppointmentType[] }>(
-    '/calendar/appointment-types',
-    () => api.get<{ types: AppointmentType[] }>('/calendar/appointment-types'),
+    url,
+    () => api.get<{ types: AppointmentType[] }>(url),
   );
   return {
     types: data?.types ?? [],

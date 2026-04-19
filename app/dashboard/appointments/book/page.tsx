@@ -19,7 +19,7 @@ export default function BookAppointmentPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const { types, isLoading: typesLoading } = useAppointmentTypes();
+  const { types, isLoading: typesLoading } = useAppointmentTypes(nutritionistID || undefined);
   const selectedType = types.find(t => t.id === selectedTypeID);
 
   const { slots, isLoading: slotsLoading } = useAvailableSlots(
