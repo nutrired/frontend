@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "bash scripts/build-with-version.sh",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
