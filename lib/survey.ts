@@ -153,3 +153,36 @@ export function useSurveyAssignment(relationshipId: string | null | undefined) {
     mutate,
   };
 }
+
+export async function getPendingSurveyReviews(): Promise<{
+  reviews: {
+    assignment_id: string;
+    relationship_id: string;
+    client_name: string;
+    completed_at: string;
+  }[];
+}> {
+  return api.get<{
+    reviews: {
+      assignment_id: string;
+      relationship_id: string;
+      client_name: string;
+      completed_at: string;
+    }[];
+  }>('/surveys/pending-reviews');
+}
+
+export function usePendingSurveyReviews() {
+  const { data, error, isLoading, mutate } = useSWR(
+    '/surveys/pending-reviews',
+    getPendingSurveyReviews,
+    { revalidateOnFocus: false },
+  );
+
+  return {
+    reviews: data?.reviews ?? [],
+    isLoading,
+    error,
+    mutate,
+  };
+}

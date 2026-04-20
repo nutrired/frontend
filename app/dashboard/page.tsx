@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
 import { UpcomingAppointments } from './components/UpcomingAppointments';
 import { useMyRelationships } from '@/lib/hiring';
-import { useSurveyAssignment } from '@/lib/survey';
+import { useSurveyAssignment, usePendingSurveyReviews } from '@/lib/survey';
 
 // ─── Mini weight chart (SVG, no deps) ─────────────────────────────────────────
 
@@ -236,6 +236,87 @@ function ClientOverview() {
   );
 }
 
+// ─── Nutritionist overview ────────────────────────────────────────────────────
+
+function NutritionistOverview() {
+  const { reviews, isLoading } = usePendingSurveyReviews();
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {!isLoading && reviews.length > 0 && (
+        <div style={{
+          background: 'rgba(196,98,45,0.08)',
+          border: '1px solid rgba(196,98,45,0.2)',
+          borderRadius: 10,
+          padding: '16px 20px',
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-terra)', marginBottom: 12 }}>
+            📋 Encuestas completadas ({reviews.length})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {reviews.slice(0, 3).map((review) => (
+              <Link
+                key={review.assignment_id}
+                href={`/dashboard/clients/${review.relationship_id}`}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '8px 12px',
+                  background: 'white',
+                  border: '1px solid rgba(196,98,45,0.15)',
+                  borderRadius: 6,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)' }}>
+                    {review.client_name}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--nc-stone)', fontWeight: 300 }}>
+                    Completado {new Date(review.completed_at).toLocaleDateString('es-ES')}
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--nc-terra)', fontWeight: 500 }}>
+                  Revisar →
+                </div>
+              </Link>
+            ))}
+          </div>
+          {reviews.length > 3 && (
+            <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginTop: 8, textAlign: 'center' }}>
+              Y {reviews.length - 3} más...
+            </div>
+          )}
+        </div>
+      )}
+
+      <div style={{
+        background: 'white',
+        border: '1px solid var(--nc-border)',
+        borderRadius: 10,
+        padding: '20px 24px',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 8 }}>
+          Acciones rápidas
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Link href="/dashboard/clients" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
+            → Ver mis clientes
+          </Link>
+          <Link href="/dashboard/surveys" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
+            → Gestionar encuestas
+          </Link>
+          <Link href="/dashboard/profile" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
+            → Editar mi perfil
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -248,15 +329,7 @@ export default function DashboardPage() {
       </div>
       <div className="dash-content">
         {user?.role === 'client' && <ClientOverview />}
-        {user?.role === 'nutritionist' && (
-          <p style={{ color: 'var(--nc-stone)', fontSize: 14, fontWeight: 300 }}>
-            Welcome back, {user.email.split('@')[0]}. Head to{' '}
-            <Link href="/dashboard/profile" style={{ color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-              My profile
-            </Link>{' '}
-            to manage your listings.
-          </p>
-        )}
+        {user?.role === 'nutritionist' && <NutritionistOverview />}
       </div>
     </>
   );
