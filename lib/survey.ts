@@ -158,6 +158,7 @@ export async function getPendingSurveyReviews(): Promise<{
   reviews: {
     assignment_id: string;
     relationship_id: string;
+    client_id: string;
     client_name: string;
     completed_at: string;
   }[];
@@ -166,6 +167,7 @@ export async function getPendingSurveyReviews(): Promise<{
     reviews: {
       assignment_id: string;
       relationship_id: string;
+      client_id: string;
       client_name: string;
       completed_at: string;
     }[];

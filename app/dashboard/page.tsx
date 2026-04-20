@@ -257,7 +257,7 @@ function NutritionistOverview() {
             {reviews.slice(0, 3).map((review) => (
               <Link
                 key={review.assignment_id}
-                href={`/dashboard/clients/${review.relationship_id}`}
+                href={`/dashboard/clients/${review.client_id}`}
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
