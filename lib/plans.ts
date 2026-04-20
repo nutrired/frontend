@@ -213,7 +213,8 @@ export function useClientProfile(clientId: string) {
     clientId ? `/clients/${clientId}/profile` : null,
     () =>
       api
-        .get<ClientProfileSummary>(`/clients/${clientId}/profile`)
+        .get<{ profile: ClientProfileSummary | null }>(`/clients/${clientId}/profile`)
+        .then((res) => res.profile)
         .catch((err) => {
           if (err instanceof ApiRequestError && err.status === 404) return null;
           throw err;

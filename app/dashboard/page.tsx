@@ -1,43 +1,137 @@
 // frontend/app/dashboard/page.tsx
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
 import { UpcomingAppointments } from './components/UpcomingAppointments';
 import { useMyRelationships } from '@/lib/hiring';
 import { useSurveyAssignment, usePendingSurveyReviews } from '@/lib/survey';
+import type { WeightEntry, ActivityEntry } from '@/lib/types';
 
-// ─── Mini weight chart (SVG, no deps) ─────────────────────────────────────────
+// ─── Client Health Graphs ──────────────────────────────────────────────────────
 
-type MiniEntry = { id: string; weight_kg: number; recorded_at: string };
+function WeightGraph({ entries }: { entries: WeightEntry[] }) {
+  const data = entries
+    .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime())
+    .map(e => ({
+      date: new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }),
+      weight: parseFloat(String(e.weight_kg)),
+    }));
 
-function MiniWeightChart({ entries }: { entries: MiniEntry[] }) {
-  if (entries.length < 2) return null;
-  const sorted = [...entries].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at));
-  const W = 300; const H = 60; const PX = 4; const PY = 4;
-  const innerW = W - PX * 2; const innerH = H - PY * 2;
-  const vals = sorted.map((e) => e.weight_kg);
-  const minV = Math.min(...vals); const maxV = Math.max(...vals);
-  const range = maxV - minV || 1;
-  const toX = (i: number) => PX + (i / (sorted.length - 1)) * innerW;
-  const toY = (v: number) => PY + innerH - ((v - minV) / range) * innerH;
-  const pts = sorted.map((e, i) => `${toX(i)},${toY(e.weight_kg)}`).join(' ');
-  const area = `${PX},${PY + innerH} ${pts} ${PX + innerW},${PY + innerH}`;
+  if (data.length === 0) {
+    return (
+      <div style={{
+        color: 'var(--nc-stone)',
+        fontSize: 13,
+        fontWeight: 300,
+        padding: '40px 0',
+        textAlign: 'center'
+      }}>
+        No weight entries yet. Log your first weight to see your trend.
+      </div>
+    );
+  }
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
-      <polygon points={area} fill="rgba(26,51,41,0.07)" />
-      <polyline points={pts} fill="none" stroke="#1A3329" strokeWidth={1.5} strokeLinejoin="round" strokeLinecap="round" />
-      {sorted.map((e, i) => (
-        <circle key={e.id} cx={toX(i)} cy={toY(e.weight_kg)} r={2.5} fill="#C4622D" />
-      ))}
-    </svg>
+    <ResponsiveContainer width="100%" height={200}>
+      <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--nc-border)" />
+        <XAxis
+          dataKey="date"
+          style={{ fontSize: 11, fill: 'var(--nc-stone)' }}
+        />
+        <YAxis
+          domain={['dataMin - 1', 'dataMax + 1']}
+          style={{ fontSize: 11, fill: 'var(--nc-stone)' }}
+          label={{ value: 'kg', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+        />
+        <Tooltip
+          contentStyle={{
+            background: 'white',
+            border: '1px solid var(--nc-border)',
+            borderRadius: 6,
+            fontSize: 12
+          }}
+        />
+        <Line
+          type="monotone"
+          dataKey="weight"
+          stroke="var(--nc-forest)"
+          strokeWidth={2}
+          dot={{ r: 3, fill: 'var(--nc-forest)' }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
+  // Group by date, sum duration_minutes
+  const grouped = entries.reduce((acc, e) => {
+    const date = new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    if (!acc[date]) {
+      acc[date] = 0;
+    }
+    acc[date] += e.duration_minutes;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const data = Object.entries(grouped)
+    .map(([date, minutes]) => ({ date, minutes }))
+    .sort((a, b) => {
+      const entryA = entries.find(e => new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }) === a.date);
+      const entryB = entries.find(e => new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }) === b.date);
+      if (!entryA || !entryB) return 0;
+      return new Date(entryA.recorded_at).getTime() - new Date(entryB.recorded_at).getTime();
+    });
+
+  if (data.length === 0) {
+    return (
+      <div style={{
+        color: 'var(--nc-stone)',
+        fontSize: 13,
+        fontWeight: 300,
+        padding: '40px 0',
+        textAlign: 'center'
+      }}>
+        No activity entries yet. Log your first workout to see your progress.
+      </div>
+    );
+  }
+
+  return (
+    <ResponsiveContainer width="100%" height={200}>
+      <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--nc-border)" />
+        <XAxis
+          dataKey="date"
+          style={{ fontSize: 11, fill: 'var(--nc-stone)' }}
+        />
+        <YAxis
+          style={{ fontSize: 11, fill: 'var(--nc-stone)' }}
+          label={{ value: 'min', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+        />
+        <Tooltip
+          contentStyle={{
+            background: 'white',
+            border: '1px solid var(--nc-border)',
+            borderRadius: 6,
+            fontSize: 12
+          }}
+        />
+        <Bar dataKey="minutes" fill="var(--nc-terra)" />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }
 
 // ─── Client overview ──────────────────────────────────────────────────────────
 
 function ClientOverview() {
+  const [activeTab, setActiveTab] = useState<'weight' | 'activity'>('weight');
   const { profile, isLoading: profileLoading } = useMyClientProfile();
   const { entries: weightEntries, isLoading: weightLoading } = useWeightEntries();
   const { entries: activityEntries, isLoading: activityLoading } = useActivityEntries();
@@ -165,20 +259,74 @@ function ClientOverview() {
       {/* Upcoming appointments */}
       <UpcomingAppointments />
 
-      {/* Weight chart card */}
+      {/* Health tracking graphs */}
       <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '20px 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>Weight trend</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>Health Tracking</div>
           <Link href="/dashboard/client-profile" style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-            Log weight →
+            Log data →
           </Link>
         </div>
-        {!weightLoading && sortedWeight.length >= 2 ? (
-          <MiniWeightChart entries={sortedWeight} />
+
+        {/* Tab buttons */}
+        <div style={{
+          display: 'flex',
+          gap: 8,
+          marginBottom: 20,
+          borderBottom: '1px solid var(--nc-border)',
+          paddingBottom: 0,
+        }}>
+          <button
+            onClick={() => setActiveTab('weight')}
+            style={{
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 500,
+              color: activeTab === 'weight' ? 'var(--nc-forest)' : 'var(--nc-stone)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'weight' ? '2px solid var(--nc-forest)' : '2px solid transparent',
+              cursor: 'pointer',
+              transition: 'color 0.2s, border-color 0.2s',
+            }}
+          >
+            Weight
+          </button>
+          <button
+            onClick={() => setActiveTab('activity')}
+            style={{
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 500,
+              color: activeTab === 'activity' ? 'var(--nc-forest)' : 'var(--nc-stone)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'activity' ? '2px solid var(--nc-forest)' : '2px solid transparent',
+              cursor: 'pointer',
+              transition: 'color 0.2s, border-color 0.2s',
+            }}
+          >
+            Activity
+          </button>
+        </div>
+
+        {/* Graph content */}
+        {activeTab === 'weight' ? (
+          weightLoading ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300 }}>
+              Loading...
+            </div>
+          ) : (
+            <WeightGraph entries={weightEntries} />
+          )
         ) : (
-          <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300, borderTop: '1px dashed var(--nc-border)', borderBottom: '1px dashed var(--nc-border)' }}>
-            Log at least 2 weights to see your trend
-          </div>
+          activityLoading ? (
+            <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300 }}>
+              Loading...
+            </div>
+          ) : (
+            <ActivityGraph entries={activityEntries} />
+          )
         )}
       </div>
 
