@@ -298,6 +298,9 @@ export interface ClientProfileSummary {
   city: string;
   birth_date: string | null;
   height_cm: number | null;
+  gender: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null;
+  bmi: number | null;
+  bmi_category: 'underweight' | 'normal' | 'overweight' | 'obese' | null;
   activity_level: string;
   goals: string[];
   dietary_restrictions: string[];
