@@ -100,10 +100,20 @@ export default function SurveyTemplatesPage() {
     : templates.filter((t) => t.is_active);
 
   const handleSetDefaultTemplate = async (templateId: string | null) => {
+    if (!profile) return;
     setIsSavingDefault(true);
     try {
       await api.put('/profile', {
-        ...profile,
+        display_name: profile.display_name,
+        bio: profile.bio,
+        city: profile.city,
+        years_exp: profile.years_exp,
+        specialties: profile.specialties,
+        languages: profile.languages,
+        certifications: profile.certifications,
+        consultation_type: profile.consultation_type,
+        intro_consultation_required: profile.intro_consultation_required,
+        accepting_new_clients: profile.accepting_new_clients,
         default_survey_template_id: templateId,
       });
       mutateProfile();
