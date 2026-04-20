@@ -19,6 +19,7 @@ export interface NutritionistProfile {
   accepting_new_clients: boolean;
   at_capacity: boolean;
   avatar_url: string | null;
+  default_survey_template_id: string | null;
   created_at: string;
   updated_at: string;
   packages: ServicePackage[];

@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSurveyTemplates, archiveSurveyTemplate, unarchiveSurveyTemplate } from '@/lib/survey';
+import { useMyProfile } from '@/lib/profile';
+import { api } from '@/lib/api';
 import type { SurveyTemplateListItem } from '@/lib/types';
 
 function TemplateBadge({ active }: { active: boolean }) {
@@ -90,10 +92,27 @@ function TemplateRow({ template, onToggleArchive }: { template: SurveyTemplateLi
 export default function SurveyTemplatesPage() {
   const [showArchived, setShowArchived] = useState(false);
   const { templates, isLoading, error, mutate } = useSurveyTemplates(showArchived ? undefined : true);
+  const { profile, mutate: mutateProfile } = useMyProfile();
+  const [isSavingDefault, setIsSavingDefault] = useState(false);
 
   const filteredTemplates = showArchived
     ? templates
     : templates.filter((t) => t.is_active);
+
+  const handleSetDefaultTemplate = async (templateId: string | null) => {
+    setIsSavingDefault(true);
+    try {
+      await api.put('/profile', {
+        ...profile,
+        default_survey_template_id: templateId,
+      });
+      mutateProfile();
+    } catch (err) {
+      alert('Error al guardar. Intenta de nuevo.');
+    } finally {
+      setIsSavingDefault(false);
+    }
+  };
 
   return (
     <>
@@ -124,6 +143,38 @@ export default function SurveyTemplatesPage() {
             </div>
           </div>
           <div className="dash-section-body">
+            {/* Auto-assignment configuration */}
+            {profile && (
+              <div style={{
+                background: 'rgba(74,124,89,0.05)', border: '1px solid rgba(74,124,89,0.2)',
+                borderRadius: 8, padding: 16, marginBottom: 20,
+              }}>
+                <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 8 }}>
+                  ⚙️ Asignación automática
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 12, lineHeight: 1.5 }}>
+                  Selecciona una plantilla para asignar automáticamente cuando un nuevo cliente te contrata.
+                  Si no seleccionas ninguna, deberás asignar encuestas manualmente desde la página del cliente.
+                </div>
+                <select
+                  value={profile.default_survey_template_id || ''}
+                  onChange={(e) => handleSetDefaultTemplate(e.target.value || null)}
+                  disabled={isSavingDefault}
+                  style={{
+                    fontSize: 13, padding: '8px 12px', borderRadius: 6,
+                    border: '1px solid var(--nc-border)', background: 'white',
+                    width: '100%', maxWidth: 400,
+                    cursor: isSavingDefault ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  <option value="">Sin asignación automática (manual)</option>
+                  {templates.filter(t => t.is_active).map(t => (
+                    <option key={t.id} value={t.id}>{t.title}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Active/archived toggle */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
               <button
