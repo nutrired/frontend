@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
 import { UpcomingAppointments } from './components/UpcomingAppointments';
+import { useMyRelationships } from '@/lib/hiring';
+import { useSurveyAssignment } from '@/lib/survey';
 
 // ─── Mini weight chart (SVG, no deps) ─────────────────────────────────────────
 
@@ -39,6 +41,9 @@ function ClientOverview() {
   const { profile, isLoading: profileLoading } = useMyClientProfile();
   const { entries: weightEntries, isLoading: weightLoading } = useWeightEntries();
   const { entries: activityEntries, isLoading: activityLoading } = useActivityEntries();
+  const { relationships } = useMyRelationships();
+  const activeRelationship = relationships.find(r => r.status === 'active');
+  const { assignment } = useSurveyAssignment(activeRelationship?.id);
 
   if (profileLoading) return null;
 
@@ -83,6 +88,44 @@ function ClientOverview() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+      {/* Pending survey alert */}
+      {assignment && assignment.status === 'pending' && (
+        <div style={{
+          background: 'rgba(196,98,45,0.08)',
+          border: '1px solid rgba(196,98,45,0.2)',
+          borderRadius: 10,
+          padding: '16px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+        }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-terra)', marginBottom: 4 }}>
+              📋 Cuestionario pendiente
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
+              Tu nutricionista necesita que completes un cuestionario inicial.
+            </div>
+          </div>
+          <Link
+            href={`/dashboard/survey/${assignment.id}`}
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: 'white',
+              background: 'var(--nc-terra)',
+              borderRadius: 6,
+              padding: '8px 16px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Completar →
+          </Link>
+        </div>
+      )}
 
       {/* Top stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
