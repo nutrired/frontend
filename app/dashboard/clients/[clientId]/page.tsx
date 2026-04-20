@@ -392,16 +392,18 @@ export default function ClientDetailPage() {
             href="/dashboard/clients"
             style={{ fontSize: 13, color: 'var(--nc-stone)', textDecoration: 'none' }}
           >
-            ← {profileLoading ? 'Mis clientes' : (profile?.display_name ?? 'Mis clientes')}
+            ← Mis clientes
           </Link>
-          <div className="dash-topbar-title">Cliente</div>
+          <div className="dash-topbar-title">
+            {profileLoading ? 'Cliente' : (profile?.display_name ?? 'Cliente')}
+          </div>
         </div>
       </div>
       <div className="dash-content">
         {/* Client quick info */}
         {!profileLoading && profile && (
           <div style={{
-            background: 'var(--nc-cream)', border: '1px solid rgba(139,115,85,0.12)',
+            background: 'white', border: '1px solid var(--nc-border)',
             borderRadius: 8, padding: '12px 16px', marginBottom: 20,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
           }}>
