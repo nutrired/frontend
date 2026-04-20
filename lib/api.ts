@@ -23,14 +23,19 @@ async function request<T>(
   path: string,
   options: RequestInit = {},
   retry = true,
+  isFormData = false,
 ): Promise<T> {
+  const headers: HeadersInit = isFormData
+    ? { ...options.headers }
+    : {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
 
   if (res.status === 401 && retry && path !== '/auth/login') {
@@ -50,7 +55,7 @@ async function request<T>(
         // Ignore JSON parse errors
       }
       // Retry original request (no further retry to avoid loops).
-      return request<T>(path, options, false);
+      return request<T>(path, options, false, isFormData);
     }
     // Refresh failed — redirect to login.
     if (typeof window !== 'undefined') {
@@ -91,6 +96,9 @@ export const api = {
   del: <T>(path: string) =>
     request<T>(path, { method: 'DELETE' }),
 
+  postForm: <T>(path: string, body: FormData) =>
+    request<T>(path, { method: 'POST', body }, true, true),
+
   joinWaitlist: (slug: string): Promise<void> =>
     request<void>(`/nutritionists/${slug}/waitlist`, { method: 'POST' }),
 
@@ -113,3 +121,5 @@ export const api = {
       body: JSON.stringify({ reason }),
     }),
 };
+
+export const apiClient = api;
