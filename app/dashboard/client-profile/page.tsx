@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
 import { api, ApiRequestError } from '@/lib/api';
 import { AvatarUpload } from '@/components/AvatarUpload';
+import { BMIBadge } from '@/components/BMIBadge';
 
 // ─── TagInput ─────────────────────────────────────────────────────────────────
 
@@ -317,6 +318,7 @@ export default function ClientProfilePage() {
   const [city, setCity] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [heightCm, setHeightCm] = useState('');
+  const [gender, setGender] = useState<string | null>(null);
   const [activityLevel, setActivityLevel] = useState('');
   const [goals, setGoals] = useState<string[]>([]);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
@@ -331,6 +333,7 @@ export default function ClientProfilePage() {
       setCity(profile.city);
       setBirthDate(profile.birth_date ?? '');
       setHeightCm(profile.height_cm !== null ? String(profile.height_cm) : '');
+      setGender(profile.gender || null);
       setActivityLevel(profile.activity_level ?? '');
       setGoals(profile.goals);
       setDietaryRestrictions(profile.dietary_restrictions);
@@ -349,6 +352,7 @@ export default function ClientProfilePage() {
         city,
         birth_date: birthDate || undefined,
         height_cm: heightCm ? parseInt(heightCm, 10) : null,
+        gender: gender || null,
         activity_level: activityLevel,
         goals,
         dietary_restrictions: dietaryRestrictions,
@@ -488,6 +492,20 @@ export default function ClientProfilePage() {
                 </div>
               </div>
               <div className="dash-field">
+                <label className="dash-label">Género (opcional)</label>
+                <select
+                  value={gender || ''}
+                  onChange={(e) => setGender(e.target.value || null)}
+                  className="dash-input"
+                >
+                  <option value="">-- No especificado --</option>
+                  <option value="male">Masculino</option>
+                  <option value="female">Femenino</option>
+                  <option value="other">Otro</option>
+                  <option value="prefer_not_to_say">Prefiero no decir</option>
+                </select>
+              </div>
+              <div className="dash-field">
                 <label className="dash-label">Nivel de actividad</label>
                 <select
                   className="dash-input"
@@ -548,6 +566,21 @@ export default function ClientProfilePage() {
 
         <WeightLogWidget />
         <ActivityLogWidget />
+
+        {profile?.bmi && (
+          <div className="dash-section">
+            <div className="dash-section-head">
+              <div className="dash-section-title">Índice de Masa Corporal (IMC)</div>
+              <div className="dash-section-sub">Calculado automáticamente basado en tu peso y altura</div>
+            </div>
+            <div className="dash-section-body">
+              <BMIBadge
+                bmi={profile.bmi}
+                bmi_category={profile.bmi_category}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="dash-save-bar">

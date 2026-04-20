@@ -66,6 +66,9 @@ export interface ClientProfile {
   city: string;
   birth_date: string | null;
   height_cm: number | null;
+  gender: string | null;
+  bmi: number | null;
+  bmi_category: 'underweight' | 'normal' | 'overweight' | 'obese' | null;
   activity_level: string;
   goals: string[];
   dietary_restrictions: string[];
