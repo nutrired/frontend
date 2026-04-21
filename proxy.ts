@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { locales, defaultLocale } from './lib/i18n';
 
 // Routes accessible without authentication.
 const PUBLIC_PATHS = ['/', '/search', '/for-nutritionists', '/how', '/about', '/privacy', '/terms', '/palette-v2'];
@@ -35,21 +36,69 @@ function hasValidAccessToken(request: NextRequest): boolean {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Skip API routes and static files
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  // Check if pathname already has a locale
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
+
+  // If no locale in pathname, detect and redirect
+  if (!pathnameHasLocale) {
+    let locale = defaultLocale;
+
+    // 1. Check NEXT_LOCALE cookie
+    const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+    if (cookieLocale && locales.includes(cookieLocale as any)) {
+      locale = cookieLocale;
+    } else {
+      // 2. Check Accept-Language header
+      const acceptLanguage = request.headers.get('accept-language');
+      if (acceptLanguage) {
+        // Simple negotiation: check if 'en' appears before 'es'
+        const enIndex = acceptLanguage.indexOf('en');
+        const esIndex = acceptLanguage.indexOf('es');
+
+        if (enIndex !== -1 && (esIndex === -1 || enIndex < esIndex)) {
+          locale = 'en';
+        }
+      }
+    }
+
+    // Redirect to localized URL
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}${pathname}`;
+    return NextResponse.redirect(url);
+  }
+
+  // Extract locale from pathname for auth checks
+  const localeMatch = pathname.match(/^\/([^/]+)/);
+  const locale = localeMatch ? localeMatch[1] : defaultLocale;
+  const pathnameWithoutLocale = pathname.replace(`/${locale}`, '') || '/';
+
   const loggedIn = hasValidAccessToken(request);
 
   // Already logged in → redirect away from auth pages and landing page to dashboard.
-  if (loggedIn && isAuthPage(pathname)) {
-    return NextResponse.redirect(new URL('/', request.url));
+  if (loggedIn && isAuthPage(pathnameWithoutLocale)) {
+    return NextResponse.redirect(new URL(`/${locale}/`, request.url));
   }
 
   // Already logged in and on landing page → redirect to dashboard.
-  if (loggedIn && pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (loggedIn && pathnameWithoutLocale === '/') {
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
   }
 
   // Not logged in → redirect to login for protected routes.
-  if (!loggedIn && !isPublic(pathname) && !isAuthPage(pathname)) {
-    const url = new URL('/login', request.url);
+  if (!loggedIn && !isPublic(pathnameWithoutLocale) && !isAuthPage(pathnameWithoutLocale)) {
+    const url = new URL(`/${locale}/login`, request.url);
     url.searchParams.set('from', pathname);
     return NextResponse.redirect(url);
   }
