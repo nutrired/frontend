@@ -29,21 +29,19 @@
   },
   "auth": {
     "login": {
-      "title": "Welcome back",
-      "title_em": "back",
-      "subtitle": "Log in to continue.",
-      "email": "Email",
+      "title": "Log in",
+      "subtitle": "Access your NutriConnect account",
+      "email": "Email address",
       "email_placeholder": "you@email.com",
       "password": "Password",
       "password_placeholder": "Your password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
       "forgot_password": "Forgot your password?",
-      "submit": "Log in",
-      "submitting": "Logging in…",
       "no_account": "Don't have an account?",
-      "register": "Sign up free",
-      "email_unverified": "Your email has not been verified.",
-      "resend_verification": "Resend verification",
-      "error_generic": "Something went wrong. Please try again."
+      "register": "Sign up here",
+      "error_invalid": "Invalid email or password",
+      "error_network": "Connection error. Please try again."
     }
   }
 }

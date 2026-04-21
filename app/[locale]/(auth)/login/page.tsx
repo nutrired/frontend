@@ -42,10 +42,10 @@ function LoginForm() {
         } else if (err.code === 'INVALID_CREDENTIALS') {
           setError(t('error_invalid', { default: err.message }));
         } else {
-          setError(err.message);
+          setError(t('error_network'));
         }
       } else {
-        setError(t('error_generic'));
+        setError(t('error_network'));
       }
     } finally {
       setLoading(false);
@@ -57,7 +57,7 @@ function LoginForm() {
       <a href="/" className="auth-logo">nutri<span>red</span></a>
 
       <h1 className="auth-heading">
-        {t('title')} <em>{t('title_em')}</em>
+        {t('title')}
       </h1>
       <p className="auth-sub">{t('subtitle')}</p>
 
@@ -65,9 +65,9 @@ function LoginForm() {
 
       {unverified && (
         <div className="auth-alert auth-alert-error">
-          {t('email_unverified')}{' '}
+          Your email has not been verified.{' '}
           <a href="/verify-email" style={{ fontWeight: 500, color: 'inherit', textDecoration: 'underline' }}>
-            {t('resend_verification')}
+            Resend verification
           </a>
         </div>
       )}
