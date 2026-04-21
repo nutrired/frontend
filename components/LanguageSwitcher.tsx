@@ -16,22 +16,34 @@ export function LanguageSwitcher() {
   }, []);
 
   const switchLocale = async (newLocale: string) => {
-    // Update cookie
-    document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
-
-    // Update user preference if logged in (ignore errors)
     try {
-      await api.put('/user/preferences', { preferred_locale: newLocale });
-    } catch (e) {
-      console.log('Failed to update user preference:', e);
-    }
+      console.log('[LanguageSwitcher] Switching from', locale, 'to', newLocale);
+      console.log('[LanguageSwitcher] Current pathname:', pathname);
 
-    // Redirect to new locale
-    const segments = pathname.split('/');
-    segments[1] = newLocale; // Replace locale segment
-    const newPath = segments.join('/');
-    router.push(newPath);
-    router.refresh();
+      // Update cookie
+      document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=31536000`;
+      console.log('[LanguageSwitcher] Cookie set');
+
+      // Update user preference if logged in (ignore errors)
+      try {
+        await api.put('/user/preferences', { preferred_locale: newLocale });
+        console.log('[LanguageSwitcher] User preference updated in backend');
+      } catch (e) {
+        console.log('[LanguageSwitcher] Failed to update user preference (may not be logged in):', e);
+      }
+
+      // Redirect to new locale
+      const segments = pathname.split('/');
+      console.log('[LanguageSwitcher] Path segments:', segments);
+      segments[1] = newLocale; // Replace locale segment
+      const newPath = segments.join('/');
+      console.log('[LanguageSwitcher] New path:', newPath);
+
+      router.push(newPath);
+      router.refresh();
+    } catch (error) {
+      console.error('[LanguageSwitcher] Error switching locale:', error);
+    }
   };
 
   if (!isClient) {
