@@ -17,16 +17,21 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
+  console.log('[LocaleLayout] Received locale:', locale);
+
   // Validate locale
   if (!locales.includes(locale as Locale)) {
+    console.error('[LocaleLayout] Invalid locale:', locale);
     notFound();
   }
 
   // Enable static rendering
   setRequestLocale(locale);
+  console.log('[LocaleLayout] setRequestLocale called with:', locale);
 
   // Load messages for the current locale
   const messages = await getMessages();
+  console.log('[LocaleLayout] Messages loaded for locale:', locale);
 
   return (
     <>
