@@ -19,19 +19,25 @@ function isAuthPage(pathname: string): boolean {
   return AUTH_PATHS.some((p) => pathname.startsWith(p));
 }
 
+function decodeJWT(token: string): Record<string, any> | null {
+  try {
+    const [, payloadB64] = token.split('.');
+    // Node.js runtime (Next.js 16 default): atob() is available as a global Web API.
+    return JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
+  } catch {
+    return null;
+  }
+}
+
 function hasValidAccessToken(request: NextRequest): boolean {
   const token = request.cookies.get('access_token')?.value;
   if (!token) return false;
 
-  try {
-    const [, payloadB64] = token.split('.');
-    // Node.js runtime (Next.js 16 default): atob() is available as a global Web API.
-    const payload = JSON.parse(atob(payloadB64.replace(/-/g, '+').replace(/_/g, '/')));
-    const exp: number = payload.exp ?? 0;
-    return Date.now() / 1000 < exp;
-  } catch {
-    return false;
-  }
+  const payload = decodeJWT(token);
+  if (!payload) return false;
+
+  const exp: number = payload.exp ?? 0;
+  return Date.now() / 1000 < exp;
 }
 
 export function proxy(request: NextRequest) {
@@ -55,12 +61,25 @@ export function proxy(request: NextRequest) {
   if (!pathnameHasLocale) {
     let locale = defaultLocale;
 
-    // 1. Check NEXT_LOCALE cookie
-    const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
-    if (cookieLocale && locales.includes(cookieLocale as any)) {
-      locale = cookieLocale;
-    } else {
-      // 2. Check Accept-Language header
+    // 1. Check JWT preferred_locale (highest priority for logged-in users)
+    const token = request.cookies.get('access_token')?.value;
+    if (token) {
+      const payload = decodeJWT(token);
+      if (payload?.preferred_locale && locales.includes(payload.preferred_locale)) {
+        locale = payload.preferred_locale;
+      }
+    }
+
+    // 2. Check NEXT_LOCALE cookie (if JWT didn't provide locale)
+    if (locale === defaultLocale) {
+      const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value;
+      if (cookieLocale && locales.includes(cookieLocale as any)) {
+        locale = cookieLocale;
+      }
+    }
+
+    // 3. Check Accept-Language header (fallback)
+    if (locale === defaultLocale) {
       const acceptLanguage = request.headers.get('accept-language');
       if (acceptLanguage) {
         // Simple negotiation: check if 'en' appears before 'es'
