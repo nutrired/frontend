@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface SearchFilterBarProps {
   onSearchChange: (search: string) => void;
@@ -20,6 +21,7 @@ export default function SearchFilterBar({
   initialStatus = '',
   initialSort = 'newest',
 }: SearchFilterBarProps) {
+  const t = useTranslations('dashboard.clients');
   const [searchInput, setSearchInput] = useState(initialSearch);
 
   // Debounce search input
@@ -41,7 +43,7 @@ export default function SearchFilterBar({
       {/* Search input */}
       <input
         type="text"
-        placeholder="Buscar por nombre o email…"
+        placeholder={t('search_placeholder')}
         value={searchInput}
         onChange={(e) => setSearchInput(e.target.value)}
         style={{
@@ -70,9 +72,9 @@ export default function SearchFilterBar({
           cursor: 'pointer',
         }}
       >
-        <option value="">Todos los estados</option>
-        <option value="active">Activos</option>
-        <option value="pending_intro">Pendientes</option>
+        <option value="">{t('filter_all_statuses')}</option>
+        <option value="active">{t('filter_active')}</option>
+        <option value="pending_intro">{t('filter_pending')}</option>
       </select>
 
       {/* Sort dropdown */}
@@ -90,10 +92,10 @@ export default function SearchFilterBar({
           cursor: 'pointer',
         }}
       >
-        <option value="newest">Más recientes</option>
-        <option value="oldest">Más antiguos</option>
-        <option value="name_asc">Nombre A-Z</option>
-        <option value="name_desc">Nombre Z-A</option>
+        <option value="newest">{t('sort_newest')}</option>
+        <option value="oldest">{t('sort_oldest')}</option>
+        <option value="name_asc">{t('sort_name_asc')}</option>
+        <option value="name_desc">{t('sort_name_desc')}</option>
       </select>
     </div>
   );

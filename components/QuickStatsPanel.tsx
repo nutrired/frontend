@@ -1,6 +1,6 @@
 // frontend/components/QuickStatsPanel.tsx
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { QuickStats } from '@/lib/types';
 
 interface QuickStatsPanelProps {
@@ -14,6 +14,8 @@ function formatCurrency(cents: number): string {
 
 export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelProps) {
   const locale = useLocale();
+  const t = useTranslations('dashboard.clients');
+
   if (isLoading) {
     return (
       <div style={{
@@ -23,7 +25,7 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
         padding: 24,
         marginBottom: 20,
       }}>
-        <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando estadísticas…</div>
+        <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('stats_loading')}</div>
       </div>
     );
   }
@@ -54,14 +56,14 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
             letterSpacing: '0.05em',
             marginBottom: 6,
           }}>
-            MRR (Ingresos Mensuales)
+            {t('stats_mrr')}
           </div>
           <div style={{
             fontSize: 24,
             fontWeight: 600,
             color: 'var(--nc-forest)',
           }}>
-            {formatCurrency(stats.mrr_cents)}/mes
+            {formatCurrency(stats.mrr_cents)}{t('stats_per_month')}
           </div>
         </div>
 
@@ -75,7 +77,7 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
             letterSpacing: '0.05em',
             marginBottom: 6,
           }}>
-            Clientes Activos
+            {t('stats_active_clients')}
           </div>
           <div style={{
             fontSize: 24,
@@ -96,7 +98,7 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
             letterSpacing: '0.05em',
             marginBottom: 6,
           }}>
-            Pendientes
+            {t('stats_pending')}
           </div>
           <div style={{
             fontSize: 24,
@@ -117,7 +119,7 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
             letterSpacing: '0.05em',
             marginBottom: 6,
           }}>
-            Ingresos Únicos (Este Mes)
+            {t('stats_one_time')}
           </div>
           <div style={{
             fontSize: 24,
@@ -139,7 +141,7 @@ export default function QuickStatsPanel({ stats, isLoading }: QuickStatsPanelPro
           fontWeight: 500,
         }}
       >
-        Ver Panel de Negocio →
+        {t('stats_view_business')}
       </Link>
     </div>
   );

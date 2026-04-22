@@ -1,5 +1,6 @@
 // frontend/components/ClientCard.tsx
 import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
 import { Avatar } from './Avatar';
 import type { EnhancedClient } from '@/lib/types';
 
@@ -7,12 +8,12 @@ interface ClientCardProps {
   client: EnhancedClient;
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, { bg: string; color: string; label: string }> = {
-    pending_intro: { bg: 'rgba(184,134,11,0.1)', color: '#b8860b', label: 'Pendiente' },
-    active: { bg: 'rgba(74,124,89,0.1)', color: '#4a7c59', label: 'Activo' },
-    completed: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', label: 'Completado' },
-    cancelled: { bg: 'rgba(139,115,85,0.1)', color: 'var(--nc-stone)', label: 'Cancelado' },
+function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
+  const styles: Record<string, { bg: string; color: string; labelKey: string }> = {
+    pending_intro: { bg: 'rgba(184,134,11,0.1)', color: '#b8860b', labelKey: 'status_pending' },
+    active: { bg: 'rgba(74,124,89,0.1)', color: '#4a7c59', labelKey: 'status_active' },
+    completed: { bg: 'rgba(59,130,246,0.1)', color: '#3b82f6', labelKey: 'status_completed' },
+    cancelled: { bg: 'rgba(139,115,85,0.1)', color: 'var(--nc-stone)', labelKey: 'status_cancelled' },
   };
 
   const s = styles[status] || styles.pending_intro;
@@ -26,28 +27,30 @@ function StatusBadge({ status }: { status: string }) {
       background: s.bg,
       color: s.color,
     }}>
-      {s.label}
+      {t(s.labelKey)}
     </span>
   );
 }
 
-function formatPrice(cents: number, cycle: string): string {
+function formatPrice(cents: number, cycle: string, t: (key: string) => string): string {
   const amount = `€${(cents / 100).toFixed(0)}`;
-  return cycle === 'monthly' ? `${amount}/mes` : amount;
+  return cycle === 'monthly' ? `${amount}${t('price_per_month')}` : amount;
 }
 
 export default function ClientCard({ client }: ClientCardProps) {
+  const t = useTranslations('dashboard.clients');
+  const locale = useLocale();
   const totalPlans = client.active_nutrition_plans_count + client.active_exercise_plans_count;
 
-  let plansText = 'Sin planes';
+  let plansText = t('plans_none');
   if (totalPlans === 1) {
     if (client.active_nutrition_plans_count === 1) {
-      plansText = '1 plan de nutrición';
+      plansText = t('plans_nutrition_one');
     } else {
-      plansText = '1 plan de ejercicio';
+      plansText = t('plans_exercise_one');
     }
   } else if (totalPlans > 1) {
-    plansText = `${totalPlans} planes activos`;
+    plansText = t('plans_multiple', { count: totalPlans });
   }
 
   return (
@@ -95,7 +98,7 @@ export default function ClientCard({ client }: ClientCardProps) {
 
           <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--nc-stone)' }}>
             <span>
-              🎯 {client.client_goal || 'Sin objetivo definido'}
+              🎯 {client.client_goal || t('goal_none')}
             </span>
             <span>•</span>
             <span>{plansText}</span>
@@ -111,20 +114,20 @@ export default function ClientCard({ client }: ClientCardProps) {
         flexShrink: 0,
       }}>
         <div style={{ textAlign: 'right' }}>
-          <StatusBadge status={client.status} />
+          <StatusBadge status={client.status} t={t} />
           <div style={{
             fontSize: 12,
             color: 'var(--nc-stone)',
             marginTop: 6,
           }}>
-            {client.package_name} · {formatPrice(client.package_price_cents, client.package_billing_type)}
+            {client.package_name} · {formatPrice(client.package_price_cents, client.package_billing_type, t)}
           </div>
         </div>
 
         {/* Quick actions */}
         <div style={{ display: 'flex', gap: 8 }}>
           <Link
-            href={`/dashboard/clients/${client.client_id}`}
+            href={`/${locale}/dashboard/clients/${client.client_id}`}
             style={{
               padding: '8px 14px',
               fontSize: 13,
@@ -137,7 +140,7 @@ export default function ClientCard({ client }: ClientCardProps) {
               whiteSpace: 'nowrap',
             }}
           >
-            Ver cliente
+            {t('action_view_client')}
           </Link>
 
           <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -155,16 +158,16 @@ export default function ClientCard({ client }: ClientCardProps) {
               }}
               onClick={(e) => {
                 // TODO: implement dropdown menu
-                alert('Menú de planes: Nutrición / Ejercicio');
+                alert(t('alert_create_plan_menu'));
               }}
             >
-              Crear plan
+              {t('action_create_plan')}
             </button>
           </div>
 
           <button
             disabled
-            title="Próximamente (Slice 7)"
+            title={t('action_message_disabled')}
             style={{
               padding: '8px 14px',
               fontSize: 13,
@@ -178,7 +181,7 @@ export default function ClientCard({ client }: ClientCardProps) {
               whiteSpace: 'nowrap',
             }}
           >
-            Mensaje
+            {t('action_message')}
           </button>
         </div>
       </div>
