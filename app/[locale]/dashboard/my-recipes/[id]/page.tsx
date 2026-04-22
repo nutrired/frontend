@@ -4,15 +4,16 @@
 import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useRecipe, deleteRecipe } from '@/lib/recipes';
 import type { RecipeCategory } from '@/lib/types';
 
-const CATEGORY_LABELS: Record<RecipeCategory, string> = {
-  breakfast: 'Desayuno',
-  lunch: 'Almuerzo',
-  dinner: 'Cena',
-  snack: 'Snack',
-  other: 'Otros',
+const CATEGORY_KEYS: Record<RecipeCategory, string> = {
+  breakfast: 'category_breakfast',
+  lunch: 'category_lunch',
+  dinner: 'category_dinner',
+  snack: 'category_snack',
+  other: 'category_other',
 };
 
 export default function RecipeDetailPage({
@@ -20,6 +21,7 @@ export default function RecipeDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations('dashboard.recipes');
   const resolvedParams = use(params);
   const router = useRouter();
   const { recipe, isLoading } = useRecipe(resolvedParams.id);
@@ -34,7 +36,7 @@ export default function RecipeDetailPage({
       await deleteRecipe(recipe.id);
       router.push('/dashboard/my-recipes');
     } catch (err: any) {
-      alert(err?.message ?? 'Error al eliminar la receta');
+      alert(err?.message ?? t('delete_error'));
       setDeleting(false);
     }
   };
@@ -43,10 +45,10 @@ export default function RecipeDetailPage({
     return (
       <>
         <div className="dash-topbar">
-          <div className="dash-topbar-title">Cargando...</div>
+          <div className="dash-topbar-title">Loading...</div>
         </div>
         <div className="dash-content">
-          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando receta...</div>
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading_recipe')}</div>
         </div>
       </>
     );
@@ -56,7 +58,7 @@ export default function RecipeDetailPage({
     return (
       <>
         <div className="dash-topbar">
-          <div className="dash-topbar-title">Receta no encontrada</div>
+          <div className="dash-topbar-title">{t('recipe_not_found')}</div>
         </div>
         <div className="dash-content">
           <div
@@ -68,7 +70,7 @@ export default function RecipeDetailPage({
               fontSize: 13,
             }}
           >
-            La receta solicitada no existe.
+            {t('recipe_not_exist')}
           </div>
           <Link
             href="/dashboard/my-recipes"
@@ -79,7 +81,7 @@ export default function RecipeDetailPage({
               textDecoration: 'underline',
             }}
           >
-            Volver a Mis recetas
+            {t('back_to_recipes')}
           </Link>
         </div>
       </>
@@ -95,14 +97,14 @@ export default function RecipeDetailPage({
         <div className="dash-topbar-title">{recipe.name}</div>
         <div className="dash-topbar-right">
           <Link href={`/dashboard/my-recipes/${recipe.id}/edit`} className="dash-btn-preview">
-            Editar
+            {t('edit_button')}
           </Link>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="dash-btn-preview"
             style={{ color: 'var(--nc-terra)', borderColor: 'var(--nc-terra)' }}
           >
-            Eliminar
+            {t('delete_button')}
           </button>
         </div>
       </div>
@@ -217,7 +219,7 @@ export default function RecipeDetailPage({
                   fontWeight: 500,
                 }}
               >
-                {CATEGORY_LABELS[recipe.category]}
+                {t(CATEGORY_KEYS[recipe.category])}
               </div>
               <h2
                 style={{
@@ -264,7 +266,7 @@ export default function RecipeDetailPage({
                     letterSpacing: '0.06em',
                   }}
                 >
-                  Porciones
+                  {t('servings_label')}
                 </div>
                 <div
                   style={{
@@ -287,7 +289,7 @@ export default function RecipeDetailPage({
                       letterSpacing: '0.06em',
                     }}
                   >
-                    Prep
+                    {t('prep_label')}
                   </div>
                   <div
                     style={{
@@ -311,7 +313,7 @@ export default function RecipeDetailPage({
                       letterSpacing: '0.06em',
                     }}
                   >
-                    Cocción
+                    {t('cook_label')}
                   </div>
                   <div
                     style={{
@@ -320,7 +322,7 @@ export default function RecipeDetailPage({
                       color: 'var(--nc-ink)',
                     }}
                   >
-                    {recipe.cook_time_minutes} min
+                    {recipe.cook_time_minutes} {t('min_unit')}
                   </div>
                 </div>
               )}
@@ -335,7 +337,7 @@ export default function RecipeDetailPage({
                       letterSpacing: '0.06em',
                     }}
                   >
-                    Total
+                    {t('total_label')}
                   </div>
                   <div
                     style={{
@@ -344,7 +346,7 @@ export default function RecipeDetailPage({
                       color: 'var(--nc-ink)',
                     }}
                   >
-                    {totalTime} min
+                    {totalTime} {t('min_unit')}
                   </div>
                 </div>
               )}
@@ -370,7 +372,7 @@ export default function RecipeDetailPage({
                     fontWeight: 500,
                   }}
                 >
-                  Por porción:
+                  {t('per_serving')}
                 </div>
                 <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
                   {recipe.calories_per_serving !== null && (
@@ -423,7 +425,7 @@ export default function RecipeDetailPage({
         {/* Ingredients */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Ingredientes</div>
+            <div className="dash-section-title">{t('ingredients_section')}</div>
           </div>
           <div className="dash-section-body">
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -483,7 +485,7 @@ export default function RecipeDetailPage({
                 marginBottom: 12,
               }}
             >
-              Eliminar receta
+              {t('delete_recipe_modal_title')}
             </h3>
             <p
               style={{
@@ -493,8 +495,7 @@ export default function RecipeDetailPage({
                 marginBottom: 24,
               }}
             >
-              ¿Estás seguro de que deseas eliminar esta receta? Esta acción no se puede
-              deshacer.
+              {t('delete_recipe_modal_text')}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button
@@ -502,7 +503,7 @@ export default function RecipeDetailPage({
                 className="dash-btn-draft"
                 disabled={deleting}
               >
-                Cancelar
+                {t('delete_recipe_cancel')}
               </button>
               <button
                 onClick={handleDelete}
@@ -521,7 +522,7 @@ export default function RecipeDetailPage({
                   opacity: deleting ? 0.6 : 1,
                 }}
               >
-                {deleting ? 'Eliminando...' : 'Eliminar'}
+                {deleting ? t('deleting') : t('delete_recipe_confirm')}
               </button>
             </div>
           </div>

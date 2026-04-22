@@ -3,19 +3,21 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useRecipes } from '@/lib/recipes';
 import type { RecipeCategory } from '@/lib/types';
 
-const CATEGORY_LABELS: Record<RecipeCategory | 'all', string> = {
-  all: 'Todas',
-  breakfast: 'Desayuno',
-  lunch: 'Almuerzo',
-  dinner: 'Cena',
-  snack: 'Snack',
-  other: 'Otros',
+const CATEGORY_KEYS: Record<RecipeCategory | 'all', string> = {
+  all: 'all_categories',
+  breakfast: 'category_breakfast',
+  lunch: 'category_lunch',
+  dinner: 'category_dinner',
+  snack: 'category_snack',
+  other: 'category_other',
 };
 
 export default function MyRecipesPage() {
+  const t = useTranslations('dashboard.recipes');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<RecipeCategory | 'all'>('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -36,10 +38,10 @@ export default function MyRecipesPage() {
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Mis recetas</div>
+        <div className="dash-topbar-title">{t('title')}</div>
         <div className="dash-topbar-right">
           <Link href="/dashboard/my-recipes/new" className="dash-btn-publish">
-            Nueva receta
+            {t('new_recipe_button')}
           </Link>
         </div>
       </div>
@@ -49,7 +51,7 @@ export default function MyRecipesPage() {
         <div style={{ marginBottom: 24, display: 'flex', gap: 10, alignItems: 'center' }}>
           <input
             type="text"
-            placeholder="Buscar recetas..."
+            placeholder={t('search_placeholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="dash-input"
@@ -61,16 +63,16 @@ export default function MyRecipesPage() {
             className="dash-input"
             style={{ width: 180 }}
           >
-            {Object.entries(CATEGORY_LABELS).map(([val, label]) => (
+            {Object.entries(CATEGORY_KEYS).map(([val, key]) => (
               <option key={val} value={val}>
-                {label}
+                {t(key)}
               </option>
             ))}
           </select>
         </div>
 
         {isLoading ? (
-          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando recetas...</div>
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading')}</div>
         ) : recipes.length === 0 ? (
           <div
             style={{
@@ -90,12 +92,12 @@ export default function MyRecipesPage() {
               }}
             >
               {debouncedSearch || category !== 'all'
-                ? 'No se encontraron recetas con esos filtros.'
-                : 'Aún no tienes recetas. Crea tu primera receta para comenzar.'}
+                ? t('no_results_filtered')
+                : t('no_recipes')}
             </div>
             {!debouncedSearch && category === 'all' && (
               <Link href="/dashboard/my-recipes/new" className="dash-btn-publish">
-                Nueva receta
+                {t('new_recipe_button')}
               </Link>
             )}
           </div>
@@ -184,7 +186,7 @@ export default function MyRecipesPage() {
                           fontWeight: 500,
                         }}
                       >
-                        {CATEGORY_LABELS[recipe.category]}
+                        {t(CATEGORY_KEYS[recipe.category])}
                       </div>
 
                       <div
@@ -198,9 +200,9 @@ export default function MyRecipesPage() {
                       >
                         <span>
                           {recipe.base_servings}{' '}
-                          {recipe.base_servings === 1 ? 'porción' : 'porciones'}
+                          {recipe.base_servings === 1 ? t('serving_singular') : t('serving_plural')}
                         </span>
-                        {totalTime > 0 && <span>{totalTime} min</span>}
+                        {totalTime > 0 && <span>{totalTime} {t('min_unit')}</span>}
                       </div>
 
                       {recipe.tags.length > 0 && (

@@ -4,6 +4,7 @@
 import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import RecipeForm from '@/components/RecipeForm';
 import { useRecipe, updateRecipe } from '@/lib/recipes';
 import type { RecipePayload } from '@/lib/recipes';
@@ -13,6 +14,7 @@ export default function EditRecipePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const t = useTranslations('dashboard.recipes');
   const resolvedParams = use(params);
   const router = useRouter();
   const { recipe, isLoading } = useRecipe(resolvedParams.id);
@@ -27,10 +29,10 @@ export default function EditRecipePage({
     return (
       <>
         <div className="dash-topbar">
-          <div className="dash-topbar-title">Cargando...</div>
+          <div className="dash-topbar-title">Loading...</div>
         </div>
         <div className="dash-content">
-          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando receta...</div>
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading_recipe')}</div>
         </div>
       </>
     );
@@ -40,7 +42,7 @@ export default function EditRecipePage({
     return (
       <>
         <div className="dash-topbar">
-          <div className="dash-topbar-title">Receta no encontrada</div>
+          <div className="dash-topbar-title">{t('recipe_not_found')}</div>
         </div>
         <div className="dash-content">
           <div
@@ -52,7 +54,7 @@ export default function EditRecipePage({
               fontSize: 13,
             }}
           >
-            La receta solicitada no existe.
+            {t('recipe_not_exist')}
           </div>
           <Link
             href="/dashboard/my-recipes"
@@ -63,7 +65,7 @@ export default function EditRecipePage({
               textDecoration: 'underline',
             }}
           >
-            Volver a Mis recetas
+            {t('back_to_recipes')}
           </Link>
         </div>
       </>
@@ -73,13 +75,13 @@ export default function EditRecipePage({
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Editar receta</div>
+        <div className="dash-topbar-title">Edit recipe</div>
       </div>
       <div className="dash-content">
         <RecipeForm
           initialData={recipe}
           onSubmit={handleSubmit}
-          submitLabel="Guardar cambios"
+          submitLabel="Save changes"
         />
       </div>
     </>
