@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 export default function CheckoutSuccessPage() {
+  const t = useTranslations('public.checkout.success');
+  const locale = useLocale();
+
   return (
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
-        <Link href="/" className="nc-nav-logo">Nutri<span>Connect</span></Link>
+        <Link href={`/${locale}`} className="nc-nav-logo">Nutri<span>Connect</span></Link>
       </nav>
 
       <div style={{
@@ -36,7 +41,7 @@ export default function CheckoutSuccessPage() {
           marginBottom: 12,
           fontWeight: 400,
         }}>
-          Payment confirmed
+          {t('title')}
         </h1>
 
         <p style={{
@@ -46,16 +51,15 @@ export default function CheckoutSuccessPage() {
           marginBottom: 32,
           fontWeight: 300,
         }}>
-          Your nutritionist has been notified and your programme is ready to begin.
-          Head to your dashboard to get started.
+          {t('description')}
         </p>
 
         <Link
-          href="/dashboard"
+          href={`/${locale}/dashboard`}
           className="nc-btn-contact"
           style={{ display: 'inline-block', textDecoration: 'none' }}
         >
-          Go to dashboard
+          {t('go_to_dashboard')}
         </Link>
       </div>
     </div>

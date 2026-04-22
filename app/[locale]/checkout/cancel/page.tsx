@@ -2,14 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 
 export default function CheckoutCancelPage() {
   const router = useRouter();
+  const t = useTranslations('public.checkout.cancel');
+  const locale = useLocale();
 
   return (
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
-        <Link href="/" className="nc-nav-logo">Nutri<span>Connect</span></Link>
+        <Link href={`/${locale}`} className="nc-nav-logo">Nutri<span>Connect</span></Link>
       </nav>
 
       <div style={{
@@ -40,7 +44,7 @@ export default function CheckoutCancelPage() {
           marginBottom: 12,
           fontWeight: 400,
         }}>
-          Payment cancelled
+          {t('title')}
         </h1>
 
         <p style={{
@@ -50,7 +54,7 @@ export default function CheckoutCancelPage() {
           marginBottom: 32,
           fontWeight: 300,
         }}>
-          No charge was made. You can go back and choose a different package or try again.
+          {t('description')}
         </p>
 
         <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -59,14 +63,14 @@ export default function CheckoutCancelPage() {
             className="nc-btn-contact"
             style={{ background: 'transparent', border: '1px solid var(--nc-terra)', color: 'var(--nc-terra)' }}
           >
-            ← Go back
+            {t('go_back')}
           </button>
           <Link
-            href="/nutritionists"
+            href={`/${locale}/nutritionists`}
             className="nc-btn-contact"
             style={{ display: 'inline-block', textDecoration: 'none' }}
           >
-            Browse nutritionists
+            {t('browse_nutritionists')}
           </Link>
         </div>
       </div>

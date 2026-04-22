@@ -1,6 +1,9 @@
 import { PublicNav } from '@/components/PublicNav';
+import { useTranslations } from 'next-intl';
 
 export default function Terms() {
+  const t = useTranslations('public.static.terms');
+
   return (
     <div className="content-page">
       <PublicNav />
@@ -8,40 +11,36 @@ export default function Terms() {
       <main className="content-main">
         <article className="content-article">
 
-          <h1>Términos de Servicio</h1>
-          <p><em>Última actualización: 15 de abril de 2026</em></p>
+          <h1>{t('title')}</h1>
+          <p><em>{t('last_updated')}</em></p>
 
-          <h2>1. Aceptación de Términos</h2>
-          <p>
-            Al acceder o usar Nutri Red ("la plataforma", "nosotros", "nuestro"),
-            aceptas estar vinculado por estos Términos de Servicio. Si no estás de acuerdo
-            con alguna parte de estos términos, no puedes usar la plataforma.
-          </p>
+          <h2>{t('acceptance_title')}</h2>
+          <p>{t('acceptance_text')}</p>
 
-          <h2>2. Elegibilidad</h2>
+          <h2>{t('eligibility_title')}</h2>
           <ul>
-            <li>Debes tener al menos <strong>18 años</strong> para usar Nutri Red</li>
-            <li>Debes proporcionar información veraz, completa y actualizada al registrarte</li>
-            <li>No puedes usar el servicio para fines ilegales o no autorizados</li>
-            <li>No puedes violar ninguna ley en tu jurisdicción al usar la plataforma</li>
+            <li>{t('eligibility_age')}</li>
+            <li>{t('eligibility_info')}</li>
+            <li>{t('eligibility_legal')}</li>
+            <li>{t('eligibility_jurisdiction')}</li>
           </ul>
 
-          <h2>3. Tipos de Cuenta</h2>
+          <h2>{t('account_types_title')}</h2>
 
-          <h3>Cuentas de Cliente</h3>
+          <h3>{t('account_client_title')}</h3>
           <ul>
-            <li>Acceso <strong>gratuito</strong> a la plataforma</li>
-            <li>Puedes buscar y conectar con nutricionistas ilimitadamente</li>
-            <li>Sin cargos por usar la plataforma</li>
-            <li>Pagas directamente al nutricionista por sus servicios profesionales</li>
+            <li>{t('account_client_free')}</li>
+            <li>{t('account_client_unlimited')}</li>
+            <li>{t('account_client_no_charge')}</li>
+            <li>{t('account_client_direct')}</li>
           </ul>
 
-          <h3>Cuentas de Nutricionista</h3>
+          <h3>{t('account_nutritionist_title')}</h3>
           <ul>
-            <li>Requieren suscripción activa (Free, Pro o Premium)</li>
-            <li>Sujetas a <strong>verificación de credenciales</strong> antes de aprobación</li>
-            <li>Límites de clientes activos según tier (5 / 25 / ilimitado)</li>
-            <li>Procesamiento de pagos mediante Stripe</li>
+            <li>{t('account_nutritionist_subscription')}</li>
+            <li>{t('account_nutritionist_verification')}</li>
+            <li>{t('account_nutritionist_limits')}</li>
+            <li>{t('account_nutritionist_stripe')}</li>
           </ul>
 
           <h2>4. Obligaciones de Nutricionistas</h2>

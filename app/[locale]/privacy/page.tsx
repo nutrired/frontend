@@ -1,6 +1,9 @@
 import { PublicNav } from '@/components/PublicNav';
+import { useTranslations } from 'next-intl';
 
 export default function Privacy() {
+  const t = useTranslations('public.static.privacy');
+
   return (
     <div className="content-page">
       <PublicNav />
@@ -8,20 +11,12 @@ export default function Privacy() {
       <main className="content-main">
         <article className="content-article">
 
-          <h1>Política de Privacidad</h1>
-          <p><em>Última actualización: 15 de abril de 2026</em></p>
+          <h1>{t('title')}</h1>
+          <p><em>{t('last_updated')}</em></p>
 
-          <h2>1. Introducción</h2>
-          <p>
-            Bienvenido a Nutri Red ("nosotros", "nuestro" o "la plataforma"). Estamos comprometidos
-            con la protección de tu privacidad y tus datos personales. Esta política de privacidad
-            explica qué datos recopilamos, cómo los usamos, con quién los compartimos, y cuáles
-            son tus derechos.
-          </p>
-          <p>
-            Nutri Red es una plataforma con sede en España que conecta clientes con nutricionistas
-            certificados. Al usar nuestros servicios, aceptas las prácticas descritas en esta política.
-          </p>
+          <h2>{t('intro_title')}</h2>
+          <p>{t('intro_text')}</p>
+          <p>{t('intro_platform')}</p>
 
           <h2>2. Datos que Recopilamos</h2>
 
