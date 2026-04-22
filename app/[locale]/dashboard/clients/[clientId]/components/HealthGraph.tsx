@@ -1,11 +1,14 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { useTranslations, useLocale } from 'next-intl';
 import type { WeightEntry, ActivityEntry } from '@/lib/types';
 
 export function WeightGraph({ entries }: { entries: WeightEntry[] }) {
+  const t = useTranslations('dashboard.client_detail');
+  const locale = useLocale();
   const data = entries
     .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime())
     .map(e => ({
-      date: new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }),
+      date: new Date(e.recorded_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' }),
       weight: parseFloat(String(e.weight_kg)),
     }));
 
@@ -57,9 +60,12 @@ export function WeightGraph({ entries }: { entries: WeightEntry[] }) {
 }
 
 export function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
+  const t = useTranslations('dashboard.client_detail');
+  const locale = useLocale();
+
   // Group by date, sum duration_minutes
   const grouped = entries.reduce((acc, e) => {
-    const date = new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+    const date = new Date(e.recorded_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
     if (!acc[date]) {
       acc[date] = 0;
     }
@@ -71,8 +77,8 @@ export function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
     .map(([date, minutes]) => ({ date, minutes }))
     .sort((a, b) => {
       // Sort by original date
-      const entryA = entries.find(e => new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }) === a.date);
-      const entryB = entries.find(e => new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }) === b.date);
+      const entryA = entries.find(e => new Date(e.recorded_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' }) === a.date);
+      const entryB = entries.find(e => new Date(e.recorded_at).toLocaleDateString(locale, { month: 'short', day: 'numeric' }) === b.date);
       if (!entryA || !entryB) return 0;
       return new Date(entryA.recorded_at).getTime() - new Date(entryB.recorded_at).getTime();
     });
