@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { useAuth } from '@/lib/auth';
 import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/client-profile';
@@ -15,6 +16,7 @@ import type { WeightEntry, ActivityEntry } from '@/lib/types';
 // ─── Client Health Graphs ──────────────────────────────────────────────────────
 
 function WeightGraph({ entries }: { entries: WeightEntry[] }) {
+  const t = useTranslations('dashboard.home');
   const data = entries
     .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime())
     .map(e => ({
@@ -31,7 +33,7 @@ function WeightGraph({ entries }: { entries: WeightEntry[] }) {
         padding: '40px 0',
         textAlign: 'center'
       }}>
-        No weight entries yet. Log your first weight to see your trend.
+        {t('no_weight_entries')}
       </div>
     );
   }
@@ -70,6 +72,7 @@ function WeightGraph({ entries }: { entries: WeightEntry[] }) {
 }
 
 function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
+  const t = useTranslations('dashboard.home');
   // Group by date, sum duration_minutes
   const grouped = entries.reduce((acc, e) => {
     const date = new Date(e.recorded_at).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
@@ -98,7 +101,7 @@ function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
         padding: '40px 0',
         textAlign: 'center'
       }}>
-        No activity entries yet. Log your first workout to see your progress.
+        {t('no_activity_entries')}
       </div>
     );
   }
@@ -132,6 +135,7 @@ function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
 // ─── Client overview ──────────────────────────────────────────────────────────
 
 function ClientOverview() {
+  const t = useTranslations('dashboard.home');
   const [activeTab, setActiveTab] = useState<'weight' | 'activity'>('weight');
   const { profile, isLoading: profileLoading } = useMyClientProfile();
   const { entries: weightEntries, isLoading: weightLoading } = useWeightEntries();
@@ -155,11 +159,11 @@ function ClientOverview() {
         gap: 12,
       }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)', marginBottom: 4 }}>Set up your profile</div>
-          <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>Add your goals and health info so your nutritionist can personalise your plan.</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)', marginBottom: 4 }}>{t('setup_profile')}</div>
+          <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>{t('setup_profile_desc')}</div>
         </div>
         <Link href="/dashboard/client-profile" style={{ color: 'var(--nc-terra)', fontSize: 14, fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-          Get started →
+          {t('get_started')}
         </Link>
       </div>
     );
@@ -225,13 +229,13 @@ function ClientOverview() {
       {/* Top stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '16px 18px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>Latest weight</div>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>{t('latest_weight')}</div>
           {weightLoading ? (
             <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>—</div>
           ) : latestWeight ? (
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
               <span style={{ fontSize: 26, fontWeight: 600, color: 'var(--nc-ink)', fontFamily: 'var(--font-display)' }}>{latestWeight.weight_kg}</span>
-              <span style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>kg</span>
+              <span style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>{t('weight_unit')}</span>
               {weightDelta !== null && (
                 <span style={{ fontSize: 12, fontWeight: 500, color: weightDelta <= 0 ? '#2A7A4A' : '#C4622D', marginLeft: 2 }}>
                   {weightDelta > 0 ? '+' : ''}{weightDelta.toFixed(1)}
@@ -245,15 +249,15 @@ function ClientOverview() {
         </div>
 
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '16px 18px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>Entries logged</div>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>{t('entries_logged')}</div>
           <div style={{ fontSize: 26, fontWeight: 600, color: 'var(--nc-ink)', fontFamily: 'var(--font-display)' }}>{weightLoading ? '—' : weightEntries.length}</div>
-          <div style={{ fontSize: 11, color: 'var(--nc-stone)', marginTop: 2 }}>weight readings</div>
+          <div style={{ fontSize: 11, color: 'var(--nc-stone)', marginTop: 2 }}>{t('weight_readings')}</div>
         </div>
 
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '16px 18px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>Activities</div>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--nc-stone)', textTransform: 'uppercase', marginBottom: 8 }}>{t('activities')}</div>
           <div style={{ fontSize: 26, fontWeight: 600, color: 'var(--nc-ink)', fontFamily: 'var(--font-display)' }}>{activityLoading ? '—' : activityEntries.length}</div>
-          <div style={{ fontSize: 11, color: 'var(--nc-stone)', marginTop: 2 }}>sessions logged</div>
+          <div style={{ fontSize: 11, color: 'var(--nc-stone)', marginTop: 2 }}>{t('sessions_logged')}</div>
         </div>
 
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '16px 18px' }}>
@@ -265,7 +269,7 @@ function ClientOverview() {
             textTransform: 'uppercase',
             marginBottom: 8
           }}>
-            BMI
+            {t('bmi')}
           </div>
           {!profileLoading && profile ? (
             <BMIBadge
@@ -285,9 +289,9 @@ function ClientOverview() {
       {/* Health tracking graphs */}
       <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '20px 24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>Health Tracking</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>{t('health_tracking')}</div>
           <Link href="/dashboard/client-profile" style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-            Log data →
+            {t('log_data')}
           </Link>
         </div>
 
@@ -313,7 +317,7 @@ function ClientOverview() {
               transition: 'color 0.2s, border-color 0.2s',
             }}
           >
-            Weight
+            {t('weight')}
           </button>
           <button
             onClick={() => setActiveTab('activity')}
@@ -329,7 +333,7 @@ function ClientOverview() {
               transition: 'color 0.2s, border-color 0.2s',
             }}
           >
-            Activity
+            {t('activity')}
           </button>
         </div>
 
@@ -337,7 +341,7 @@ function ClientOverview() {
         {activeTab === 'weight' ? (
           weightLoading ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300 }}>
-              Loading...
+              {t('loading')}
             </div>
           ) : (
             <WeightGraph entries={weightEntries} />
@@ -345,7 +349,7 @@ function ClientOverview() {
         ) : (
           activityLoading ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300 }}>
-              Loading...
+              {t('loading')}
             </div>
           ) : (
             <ActivityGraph entries={activityEntries} />
@@ -357,9 +361,9 @@ function ClientOverview() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>Recent activity</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>{t('recent_activity')}</div>
             <Link href="/dashboard/client-profile" style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-              Log →
+              {t('log')}
             </Link>
           </div>
           {!activityLoading && recentActivity.length > 0 ? (
@@ -375,15 +379,15 @@ function ClientOverview() {
               ))}
             </div>
           ) : (
-            <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>No activity logged yet.</div>
+            <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>{t('no_activity_logged')}</div>
           )}
         </div>
 
         <div style={{ background: 'white', border: '1px solid var(--nc-border)', borderRadius: 10, padding: '20px 24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>Your profile</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>{t('your_profile')}</div>
             <Link href="/dashboard/client-profile" style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-              Edit →
+              {t('edit')}
             </Link>
           </div>
           <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 4 }}>{profile.display_name}</div>
@@ -410,6 +414,7 @@ function ClientOverview() {
 // ─── Nutritionist overview ────────────────────────────────────────────────────
 
 function NutritionistOverview() {
+  const t = useTranslations('dashboard.home');
   const { reviews, isLoading } = usePendingSurveyReviews();
 
   return (
@@ -422,7 +427,7 @@ function NutritionistOverview() {
           padding: '16px 20px',
         }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-terra)', marginBottom: 12 }}>
-            📋 Encuestas completadas ({reviews.length})
+            📋 {t('completed_surveys', { count: reviews.length })}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {reviews.slice(0, 3).map((review) => (
@@ -446,11 +451,11 @@ function NutritionistOverview() {
                     {review.client_name}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--nc-stone)', fontWeight: 300 }}>
-                    Completado {new Date(review.completed_at).toLocaleDateString('es-ES')}
+                    Completado el {new Date(review.completed_at).toLocaleDateString('es-ES')}
                   </div>
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--nc-terra)', fontWeight: 500 }}>
-                  Revisar →
+                  {t('recent_activity')} →
                 </div>
               </Link>
             ))}
@@ -470,17 +475,17 @@ function NutritionistOverview() {
         padding: '20px 24px',
       }}>
         <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 8 }}>
-          Acciones rápidas
+          {t('quick_actions_title')}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <Link href="/dashboard/clients" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
-            → Ver mis clientes
+            → {t('view_my_clients')}
           </Link>
           <Link href="/dashboard/surveys" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
-            → Gestionar encuestas
+            → {t('manage_surveys')}
           </Link>
           <Link href="/dashboard/profile" style={{ fontSize: 13, color: 'var(--nc-terra)', textDecoration: 'none' }}>
-            → Editar mi perfil
+            → {t('edit_my_profile')}
           </Link>
         </div>
       </div>
@@ -491,12 +496,13 @@ function NutritionistOverview() {
 // ─── Page ──────────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard.home');
   const { user } = useAuth();
 
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Overview</div>
+        <div className="dash-topbar-title">{t('overview')}</div>
       </div>
       <div className="dash-content">
         {user?.role === 'client' && <ClientOverview />}

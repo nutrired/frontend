@@ -3,24 +3,26 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { format, formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useUpcomingAppointments } from '@/lib/calendar';
 import { cancelAppointment } from '@/lib/calendar';
 
 export function UpcomingAppointments() {
+  const t = useTranslations('dashboard.home');
   const { appointments, isLoading } = useUpcomingAppointments(5);
   const [canceling, setCanceling] = useState<string | null>(null);
 
   const handleCancel = async (id: string) => {
-    if (!confirm('¿Estás seguro de que quieres cancelar esta cita?')) return;
+    if (!confirm(t('confirm_cancel'))) return;
 
     setCanceling(id);
     try {
-      await cancelAppointment(id, 'Cancelada por el cliente');
+      await cancelAppointment(id, t('cancel_reason'));
       // SWR will auto-revalidate
     } catch (err: any) {
-      alert(err.message || 'Error al cancelar la cita');
+      alert(err.message || t('error_cancel'));
     } finally {
       setCanceling(null);
     }
@@ -34,7 +36,7 @@ export function UpcomingAppointments() {
         borderRadius: 10,
         padding: '20px 24px',
       }}>
-        <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>Cargando citas...</div>
+        <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>{t('loading_appointments')}</div>
       </div>
     );
   }
@@ -48,12 +50,12 @@ export function UpcomingAppointments() {
         padding: '20px 24px',
       }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)', marginBottom: 12 }}>
-          Próximas Citas
+          {t('upcoming_appointments_title')}
         </div>
         <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
-          No tienes citas programadas.{' '}
+          {t('no_appointments_scheduled')}{' '}
           <Link href="/dashboard/calendar" style={{ color: 'var(--nc-terra)', textDecoration: 'none' }}>
-            Agendar una cita →
+            {t('book_appointment_link')}
           </Link>
         </div>
       </div>
@@ -69,10 +71,10 @@ export function UpcomingAppointments() {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--nc-ink)' }}>
-          Próximas Citas
+          {t('upcoming_appointments_title')}
         </div>
         <Link href="/dashboard/calendar" style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none', fontWeight: 500 }}>
-          Ver todas →
+          {t('view_all_appointments')}
         </Link>
       </div>
 
@@ -98,7 +100,7 @@ export function UpcomingAppointments() {
                     {appt.appointment_type}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300, marginBottom: 4 }}>
-                    Con {appt.nutritionist_name}
+                    {t('with')} {appt.nutritionist_name}
                   </div>
                 </div>
                 {isWithin24h && (
@@ -110,7 +112,7 @@ export function UpcomingAppointments() {
                     padding: '3px 8px',
                     borderRadius: 20,
                   }}>
-                    PRÓXIMA
+                    {t('next_soon')}
                   </span>
                 )}
               </div>
@@ -143,11 +145,11 @@ export function UpcomingAppointments() {
                       fontWeight: 500,
                     }}
                   >
-                    {canceling === appt.id ? 'Cancelando...' : 'Cancelar cita'}
+                    {canceling === appt.id ? t('canceling') : t('cancel_appointment')}
                   </button>
                 ) : (
                   <div style={{ fontSize: 10, color: 'var(--nc-stone)', fontWeight: 300, fontStyle: 'italic' }}>
-                    No se puede cancelar (&lt;24h)
+                    {t('cannot_cancel_within_24h')}
                   </div>
                 )}
               </div>
