@@ -2,6 +2,7 @@
 // frontend/app/dashboard/appointment-types/page.tsx
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth';
 import { useAppointmentTypes, createAppointmentType, updateAppointmentType, deleteAppointmentType } from '@/lib/calendar';
 import type { AppointmentType } from '@/lib/types';
@@ -16,6 +17,7 @@ import {
 
 export default function AppointmentTypesPage() {
   const { user } = useAuth();
+  const t = useTranslations('dashboard.appointments');
   const { types, isLoading, mutate } = useAppointmentTypes();
 
   // Nutritionist-only page
@@ -53,11 +55,11 @@ export default function AppointmentTypesPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('El nombre es obligatorio');
+      setError(t('name_required'));
       return;
     }
     if (durationMinutes < 1 || durationMinutes > 240) {
-      setError('La duración debe estar entre 1 y 240 minutos');
+      setError(t('duration_required'));
       return;
     }
 
@@ -83,14 +85,14 @@ export default function AppointmentTypesPage() {
       setDialogOpen(false);
       await mutate();
     } catch (err: any) {
-      setError(err.message || 'Error al guardar el tipo de cita');
+      setError(err.message || t('error_save'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleDelete = async (typeId: string, typeName: string) => {
-    if (!confirm(`¿Eliminar el tipo de cita "${typeName}"? Esta acción no se puede deshacer.`)) {
+    if (!confirm(t('confirm_delete', { name: typeName }))) {
       return;
     }
 
@@ -98,26 +100,26 @@ export default function AppointmentTypesPage() {
       await deleteAppointmentType(typeId);
       await mutate();
     } catch (err: any) {
-      alert(err?.message ?? 'Error al eliminar el tipo de cita.');
+      alert(err?.message ?? t('error_delete'));
     }
   };
 
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Tipos de citas</div>
+        <div className="dash-topbar-title">{t('appointment_types_title')}</div>
         <div className="dash-topbar-right">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <button onClick={openCreateDialog} className="dash-btn-publish">
-                + Nuevo tipo de cita
+                {t('new_appointment_type')}
               </button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{editingType ? 'Editar tipo de cita' : 'Nuevo tipo de cita'}</DialogTitle>
+                <DialogTitle>{editingType ? t('edit_appointment_type') : t('create_appointment_type')}</DialogTitle>
                 <DialogDescription>
-                  Define los tipos de citas que ofreces a tus clientes.
+                  {t('define_types')}
                 </DialogDescription>
               </DialogHeader>
 
@@ -140,7 +142,7 @@ export default function AppointmentTypesPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                   <div className="dash-field">
                     <label className="dash-label">
-                      Nombre <span style={{ color: 'var(--nc-terra)' }}>*</span>
+                      {t('name_label')} <span style={{ color: 'var(--nc-terra)' }}>*</span>
                     </label>
                     <input
                       type="text"
@@ -148,14 +150,14 @@ export default function AppointmentTypesPage() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       maxLength={200}
-                      placeholder="ej. Consulta inicial, Seguimiento mensual"
+                      placeholder={t('name_placeholder')}
                       required
                     />
                   </div>
 
                   <div className="dash-field">
                     <label className="dash-label">
-                      Duración (minutos) <span style={{ color: 'var(--nc-terra)' }}>*</span>
+                      {t('duration_label')} <span style={{ color: 'var(--nc-terra)' }}>*</span>
                     </label>
                     <input
                       type="number"
@@ -169,14 +171,14 @@ export default function AppointmentTypesPage() {
                   </div>
 
                   <div className="dash-field">
-                    <label className="dash-label">Descripción</label>
+                    <label className="dash-label">{t('description_label')}</label>
                     <textarea
                       className="dash-textarea"
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       maxLength={2000}
                       rows={3}
-                      placeholder="Describe brevemente qué incluye esta cita..."
+                      placeholder={t('description_placeholder')}
                     />
                   </div>
                 </div>
@@ -188,7 +190,7 @@ export default function AppointmentTypesPage() {
                     className="dash-btn-publish"
                     style={{ flex: 1 }}
                   >
-                    {submitting ? 'Guardando...' : editingType ? 'Guardar cambios' : 'Crear tipo de cita'}
+                    {submitting ? t('saving') : editingType ? t('save_changes') : t('create_type')}
                   </button>
                   <button
                     type="button"
@@ -196,7 +198,7 @@ export default function AppointmentTypesPage() {
                     className="dash-btn-plain"
                     style={{ flex: 1 }}
                   >
-                    Cancelar
+                    {t('cancel')}
                   </button>
                 </div>
               </form>
@@ -207,7 +209,7 @@ export default function AppointmentTypesPage() {
 
       <div className="dash-content">
         {isLoading ? (
-          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando tipos de citas...</div>
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading')}</div>
         ) : types.length === 0 ? (
           <div style={{
             background: 'var(--nc-forest-pale)',
@@ -217,13 +219,13 @@ export default function AppointmentTypesPage() {
             textAlign: 'center',
           }}>
             <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)', marginBottom: 8 }}>
-              No hay tipos de citas configurados
+              {t('no_types_title')}
             </div>
             <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, marginBottom: 16 }}>
-              Define los tipos de citas que ofreces para que tus clientes puedan agendar contigo.
+              {t('no_types_desc')}
             </div>
             <button onClick={openCreateDialog} className="dash-btn-publish">
-              + Crear primer tipo de cita
+              {t('create_first_type')}
             </button>
           </div>
         ) : (
@@ -247,7 +249,7 @@ export default function AppointmentTypesPage() {
                       {type.name}
                     </div>
                     <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
-                      {type.duration_minutes} minutos
+                      {type.duration_minutes} {t('minutes')}
                     </div>
                   </div>
                 </div>
@@ -264,14 +266,14 @@ export default function AppointmentTypesPage() {
                     className="dash-btn-plain"
                     style={{ flex: 1, fontSize: 13, padding: '8px 12px' }}
                   >
-                    Editar
+                    {t('edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(type.id, type.name)}
                     className="dash-btn-plain"
                     style={{ flex: 1, fontSize: 13, padding: '8px 12px', color: 'var(--nc-terra)' }}
                   >
-                    Eliminar
+                    {t('delete')}
                   </button>
                 </div>
               </div>

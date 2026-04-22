@@ -3,11 +3,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAppointmentTypes, useAvailableSlots, createAppointment } from '@/lib/calendar';
 import { format, addDays } from 'date-fns';
+import { es, enUS } from 'date-fns/locale';
 
 export default function BookAppointmentPage() {
   const router = useRouter();
+  const t = useTranslations('dashboard.appointments');
+  const locale = useLocale();
+  const dateFnsLocale = locale === 'es' ? es : enUS;
   const searchParams = useSearchParams();
   const relationshipID = searchParams.get('relationship_id');
   const nutritionistID = searchParams.get('nutritionist_id');
@@ -36,15 +41,15 @@ export default function BookAppointmentPage() {
 
     // Validation with helpful messages
     if (!relationshipID) {
-      setError('Falta el ID de la relación');
+      setError(t('missing_params'));
       return;
     }
     if (!selectedTypeID) {
-      setError('Por favor selecciona un tipo de cita');
+      setError(t('error_no_type'));
       return;
     }
     if (!selectedSlot) {
-      setError('Por favor selecciona una hora disponible');
+      setError(t('error_no_slot'));
       return;
     }
 
@@ -58,22 +63,22 @@ export default function BookAppointmentPage() {
         start_time: selectedSlot,
         notes: notes.trim(),
       });
-      router.push('/dashboard/calendar');
+      router.push(`/${locale}/dashboard/calendar`);
     } catch (err: any) {
-      setError(err.message || 'Error booking appointment');
+      setError(err.message || t('error_booking'));
     } finally {
       setSubmitting(false);
     }
   };
 
   if (!relationshipID || !nutritionistID) {
-    return <div className="dash-content">Missing required parameters</div>;
+    return <div className="dash-content">{t('missing_params')}</div>;
   }
 
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Agendar Cita</div>
+        <div className="dash-topbar-title">{t('book_appointment_title')}</div>
       </div>
 
       <div className="dash-content">
@@ -101,17 +106,17 @@ export default function BookAppointmentPage() {
               marginBottom: 24,
               lineHeight: 1.6,
             }}>
-              <strong>No se pueden agendar citas aún</strong>
+              <strong>{t('no_types_error')}</strong>
               <br />
-              Este nutricionista aún no ha configurado sus tipos de cita. Por favor, contacta con soporte o espera a que el nutricionista complete su configuración.
+              {t('no_types_error_desc')}
             </div>
           )}
 
           <div className="dash-field">
-            <label className="dash-label">Tipo de cita</label>
+            <label className="dash-label">{t('appointment_type_label')}</label>
             {typesLoading ? (
               <div style={{ fontSize: 13, color: 'var(--nc-stone)', padding: '12px 16px' }}>
-                Cargando tipos de cita...
+                {t('loading_types')}
               </div>
             ) : (
               <select
@@ -121,10 +126,10 @@ export default function BookAppointmentPage() {
                 required
                 disabled={hasNoAppointmentTypes}
               >
-                <option value="">Seleccionar...</option>
+                <option value="">{t('select_type')}</option>
                 {types.map((type) => (
                   <option key={type.id} value={type.id}>
-                    {type.name} ({type.duration_minutes} min)
+                    {type.name} ({type.duration_minutes} {t('duration_minutes')})
                   </option>
                 ))}
               </select>
@@ -132,7 +137,7 @@ export default function BookAppointmentPage() {
           </div>
 
           <div className="dash-field">
-            <label className="dash-label">Fecha</label>
+            <label className="dash-label">{t('date_label')}</label>
             <input
               type="date"
               className="dash-input"
@@ -145,11 +150,11 @@ export default function BookAppointmentPage() {
 
           {selectedTypeID && (
             <div className="dash-field">
-              <label className="dash-label">Hora disponible</label>
+              <label className="dash-label">{t('available_time_label')}</label>
               {slotsLoading ? (
-                <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>Cargando...</div>
+                <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>{t('loading_slots')}</div>
               ) : slots.length === 0 ? (
-                <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>No hay horarios disponibles este día</div>
+                <div style={{ fontSize: 13, color: 'var(--nc-stone)' }}>{t('no_slots')}</div>
               ) : (
                 <select
                   className="dash-input"
@@ -157,10 +162,10 @@ export default function BookAppointmentPage() {
                   onChange={(e) => setSelectedSlot(e.target.value)}
                   required
                 >
-                  <option value="">Seleccionar...</option>
+                  <option value="">{t('select_type')}</option>
                   {slots.map((slot) => (
                     <option key={slot} value={slot}>
-                      {format(new Date(slot), 'HH:mm')}
+                      {format(new Date(slot), 'HH:mm', { locale: dateFnsLocale })}
                     </option>
                   ))}
                 </select>
@@ -169,13 +174,13 @@ export default function BookAppointmentPage() {
           )}
 
           <div className="dash-field">
-            <label className="dash-label">Notas (opcional)</label>
+            <label className="dash-label">{t('notes_label')}</label>
             <textarea
               className="dash-textarea"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Información adicional..."
+              placeholder={t('notes_placeholder')}
             />
           </div>
 
@@ -186,7 +191,7 @@ export default function BookAppointmentPage() {
               className="dash-btn-publish"
               style={{ flex: 1 }}
             >
-              {submitting ? 'Agendando...' : 'Confirmar Cita'}
+              {submitting ? t('booking') : t('book_button')}
             </button>
             <button
               type="button"
@@ -194,7 +199,7 @@ export default function BookAppointmentPage() {
               className="dash-btn-plain"
               style={{ flex: 1 }}
             >
-              Cancelar
+              {t('cancel')}
             </button>
           </div>
         </form>

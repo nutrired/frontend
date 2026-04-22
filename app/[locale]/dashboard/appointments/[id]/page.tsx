@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { getAppointment } from '@/lib/appointment-notes';
 import { useAuth } from '@/lib/auth';
 import { AppointmentNotesSection } from '@/components/appointments/AppointmentNotesSection';
@@ -12,6 +13,8 @@ export default function AppointmentDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
+  const t = useTranslations('dashboard.appointments');
+  const locale = useLocale();
   const appointmentId = params.id as string;
 
   const [appointment, setAppointment] = useState<Appointment | null>(null);
@@ -26,7 +29,7 @@ export default function AppointmentDetailPage() {
       setAppointment(data);
     } catch (err) {
       console.error('Failed to load appointment:', err);
-      setError('Failed to load appointment details');
+      setError(t('error_booking'));
     } finally {
       setIsLoading(false);
     }
@@ -36,6 +39,7 @@ export default function AppointmentDetailPage() {
     if (appointmentId) {
       loadAppointment();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentId]);
 
   const getStatusStyle = (status: string) => {
@@ -72,7 +76,7 @@ export default function AppointmentDetailPage() {
   if (isLoading) {
     return (
       <div className="dash-content" style={{ padding: 40, color: 'var(--nc-stone)', fontWeight: 300 }}>
-        Cargando…
+        {t('loading')}
       </div>
     );
   }
@@ -82,15 +86,15 @@ export default function AppointmentDetailPage() {
       <div className="dash-content" style={{ padding: 40 }}>
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Error</div>
-            <div className="dash-section-sub">{error || 'Cita no encontrada'}</div>
+            <div className="dash-section-title">{t('common.error', { ns: 'common' })}</div>
+            <div className="dash-section-sub">{error || t('appointment_not_found')}</div>
           </div>
           <div className="dash-section-body">
             <button
               className="dash-btn-save"
-              onClick={() => router.push('/dashboard/appointments')}
+              onClick={() => router.push(`/${locale}/dashboard/appointments`)}
             >
-              Volver a citas
+              {t('back_to_appointments')}
             </button>
           </div>
         </div>
@@ -107,7 +111,7 @@ export default function AppointmentDetailPage() {
     <>
       <div className="dash-topbar">
         <button
-          onClick={() => router.push('/dashboard/appointments')}
+          onClick={() => router.push(`/${locale}/dashboard/appointments`)}
           style={{
             background: 'transparent',
             border: 'none',
@@ -123,7 +127,7 @@ export default function AppointmentDetailPage() {
         <div style={{ flex: 1 }}>
           <div className="dash-topbar-title">{appointment.appointment_type.name}</div>
           <div style={{ fontSize: 12, fontWeight: 300, color: 'var(--nc-stone)', marginTop: 2 }}>
-            Detalles de la cita
+            {t('appointment_details')}
           </div>
         </div>
         <span
@@ -144,7 +148,7 @@ export default function AppointmentDetailPage() {
         <div style={{ display: 'grid', gap: 20, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginBottom: 20 }}>
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">📅 Fecha y hora</div>
+              <div className="dash-section-title">📅 {t('date_and_time')}</div>
             </div>
             <div className="dash-section-body">
               <p style={{ fontSize: 15, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 8 }}>
@@ -154,14 +158,14 @@ export default function AppointmentDetailPage() {
                 🕐 {startDateTime.time}
               </p>
               <p style={{ fontSize: 13, color: 'var(--nc-stone)' }}>
-                Duración: {appointment.appointment_type.duration_minutes} minutos
+                {t('duration')}: {appointment.appointment_type.duration_minutes} {t('duration_minutes')}
               </p>
             </div>
           </div>
 
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">👥 Participantes</div>
+              <div className="dash-section-title">👥 {t('participant', { ns: 'dashboard.calendar', defaultValue: 'Participants' })}</div>
             </div>
             <div className="dash-section-body">
               <div style={{ marginBottom: 12 }}>
@@ -169,7 +173,7 @@ export default function AppointmentDetailPage() {
                   {appointment.nutritionist_name}
                 </p>
                 <p style={{ fontSize: 12, fontWeight: 300, color: 'var(--nc-stone)' }}>
-                  Nutricionista
+                  {t('nutritionist', { ns: 'dashboard.calendar' })}
                 </p>
               </div>
               <div>
@@ -177,7 +181,7 @@ export default function AppointmentDetailPage() {
                   {appointment.client_name}
                 </p>
                 <p style={{ fontSize: 12, fontWeight: 300, color: 'var(--nc-stone)' }}>
-                  Cliente
+                  {t('client', { ns: 'dashboard.calendar' })}
                 </p>
               </div>
             </div>
@@ -187,7 +191,7 @@ export default function AppointmentDetailPage() {
         {appointment.appointment_type.description && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Sobre esta cita</div>
+              <div className="dash-section-title">{t('about_this_appointment')}</div>
             </div>
             <div className="dash-section-body">
               <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--nc-ink)', lineHeight: 1.7 }}>
@@ -215,7 +219,7 @@ export default function AppointmentDetailPage() {
                   onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-1px)')}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
                 >
-                  📹 Unirse a videollamada
+                  {t('join_video_call')}
                 </a>
               )}
             </div>
@@ -225,8 +229,8 @@ export default function AppointmentDetailPage() {
         {isNutritionist && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Notas de sesión</div>
-              <div className="dash-section-sub">Documenta esta cita para referencia y comunicación con el cliente</div>
+              <div className="dash-section-title">{t('session_notes')}</div>
+              <div className="dash-section-sub">{t('document_session')}</div>
             </div>
             <div className="dash-section-body">
               <AppointmentNotesSection
@@ -243,7 +247,7 @@ export default function AppointmentDetailPage() {
         {!isNutritionist && appointment.shared_summary && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Resumen de sesión</div>
+              <div className="dash-section-title">{t('session_summary')}</div>
             </div>
             <div className="dash-section-body">
               <p style={{ fontSize: 14, fontWeight: 300, color: 'var(--nc-ink)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
@@ -255,8 +259,8 @@ export default function AppointmentDetailPage() {
 
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Fotos de progreso</div>
-            <div className="dash-section-sub">Seguimiento visual del progreso a lo largo del tiempo</div>
+            <div className="dash-section-title">{t('progress_photos')}</div>
+            <div className="dash-section-sub">{t('visual_progress_tracking')}</div>
           </div>
           <div className="dash-section-body">
             <AppointmentPhotosSection
@@ -272,7 +276,7 @@ export default function AppointmentDetailPage() {
         {appointment.notes && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Notas antiguas</div>
+              <div className="dash-section-title">{t('old_notes')}</div>
             </div>
             <div className="dash-section-body">
               <p style={{ fontSize: 13, fontWeight: 300, color: 'var(--nc-stone)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>
@@ -286,7 +290,7 @@ export default function AppointmentDetailPage() {
           <div className="dash-section" style={{ border: '1px solid var(--nc-terra)' }}>
             <div className="dash-section-head" style={{ background: 'rgba(196,98,45,0.05)' }}>
               <div className="dash-section-title" style={{ color: 'var(--nc-terra)' }}>
-                Detalles de cancelación
+                {t('cancellation_details')}
               </div>
             </div>
             <div className="dash-section-body">
@@ -295,7 +299,7 @@ export default function AppointmentDetailPage() {
               </p>
               {appointment.cancelled_at && (
                 <p style={{ fontSize: 12, color: 'var(--nc-stone)', marginTop: 8 }}>
-                  Cancelado el {new Date(appointment.cancelled_at).toLocaleString('es-ES')}
+                  {t('cancelled_at')} {new Date(appointment.cancelled_at).toLocaleString(locale === 'es' ? 'es-ES' : 'en-US')}
                 </p>
               )}
             </div>
