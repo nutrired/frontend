@@ -1,9 +1,11 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import LandingAnimations from '@/components/LandingAnimations';
 import { PublicNav } from '@/components/PublicNav';
 
 export default function Home() {
+  const t = useTranslations('public.landing');
 
   return (
     <div className="lp-root">
@@ -16,24 +18,23 @@ export default function Home() {
 
         {/* LEFT */}
         <div className="hero-left">
-          <p className="hero-tag">Marketplace de Nutrición</p>
+          <p className="hero-tag">{t('hero_tag')}</p>
 
           <h1 className="hero-heading">
-            <span className="h-plain">Encuentra</span>
-            <span className="h-italic">tu nutricionista</span>
-            <span className="h-plain-2">de confianza</span>
+            <span className="h-plain">{t('hero_heading_1')}</span>
+            <span className="h-italic">{t('hero_heading_2')}</span>
+            <span className="h-plain-2">{t('hero_heading_3')}</span>
           </h1>
 
           <p className="hero-sub">
-            Conectamos a personas que quieren cuidar su alimentación
-            con nutricionistas certificados que se adaptan a tu vida y tus objetivos.
+            {t('hero_subtitle')}
           </p>
 
           <div className="hero-actions">
             <a href="/nutritionists" className="btn-primary">
-              Explorar nutricionistas
+              {t('hero_cta_explore')}
             </a>
-            <a href="/for-nutritionists" className="btn-ghost">Soy nutricionista →</a>
+            <a href="/for-nutritionists" className="btn-ghost">{t('hero_cta_nutritionist')}</a>
           </div>
 
           <div className="hero-proof">
@@ -44,8 +45,7 @@ export default function Home() {
               <div className="av av-4" />
             </div>
             <p className="proof-text">
-              <strong>+2.000 personas</strong> ya cuidan su alimentación<br />
-              con nuestros nutricionistas
+              <strong>{t('hero_proof_stat')}</strong> {t('hero_proof_desc')}
             </p>
           </div>
         </div>
@@ -108,23 +108,23 @@ export default function Home() {
       <section className="stats">
         <div className="stat">
           <div className="stat-num">500+</div>
-          <div className="stat-lbl">Nutricionistas verificados</div>
+          <div className="stat-lbl">{t('stats_nutritionists')}</div>
         </div>
         <div className="stat">
           <div className="stat-num">2.000+</div>
-          <div className="stat-lbl">Clientes activos</div>
+          <div className="stat-lbl">{t('stats_clients')}</div>
         </div>
         <div className="stat">
           <div className="stat-num">4.9</div>
-          <div className="stat-lbl">Valoración media</div>
+          <div className="stat-lbl">{t('stats_rating')}</div>
         </div>
       </section>
 
       {/* ─────────── HOW IT WORKS ─────────── */}
       <section className="how">
         <div className="sec-hdr">
-          <span className="sec-tag">Proceso</span>
-          <h2 className="sec-title">Así de <em>sencillo</em></h2>
+          <span className="sec-tag">{t('how_tag')}</span>
+          <h2 className="sec-title">{t('how_title')} <em>sencillo</em></h2>
         </div>
 
         <div className="steps">
@@ -137,8 +137,8 @@ export default function Home() {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </div>
-            <h3 className="step-title">Busca tu especialista</h3>
-            <p className="step-desc">Filtra por especialidad, idioma, precio y valoraciones. Encuentra el nutricionista que mejor encaja con tus objetivos y tu presupuesto.</p>
+            <h3 className="step-title">{t('step_1_title')}</h3>
+            <p className="step-desc">{t('step_1_desc')}</p>
           </div>
 
           <div className="step reveal">
@@ -151,8 +151,8 @@ export default function Home() {
                 <line x1="16" y1="17" x2="8" y2="17" />
               </svg>
             </div>
-            <h3 className="step-title">Elige tu plan</h3>
-            <p className="step-desc">Selecciona el servicio que necesitas: consulta puntual o seguimiento mensual. Pago seguro a través de Stripe, sin sorpresas ni letra pequeña.</p>
+            <h3 className="step-title">{t('step_2_title')}</h3>
+            <p className="step-desc">{t('step_2_desc')}</p>
           </div>
 
           <div className="step reveal">
@@ -163,8 +163,8 @@ export default function Home() {
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
             </div>
-            <h3 className="step-title">Comienza tu camino</h3>
-            <p className="step-desc">Recibe tu plan de nutrición personalizado, chatea con tu nutricionista en tiempo real y empieza a ver resultados reales en tu vida.</p>
+            <h3 className="step-title">{t('step_3_title')}</h3>
+            <p className="step-desc">{t('step_3_desc')}</p>
           </div>
 
         </div>
@@ -173,7 +173,7 @@ export default function Home() {
       {/* ─────────── NUTRITIONISTS ─────────── */}
       <section className="nutritionists">
         <div className="sec-hdr">
-          <span className="sec-tag">Destacados</span>
+          <span className="sec-tag">{t('nutritionists_tag')}</span>
           <h2 className="sec-title">Nutricionistas <em>verificados</em></h2>
         </div>
 
@@ -281,7 +281,7 @@ export default function Home() {
         </div>
 
         <div className="see-all">
-          <a href="/nutritionists" className="btn-outline">Ver todos los nutricionistas</a>
+          <a href="/nutritionists" className="btn-outline">{t('nutritionists_all')}</a>
         </div>
       </section>
 
@@ -289,7 +289,7 @@ export default function Home() {
       <section className="pricing">
         <div className="pricing-inner">
           <div className="sec-hdr">
-            <span className="sec-tag">Para nutricionistas</span>
+            <span className="sec-tag">{t('pricing_tag')}</span>
             <h2 className="sec-title">Planes y <em>precios</em></h2>
           </div>
 
@@ -297,56 +297,51 @@ export default function Home() {
 
             {/* Free */}
             <div className="pricing-card reveal">
-              <div className="pricing-tier">Free</div>
+              <div className="pricing-tier">{t('pricing_free_tier')}</div>
               <div className="pricing-price-row">
                 <span className="pricing-price">{'€0'}</span>
                 <span className="pricing-period">/mes</span>
               </div>
-              <p className="pricing-desc">Empieza a construir tu práctica online sin ningún coste.</p>
+              <p className="pricing-desc">{t('pricing_free_desc')}</p>
               <ul className="pricing-features">
-                <li>Hasta 5 clientes activos</li>
-                <li>Perfil público</li>
-                <li>Paquetes de servicios</li>
-                <li>Soporte por email</li>
+                {t.raw('pricing_free_features').map((feature: string) => (
+                  <li key={feature}>{feature}</li>
+                ))}
               </ul>
-              <a href="/register" className="btn-outline pricing-btn">Empezar gratis</a>
+              <a href="/register" className="btn-outline pricing-btn">{t('pricing_free_cta')}</a>
             </div>
 
             {/* Pro */}
             <div className="pricing-card pricing-featured reveal">
-              <div className="pricing-popular">Más popular</div>
-              <div className="pricing-tier">Pro</div>
+              <div className="pricing-popular">{t('pricing_pro_popular')}</div>
+              <div className="pricing-tier">{t('pricing_pro_tier')}</div>
               <div className="pricing-price-row">
                 <span className="pricing-price">{'€29'}</span>
                 <span className="pricing-period">/mes</span>
               </div>
-              <p className="pricing-desc">Para nutricionistas en crecimiento con una agenda activa.</p>
+              <p className="pricing-desc">{t('pricing_pro_desc')}</p>
               <ul className="pricing-features">
-                <li>Hasta 25 clientes activos</li>
-                <li>Perfil destacado en búsqueda</li>
-                <li>Todo lo del plan Free</li>
-                <li>Análisis de rendimiento</li>
-                <li>Soporte prioritario</li>
+                {t.raw('pricing_pro_features').map((feature: string) => (
+                  <li key={feature}>{feature}</li>
+                ))}
               </ul>
-              <a href="/register" className="btn-terra pricing-btn">Empezar con Pro</a>
+              <a href="/register" className="btn-terra pricing-btn">{t('pricing_pro_cta')}</a>
             </div>
 
             {/* Premium */}
             <div className="pricing-card reveal">
-              <div className="pricing-tier">Premium</div>
+              <div className="pricing-tier">{t('pricing_premium_tier')}</div>
               <div className="pricing-price-row">
                 <span className="pricing-price">{'€59'}</span>
                 <span className="pricing-period">/mes</span>
               </div>
-              <p className="pricing-desc">Sin límites para los profesionales más exigentes.</p>
+              <p className="pricing-desc">{t('pricing_premium_desc')}</p>
               <ul className="pricing-features">
-                <li>Clientes ilimitados</li>
-                <li>Posición top en búsqueda</li>
-                <li>Todo lo del plan Pro</li>
-                <li>Dashboard avanzado</li>
-                <li>Soporte dedicado</li>
+                {t.raw('pricing_premium_features').map((feature: string) => (
+                  <li key={feature}>{feature}</li>
+                ))}
               </ul>
-              <a href="/register" className="btn-outline pricing-btn">Empezar con Premium</a>
+              <a href="/register" className="btn-outline pricing-btn">{t('pricing_premium_cta')}</a>
             </div>
 
           </div>
@@ -360,20 +355,17 @@ export default function Home() {
         <div className="cta-blob" />
         <div className="cta-inner">
           <h2 className="cta-h reveal">
-            ¿Listo para <em>transformar</em><br />
-            tu alimentación?
+            {t('cta_heading')}
           </h2>
           <div className="cta-right reveal">
             <p className="cta-p">
-              Únete a más de 2.000 personas que ya están consiguiendo
-              sus objetivos con la ayuda de un nutricionista de confianza.
-              Sin compromisos, sin letra pequeña.
+              {t('cta_desc')}
             </p>
             <div className="cta-btns">
               <a href="/register" className="btn-terra">
-                Empezar gratis
+                {t('cta_free')}
               </a>
-              <a href="/nutritionists" className="btn-light">Ver nutricionistas →</a>
+              <a href="/nutritionists" className="btn-light">{t('cta_see_nutritionists')}</a>
             </div>
           </div>
         </div>
@@ -383,12 +375,12 @@ export default function Home() {
       <footer className="lp-footer">
         <div className="ft-logo">nutri<span>red</span></div>
         <ul className="ft-links">
-          <li><a href="/about">Sobre nosotros</a></li>
-          <li><a href="/for-nutritionists">Para nutricionistas</a></li>
-          <li><a href="/privacy">Privacidad</a></li>
-          <li><a href="/terms">Términos</a></li>
+          <li><a href="/about">{t('footer_about')}</a></li>
+          <li><a href="/for-nutritionists">{t('footer_for_nutritionists')}</a></li>
+          <li><a href="/privacy">{t('footer_privacy')}</a></li>
+          <li><a href="/terms">{t('footer_terms')}</a></li>
         </ul>
-        <span className="ft-copy">© 2026 Nutri Red</span>
+        <span className="ft-copy">{t('footer_copy')}</span>
       </footer>
 
     </div>
