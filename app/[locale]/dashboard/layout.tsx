@@ -62,6 +62,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleSignOut = async () => {
     await api.post('/auth/logout', {}).catch(() => {});
+    // Clear local storage token
+    localStorage.removeItem('access_token');
+    sessionStorage.removeItem('access_token');
+    // Redirect to login
     router.push(`/${locale}/login`);
   };
 
