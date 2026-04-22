@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAvailabilityRules, createAvailabilityRule, deleteAvailabilityRule } from '@/lib/calendar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,16 +10,25 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trash2 } from 'lucide-react';
 
-// Backend uses 0=Sunday, but we display Monday first (Spanish convention)
-const DAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 const DAYS_DISPLAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday to Sunday
 
 export function AvailabilityEditor() {
+  const t = useTranslations('dashboard.availability');
   const { rules, isLoading, mutate } = useAvailabilityRules();
   const [dayOfWeek, setDayOfWeek] = useState<number>(1);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('13:00');
   const [error, setError] = useState('');
+
+  const DAYS = [
+    t('day_sunday'),
+    t('day_monday'),
+    t('day_tuesday'),
+    t('day_wednesday'),
+    t('day_thursday'),
+    t('day_friday'),
+    t('day_saturday'),
+  ];
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,7 +39,7 @@ export function AvailabilityEditor() {
       setEndTime('13:00');
       await mutate();
     } catch (err: any) {
-      setError(err.message || 'Error al crear disponibilidad');
+      setError(err.message || t('error_create'));
     }
   };
 
@@ -42,7 +52,7 @@ export function AvailabilityEditor() {
     }
   };
 
-  if (isLoading) return <div>Cargando...</div>;
+  if (isLoading) return <div>{t('loading')}</div>;
 
   // Group rules by day
   const rulesByDay = rules.reduce((acc, rule) => {
@@ -54,10 +64,10 @@ export function AvailabilityEditor() {
   return (
     <div className="space-y-6">
       <form onSubmit={handleAdd} className="border rounded-lg p-4 space-y-4">
-        <h3 className="font-semibold">Añadir Disponibilidad</h3>
+        <h3 className="font-semibold">{t('add_title')}</h3>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <Label htmlFor="day">Día</Label>
+            <Label htmlFor="day">{t('label_day')}</Label>
             <Select value={dayOfWeek.toString()} onValueChange={(v) => setDayOfWeek(parseInt(v))}>
               <SelectTrigger id="day">
                 <SelectValue />
@@ -72,7 +82,7 @@ export function AvailabilityEditor() {
             </Select>
           </div>
           <div>
-            <Label htmlFor="start">Desde</Label>
+            <Label htmlFor="start">{t('label_from')}</Label>
             <Input
               id="start"
               type="time"
@@ -82,7 +92,7 @@ export function AvailabilityEditor() {
             />
           </div>
           <div>
-            <Label htmlFor="end">Hasta</Label>
+            <Label htmlFor="end">{t('label_to')}</Label>
             <Input
               id="end"
               type="time"
@@ -93,11 +103,11 @@ export function AvailabilityEditor() {
           </div>
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
-        <Button type="submit">Añadir</Button>
+        <Button type="submit">{t('button_add')}</Button>
       </form>
 
       <div className="space-y-4">
-        <h3 className="font-semibold">Disponibilidad Actual</h3>
+        <h3 className="font-semibold">{t('current_title')}</h3>
         {DAYS_DISPLAY_ORDER.map((dayIndex) => {
           const dayRules = rulesByDay[dayIndex] || [];
           if (dayRules.length === 0) return null;
@@ -120,7 +130,7 @@ export function AvailabilityEditor() {
           );
         })}
         {rules.length === 0 && (
-          <p className="text-muted-foreground text-sm">No has configurado tu disponibilidad aún.</p>
+          <p className="text-muted-foreground text-sm">{t('empty_state')}</p>
         )}
       </div>
     </div>

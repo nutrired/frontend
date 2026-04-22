@@ -670,6 +670,24 @@
       "subtitle": "Financial overview of your nutrition practice",
       "loading": "Loading business dashboard...",
       "error": "Failed to load business dashboard"
+    },
+    "availability": {
+      "add_title": "Add Availability",
+      "label_day": "Day",
+      "label_from": "From",
+      "label_to": "To",
+      "button_add": "Add",
+      "current_title": "Current Availability",
+      "empty_state": "You haven't configured your availability yet.",
+      "loading": "Loading...",
+      "error_create": "Error creating availability",
+      "day_sunday": "Sunday",
+      "day_monday": "Monday",
+      "day_tuesday": "Tuesday",
+      "day_wednesday": "Wednesday",
+      "day_thursday": "Thursday",
+      "day_friday": "Friday",
+      "day_saturday": "Saturday"
     }
   },
   "errors": {

@@ -670,6 +670,24 @@
       "subtitle": "Resumen financiero de tu práctica de nutrición",
       "loading": "Cargando panel de negocios...",
       "error": "Error al cargar el panel de negocios"
+    },
+    "availability": {
+      "add_title": "Añadir Disponibilidad",
+      "label_day": "Día",
+      "label_from": "Desde",
+      "label_to": "Hasta",
+      "button_add": "Añadir",
+      "current_title": "Disponibilidad Actual",
+      "empty_state": "No has configurado tu disponibilidad aún.",
+      "loading": "Cargando...",
+      "error_create": "Error al crear disponibilidad",
+      "day_sunday": "Domingo",
+      "day_monday": "Lunes",
+      "day_tuesday": "Martes",
+      "day_wednesday": "Miércoles",
+      "day_thursday": "Jueves",
+      "day_friday": "Viernes",
+      "day_saturday": "Sábado"
     }
   },
   "errors": {
