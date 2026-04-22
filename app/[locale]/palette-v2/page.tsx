@@ -5,6 +5,7 @@ import { PublicNav } from '@/components/PublicNav';
 import './v2-palette.css';
 
 export default function V2Landing() {
+  const locale = useLocale();
 
   return (
     <div className="lp-root v2-palette">

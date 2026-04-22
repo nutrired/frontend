@@ -8,6 +8,7 @@ import type { TemplateQuestion } from '@/lib/types';
 
 export default function NewSurveyTemplatePage() {
   const t = useTranslations('dashboard.surveys');
+  const locale = useLocale();
   const handleSave = async (data: { title: string; description: string; questions: TemplateQuestion[] }) => {
     await createSurveyTemplate(data);
   };

@@ -18,6 +18,7 @@ const CATEGORY_KEYS: Record<RecipeCategory | 'all', string> = {
 
 export default function MyRecipesPage() {
   const t = useTranslations('dashboard.recipes');
+  const locale = useLocale();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<RecipeCategory | 'all'>('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');

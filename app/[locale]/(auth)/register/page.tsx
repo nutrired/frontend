@@ -11,6 +11,7 @@ type Role = 'client' | 'nutritionist';
 function RegisterForm() {
   const router = useRouter();
   const t = useTranslations('auth.register');
+  const locale = useLocale();
   const [role, setRole] = useState<Role>('client');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

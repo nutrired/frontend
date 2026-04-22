@@ -9,6 +9,7 @@ import type { TemplateQuestion } from '@/lib/types';
 
 export default function EditSurveyTemplatePage() {
   const t = useTranslations('dashboard.surveys');
+  const locale = useLocale();
   const params = useParams<{ templateId: string }>();
   const templateId = params.templateId;
   const { template, isLoading, error } = useSurveyTemplate(templateId);

@@ -8,6 +8,7 @@ import { api, ApiRequestError } from '@/lib/api';
 
 function VerifyEmailContent() {
   const t = useTranslations('auth.verify_email');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');

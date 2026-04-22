@@ -8,6 +8,7 @@ import { api, ApiRequestError } from '@/lib/api';
 
 function ResetPasswordForm() {
   const t = useTranslations('auth.reset_password');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');

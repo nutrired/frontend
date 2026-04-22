@@ -1,6 +1,7 @@
 import { PublicNav } from '@/components/PublicNav';
 
 export default function ForNutritionists() {
+  const locale = useLocale();
   return (
     <div className="content-page">
       <PublicNav />

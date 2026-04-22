@@ -2,11 +2,13 @@
 'use client';
 
 import { useState } from 'react';
+import { useLocale } from 'next-intl';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
 import { timeSince } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function MyNutritionistPage() {
+  const locale = useLocale();
   const { relationships, isLoading } = useMyRelationships();
   const [cancelling, setCancelling] = useState<string | null>(null);
 

@@ -353,7 +353,7 @@ export default function EditExercisePlanPage() {
             ← Cliente
           </Link>
           <div className="dash-topbar-title">{plan.title}</div>
-          <StatusPill status={plan.status} />
+          <StatusPill status={plan.status} t={t} />
         </div>
         {isDraft && (
           <div style={{ display: 'flex', gap: 8 }}>

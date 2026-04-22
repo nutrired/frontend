@@ -2,6 +2,7 @@ import { PublicNav } from '@/components/PublicNav';
 import { useTranslations, useLocale } from 'next-intl';
 
 export default function Terms() {
+  const locale = useLocale();
   const t = useTranslations('public.static.terms');
 
   return (

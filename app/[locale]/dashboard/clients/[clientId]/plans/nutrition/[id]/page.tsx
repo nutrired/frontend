@@ -513,7 +513,7 @@ export default function EditNutritionPlanPage() {
             ← Cliente
           </Link>
           <div className="dash-topbar-title">{plan.title}</div>
-          <StatusPill status={plan.status} />
+          <StatusPill status={plan.status} t={t} />
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {isDraft && (

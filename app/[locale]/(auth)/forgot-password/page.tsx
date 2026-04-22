@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 
 export default function ForgotPasswordPage() {
   const t = useTranslations('auth.forgot_password');
+  const locale = useLocale();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -3,6 +3,7 @@ import { useTranslations, useLocale } from 'next-intl';
 
 export default function About() {
   const t = useTranslations('public.static.about');
+  const locale = useLocale();
 
   return (
     <div className="content-page">

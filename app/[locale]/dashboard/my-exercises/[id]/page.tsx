@@ -1,22 +1,12 @@
-'use client'
-
-import { useTranslations, useLocale } from 'next-intl';;
+'use client';
 // frontend/app/dashboard/my-exercises/[id]/page.tsx
 
 import { use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations, useLocale } from 'next-intl';
 import { useExerciseTemplate, deleteExerciseTemplate } from '@/lib/exercise-templates';
 import type { ExerciseCategory } from '@/lib/types';
-
-const t = useTranslationsForExercises();
-
-  const CATEGORY_LABELS: Record<ExerciseCategory, string> = {
-  strength: 'Fuerza',
-  cardio: 'Cardio',
-  flexibility: 'Flexibilidad',
-  balance: 'Equilibrio',
-};
 
 const CATEGORY_COLORS: Record<ExerciseCategory, string> = {
   strength: '#f0fdf4',
@@ -32,15 +22,22 @@ const CATEGORY_BADGE_COLORS: Record<ExerciseCategory, { bg: string; text: string
   balance: { bg: '#f3e8ff', text: '#6b21a8' },
 };
 
-const useTranslationsForExercises = useTranslations('dashboard.exercises');
-
 export default function ExerciseDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const t = useTranslations('dashboard.exercises');
+  const locale = useLocale();
   const router = useRouter();
   const { template, isLoading } = useExerciseTemplate(resolvedParams.id);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+
+  const CATEGORY_LABELS: Record<ExerciseCategory, string> = {
+    strength: t('category_strength'),
+    cardio: t('category_cardio'),
+    flexibility: t('category_flexibility'),
+    balance: t('category_balance'),
+  };
 
   const handleDelete = async () => {
     if (!template) return;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useSurveyAssignment, submitSurveyResponses } from '@/lib/survey';
 import SurveyForm from '@/components/survey/SurveyForm';
@@ -9,6 +10,7 @@ import SurveyForm from '@/components/survey/SurveyForm';
 // relationship_id here, since the API resolves assignments by relationship.
 
 export default function ClientSurveyPage() {
+  const locale = useLocale();
   const params = useParams<{ assignmentId: string }>();
   const relationshipId = params.assignmentId;
   const { assignment, isLoading, error, mutate } = useSurveyAssignment(relationshipId);

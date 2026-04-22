@@ -4,6 +4,7 @@
 import { use, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { useExerciseTemplate, updateExerciseTemplate, uploadTemplatePhoto, deleteTemplatePhoto, setPrimaryTemplatePhoto } from '@/lib/exercise-templates';
 import type { ExerciseCategory } from '@/lib/types';
 
@@ -16,6 +17,7 @@ const CATEGORY_OPTIONS: { value: ExerciseCategory; label: string }[] = [
 
 export default function EditExercisePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
+  const locale = useLocale();
   const router = useRouter();
   const { template, isLoading, mutate } = useExerciseTemplate(resolvedParams.id);
   const fileInputRef = useRef<HTMLInputElement>(null);

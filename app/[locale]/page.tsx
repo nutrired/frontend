@@ -208,7 +208,7 @@ export default function Home() {
               </div>
               <div className="nut-footer">
                 <div className="nut-price">60€ <span>/ sesión</span></div>
-                <a href={`/${locale}/nutritionists/laura-martinez" className="btn-sm">Ver perfil</a>
+                <a href={`/${locale}/nutritionists/laura-martinez`} className="btn-sm">Ver perfil</a>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default function Home() {
               </div>
               <div className="nut-footer">
                 <div className="nut-price">75€ <span>/ sesión</span></div>
-                <a href={`/${locale}/nutritionists/carlos-ruiz" className="btn-sm">Ver perfil</a>
+                <a href={'/' + locale + '/nutritionists/carlos-ruiz'} className="btn-sm">Ver perfil</a>
               </div>
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function Home() {
               </div>
               <div className="nut-footer">
                 <div className="nut-price">55€ <span>/ sesión</span></div>
-                <a href={`/${locale}/nutritionists/ana-gonzalez" className="btn-sm">Ver perfil</a>
+                <a href={`/${locale}/nutritionists/ana-gonzalez`} className="btn-sm">Ver perfil</a>
               </div>
             </div>
           </div>

@@ -18,6 +18,7 @@ const BANNER_CLASSES = [
 ];
 
 function formatPrice(cents: number | null): string {
+  const locale = useLocale();
   if (cents === null) return '—';
   return `€${Math.floor(cents / 100)}`;
 }

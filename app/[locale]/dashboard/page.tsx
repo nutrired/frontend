@@ -138,6 +138,7 @@ function ActivityGraph({ entries }: { entries: ActivityEntry[] }) {
 
 function ClientOverview() {
   const t = useTranslations('dashboard.home');
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<'weight' | 'activity'>('weight');
   const { profile, isLoading: profileLoading } = useMyClientProfile();
   const { entries: weightEntries, isLoading: weightLoading } = useWeightEntries();

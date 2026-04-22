@@ -2,6 +2,7 @@ import { PublicNav } from '@/components/PublicNav';
 import { useTranslations, useLocale } from 'next-intl';
 
 export default function Privacy() {
+  const locale = useLocale();
   const t = useTranslations('public.static.privacy');
 
   return (

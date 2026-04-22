@@ -50,7 +50,7 @@ function TemplateRow({ template, onToggleArchive, t }: { template: SurveyTemplat
           <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--nc-ink)' }}>
             {template.title}
           </div>
-          <TemplateBadge active={template.is_active} />
+          <TemplateBadge active={template.is_active} t={t} />
         </div>
         {template.description && (
           <div style={{
@@ -92,6 +92,7 @@ function TemplateRow({ template, onToggleArchive, t }: { template: SurveyTemplat
 
 export default function SurveyTemplatesPage() {
   const t = useTranslations('dashboard.surveys');
+  const locale = useLocale();
   const [showArchived, setShowArchived] = useState(false);
   const { templates, isLoading, error, mutate } = useSurveyTemplates(showArchived ? undefined : true);
   const { profile, mutate: mutateProfile } = useMyProfile();

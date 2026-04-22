@@ -21,6 +21,7 @@ function billingLabel(type: string): string {
 
 export default function PublicProfilePage() {
   const t = useTranslations('public.nutritionist_profile');
+  const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const slug = typeof params.slug === 'string' ? params.slug : '';

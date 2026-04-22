@@ -15,6 +15,7 @@ export default function EditRecipePage({
   params: Promise<{ id: string }>;
 }) {
   const t = useTranslations('dashboard.recipes');
+  const locale = useLocale();
   const resolvedParams = use(params);
   const router = useRouter();
   const { recipe, isLoading } = useRecipe(resolvedParams.id);
