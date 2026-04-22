@@ -89,9 +89,7 @@ export default function HowItWorks() {
             <div className="content-faq-item">
               <div className="content-faq-question">{t('faq_7_q')}</div>
               <div className="content-faq-answer">
-                {t('faq_7_a', {
-                  privacyLink: <a key="privacy-link" href="/privacy">política de privacidad</a>
-                })}
+                {t('faq_7_a')} <a href="/privacy">política de privacidad</a> para más detalles.
               </div>
             </div>
 

@@ -70,9 +70,7 @@ export default function About() {
           <h2>{t('team_title')}</h2>
           <p>{t('team_p1')}</p>
           <p>
-            {t('team_p2', {
-              email: <a key="email-link" href="mailto:hola@nutri.red">hola@nutri.red</a>
-            })}
+            {t('team_p2')} <a href="mailto:hola@nutri.red">hola@nutri.red</a>.
           </p>
 
           <div className="content-cta">
