@@ -17,6 +17,40 @@
     "billing": "Facturación",
     "settings": "Ajustes"
   },
+  "dashboard": {
+    "nav": {
+      "home": "Inicio",
+      "profile": "Mi perfil",
+      "calendar": "Calendario",
+      "appointments": "Citas",
+      "clients": "Mis clientes",
+      "plans": "Mis planes",
+      "recipes": "Mis recetas",
+      "exercises": "Mis ejercicios",
+      "surveys": "Encuestas",
+      "appointment_types": "Tipos de Cita",
+      "availability": "Disponibilidad",
+      "chat": "Mensajes",
+      "billing": "Facturación",
+      "business": "Panel de Negocio",
+      "my_nutritionist": "Mi nutricionista"
+    },
+    "user_menu": {
+      "profile": "Ver perfil",
+      "settings": "Ajustes",
+      "logout": "Cerrar sesión"
+    },
+    "sections": {
+      "manage": "Gestionar",
+      "settings": "Configuración"
+    },
+    "tier": {
+      "upgrade": "Actualizar →"
+    },
+    "profile": {
+      "view_public": "↗ Ver perfil público"
+    }
+  },
   "errors": {
     "INVALID_CREDENTIALS": "Correo o contraseña incorrectos",
     "EMAIL_ALREADY_EXISTS": "Este correo ya está registrado",

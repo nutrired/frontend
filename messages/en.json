@@ -17,6 +17,40 @@
     "billing": "Billing",
     "settings": "Settings"
   },
+  "dashboard": {
+    "nav": {
+      "home": "Home",
+      "profile": "My profile",
+      "calendar": "Calendar",
+      "appointments": "Appointments",
+      "clients": "My clients",
+      "plans": "My plans",
+      "recipes": "My recipes",
+      "exercises": "My exercises",
+      "surveys": "Surveys",
+      "appointment_types": "Appointment types",
+      "availability": "Availability",
+      "chat": "Messages",
+      "billing": "Billing",
+      "business": "Business Dashboard",
+      "my_nutritionist": "My nutritionist"
+    },
+    "user_menu": {
+      "profile": "View profile",
+      "settings": "Settings",
+      "logout": "Log out"
+    },
+    "sections": {
+      "manage": "Manage",
+      "settings": "Settings"
+    },
+    "tier": {
+      "upgrade": "Upgrade →"
+    },
+    "profile": {
+      "view_public": "↗ View public profile"
+    }
+  },
   "errors": {
     "INVALID_CREDENTIALS": "Invalid email or password",
     "EMAIL_ALREADY_EXISTS": "This email is already registered",

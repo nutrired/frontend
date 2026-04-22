@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import { useMyProfile } from '@/lib/profile';
@@ -12,6 +13,7 @@ import { Avatar } from '@/components/Avatar';
 import useSWR from 'swr';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations('dashboard');
   const { user, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
@@ -65,24 +67,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const totalUnreadCount = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 
   const navItems = [
-    { href: '/dashboard', label: 'Overview', icon: '◎', roles: ['client', 'nutritionist'] },
-    { href: '/dashboard/clients', label: 'Mis clientes', icon: '◉', roles: ['nutritionist'] },
-    { href: '/dashboard/surveys', label: 'Surveys', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/my-recipes', label: 'Mis recetas', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/my-exercises', label: 'Mis ejercicios', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/appointment-types', label: 'Tipos de Cita', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/availability', label: 'Disponibilidad', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/calendar', label: 'Calendario', icon: '◈', roles: ['client', 'nutritionist'] },
-    { href: '/dashboard/messages', label: 'Mensajes', icon: '◈', roles: ['client', 'nutritionist'] },
-    { href: '/dashboard/my-nutritionist', label: 'My nutritionist', icon: '◉', roles: ['client'] },
-    { href: '/dashboard/my-plans', label: 'Mis planes', icon: '◈', roles: ['client'] },
-    { href: '/dashboard/business', label: 'Business Dashboard', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard', labelKey: 'home', icon: '◎', roles: ['client', 'nutritionist'] },
+    { href: '/dashboard/clients', labelKey: 'clients', icon: '◉', roles: ['nutritionist'] },
+    { href: '/dashboard/surveys', labelKey: 'surveys', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/my-recipes', labelKey: 'recipes', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/my-exercises', labelKey: 'exercises', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/appointment-types', labelKey: 'appointment_types', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/availability', labelKey: 'availability', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/calendar', labelKey: 'calendar', icon: '◈', roles: ['client', 'nutritionist'] },
+    { href: '/dashboard/messages', labelKey: 'chat', icon: '◈', roles: ['client', 'nutritionist'] },
+    { href: '/dashboard/my-nutritionist', labelKey: 'my_nutritionist', icon: '◉', roles: ['client'] },
+    { href: '/dashboard/my-plans', labelKey: 'plans', icon: '◈', roles: ['client'] },
+    { href: '/dashboard/business', labelKey: 'business', icon: '◈', roles: ['nutritionist'] },
   ].filter((item) => item.roles.includes(user.role));
 
   const settingsItems = [
-    { href: '/dashboard/profile', label: 'My profile', icon: '◈', roles: ['nutritionist'] },
-    { href: '/dashboard/client-profile', label: 'My profile', icon: '◈', roles: ['client'] },
-    { href: '/dashboard/billing', label: 'Billing & Earnings', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/profile', labelKey: 'profile', icon: '◈', roles: ['nutritionist'] },
+    { href: '/dashboard/client-profile', labelKey: 'profile', icon: '◈', roles: ['client'] },
+    { href: '/dashboard/billing', labelKey: 'billing', icon: '◈', roles: ['nutritionist'] },
   ].filter((item) => item.roles.includes(user.role));
 
   return (
@@ -123,7 +125,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </span>
               {profile.tier === 'free' && (
                 <a href="/dashboard/billing" style={{ fontSize: 11, color: 'var(--nc-terra)', marginLeft: 8, textDecoration: 'none' }}>
-                  Upgrade →
+                  {t('tier.upgrade')}
                 </a>
               )}
             </div>
@@ -140,13 +142,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   gap: 4,
                 }}
               >
-                <span style={{ fontSize: 10 }}>↗</span> View public profile
+                {t('profile.view_public')}
               </Link>
             )}
           </div>
         )}
         <nav className="dash-nav">
-          <span className="dash-nav-section">Manage</span>
+          <span className="dash-nav-section">{t('sections.manage')}</span>
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -158,7 +160,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 position: 'relative',
               }}
             >
-              <span>{item.icon}</span> {item.label}
+              <span>{item.icon}</span> {t(`nav.${item.labelKey}`)}
               {item.href === '/dashboard/messages' && totalUnreadCount > 0 && (
                 <span
                   style={{
@@ -196,7 +198,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               e.currentTarget.style.background = 'transparent';
             }}
           >
-            Settings
+            {t('sections.settings')}
             <span style={{ fontSize: 12, marginLeft: 8 }}>
               {settingsOpen ? '▼' : '▶'}
             </span>
@@ -216,14 +218,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`dash-nav-item${pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href + '/')) ? ' active' : ''}`}
                 style={{ paddingLeft: 24 }}
               >
-                <span>{item.icon}</span> {item.label}
+                <span>{item.icon}</span> {t(`nav.${item.labelKey}`)}
               </Link>
             ))}
           </div>
         </nav>
         <div className="dash-footer">
           <button onClick={handleSignOut} className="dash-nav-item" style={{ width: '100%', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}>
-            <span>←</span> Sign out
+            <span>←</span> {t('user_menu.logout')}
           </button>
           {version && (
             <div
