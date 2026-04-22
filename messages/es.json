@@ -747,7 +747,11 @@
       "footer_for_nutritionists": "Para nutricionistas",
       "footer_privacy": "Privacidad",
       "footer_terms": "Términos",
-      "footer_copy": "© 2026 Nutri Red"
+      "footer_copy": "© 2026 Nutri Red",
+      "card_rating_label": "Valoración media",
+      "card_rating_specialty": "Nutrición deportiva",
+      "card_growth_label": "Nuevos clientes",
+      "card_growth_period": "este mes ↑"
     },
     "nutritionists": {
       "stats_label": "Nutricionistas certificados",
@@ -909,6 +913,12 @@
         "go_back": "← Volver atrás",
         "browse_nutritionists": "Ver nutricionistas"
       }
+    },
+    "nav": {
+      "search_nutritionists": "Buscar nutricionistas",
+      "how_it_works": "Cómo funciona",
+      "for_nutritionists": "Para nutricionistas",
+      "login": "Iniciar sesión"
     }
   },
   "auth": {

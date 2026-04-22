@@ -81,7 +81,7 @@ export default function Home() {
 
           {/* Floating card: rating + profile */}
           <div className="fc fc-1">
-            <div className="fc-label">Valoración media</div>
+            <div className="fc-label">{t('card_rating_label')}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
               <span className="fc-stars">★★★★★</span>
               <span style={{ fontWeight: 500, fontSize: '0.9rem', color: 'var(--ink)' }}>4.9</span>
@@ -90,16 +90,16 @@ export default function Home() {
               <div className="fc-avatar" />
               <div>
                 <div className="fc-name">Laura Martínez</div>
-                <div className="fc-spec">Nutrición deportiva</div>
+                <div className="fc-spec">{t('card_rating_specialty')}</div>
               </div>
             </div>
           </div>
 
           {/* Floating card: growth */}
           <div className="fc fc-2">
-            <div className="fc-label">Nuevos clientes</div>
+            <div className="fc-label">{t('card_growth_label')}</div>
             <div className="fc-val">+38%</div>
-            <div className="fc-sub">este mes ↑</div>
+            <div className="fc-sub">{t('card_growth_period')}</div>
           </div>
 
         </div>

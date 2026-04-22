@@ -747,7 +747,11 @@
       "footer_for_nutritionists": "For nutritionists",
       "footer_privacy": "Privacy",
       "footer_terms": "Terms",
-      "footer_copy": "© 2026 Nutri Red"
+      "footer_copy": "© 2026 Nutri Red",
+      "card_rating_label": "Average rating",
+      "card_rating_specialty": "Sports nutrition",
+      "card_growth_label": "New clients",
+      "card_growth_period": "this month ↑"
     },
     "nutritionists": {
       "stats_label": "Certified nutritionists",
@@ -909,6 +913,12 @@
         "go_back": "← Go back",
         "browse_nutritionists": "Browse nutritionists"
       }
+    },
+    "nav": {
+      "search_nutritionists": "Search nutritionists",
+      "how_it_works": "How it works",
+      "for_nutritionists": "For nutritionists",
+      "login": "Log in"
     }
   },
   "auth": {
