@@ -3,17 +3,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createExerciseTemplate } from '@/lib/exercise-templates';
 import type { ExerciseCategory } from '@/lib/types';
 
-const CATEGORY_OPTIONS: { value: ExerciseCategory; label: string }[] = [
-  { value: 'strength', label: 'Fuerza' },
-  { value: 'cardio', label: 'Cardio' },
-  { value: 'flexibility', label: 'Flexibilidad' },
-  { value: 'balance', label: 'Equilibrio' },
-];
+const CATEGORY_KEYS: Record<ExerciseCategory, string> = {
+  strength: 'category_strength',
+  cardio: 'category_cardio',
+  flexibility: 'category_flexibility',
+  balance: 'category_balance',
+};
 
 export default function NewExercisePage() {
+  const t = useTranslations('dashboard.exercises');
   const router = useRouter();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -28,7 +30,7 @@ export default function NewExercisePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('El nombre es obligatorio');
+      setError(t('name_required'));
       return;
     }
 
@@ -47,7 +49,7 @@ export default function NewExercisePage() {
       });
       router.push(`/dashboard/my-exercises/${result.id}`);
     } catch (err: any) {
-      setError(err.message || 'Error al crear ejercicio');
+      setError(err.message || t('create_error'));
     } finally {
       setLoading(false);
     }
@@ -56,10 +58,10 @@ export default function NewExercisePage() {
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Nuevo ejercicio</div>
+        <div className="dash-topbar-title">{t('new_exercise_button')}</div>
         <div className="dash-topbar-right">
           <button onClick={() => router.back()} className="dash-btn-plain">
-            Cancelar
+            {t('cancel_button')}
           </button>
         </div>
       </div>
@@ -83,13 +85,13 @@ export default function NewExercisePage() {
 
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Información básica</div>
+              <div className="dash-section-title">{t('basic_info_title')}</div>
             </div>
             <div className="dash-section-body">
               <div className="dash-row single">
                 <div className="dash-field">
                   <label className="dash-label">
-                    Nombre <span style={{ color: 'var(--nc-terra)' }}>*</span>
+                    {t('name_label')} <span style={{ color: 'var(--nc-terra)' }}>{t('required_indicator')}</span>
                   </label>
                   <input
                     type="text"
@@ -104,14 +106,14 @@ export default function NewExercisePage() {
 
               <div className="dash-row single">
                 <div className="dash-field">
-                  <label className="dash-label">Descripción</label>
+                  <label className="dash-label">{t('description_label')}</label>
                   <textarea
                     className="dash-textarea"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     maxLength={2000}
                     rows={3}
-                    placeholder="Breve descripción del ejercicio..."
+                    placeholder={t('description_placeholder')}
                   />
                 </div>
               </div>
@@ -119,7 +121,7 @@ export default function NewExercisePage() {
               <div className="dash-row">
                 <div className="dash-field">
                   <label className="dash-label">
-                    Categoría <span style={{ color: 'var(--nc-terra)' }}>*</span>
+                    {t('category_label')} <span style={{ color: 'var(--nc-terra)' }}>{t('required_indicator')}</span>
                   </label>
                   <select
                     className="dash-input"
@@ -127,8 +129,8 @@ export default function NewExercisePage() {
                     onChange={(e) => setCategory(e.target.value as ExerciseCategory)}
                     required
                   >
-                    {CATEGORY_OPTIONS.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {Object.entries(CATEGORY_KEYS).map(([val, key]) => (
+                      <option key={val} value={val}>{t(key)}</option>
                     ))}
                   </select>
                 </div>
@@ -136,53 +138,53 @@ export default function NewExercisePage() {
 
               <div className="dash-row">
                 <div className="dash-field">
-                  <label className="dash-label">Grupos musculares</label>
+                  <label className="dash-label">{t('muscle_groups_field')}</label>
                   <input
                     type="text"
                     className="dash-input"
                     value={muscleGroups}
                     onChange={(e) => setMuscleGroups(e.target.value)}
                     maxLength={500}
-                    placeholder="ej. Pectorales, Tríceps, Core"
+                    placeholder={t('muscle_groups_placeholder')}
                   />
                 </div>
                 <div className="dash-field">
-                  <label className="dash-label">Equipamiento</label>
+                  <label className="dash-label">{t('equipment_field')}</label>
                   <input
                     type="text"
                     className="dash-input"
                     value={equipment}
                     onChange={(e) => setEquipment(e.target.value)}
                     maxLength={500}
-                    placeholder="ej. Barra, Banco plano"
+                    placeholder={t('equipment_placeholder')}
                   />
                 </div>
               </div>
 
               <div className="dash-row single">
                 <div className="dash-field">
-                  <label className="dash-label">Instrucciones</label>
+                  <label className="dash-label">{t('instructions_field')}</label>
                   <textarea
                     className="dash-textarea"
                     value={instructions}
                     onChange={(e) => setInstructions(e.target.value)}
                     maxLength={5000}
                     rows={6}
-                    placeholder="Instrucciones paso a paso..."
+                    placeholder={t('instructions_placeholder')}
                   />
                 </div>
               </div>
 
               <div className="dash-row single">
                 <div className="dash-field">
-                  <label className="dash-label">URL de video de demostración</label>
+                  <label className="dash-label">{t('demo_video_field')}</label>
                   <input
                     type="url"
                     className="dash-input"
                     value={demoVideoUrl}
                     onChange={(e) => setDemoVideoUrl(e.target.value)}
                     maxLength={500}
-                    placeholder="https://youtube.com/watch?v=..."
+                    placeholder={t('demo_video_placeholder')}
                   />
                 </div>
               </div>
@@ -191,10 +193,10 @@ export default function NewExercisePage() {
 
           <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
             <button type="submit" disabled={loading} className="dash-btn-publish" style={{ flex: 1 }}>
-              {loading ? 'Guardando...' : 'Guardar ejercicio'}
+              {loading ? t('saving_button') : t('submit_button')}
             </button>
             <button type="button" onClick={() => router.back()} className="dash-btn-plain" style={{ flex: 1 }}>
-              Cancelar
+              {t('cancel_button')}
             </button>
           </div>
         </form>

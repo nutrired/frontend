@@ -3,16 +3,17 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useDebounce } from 'use-debounce';
 import { useExerciseTemplates } from '@/lib/exercise-templates';
 import type { ExerciseCategory } from '@/lib/types';
 
-const CATEGORY_LABELS: Record<ExerciseCategory | 'all', string> = {
-  all: 'Todas',
-  strength: 'Fuerza',
-  cardio: 'Cardio',
-  flexibility: 'Flexibilidad',
-  balance: 'Equilibrio',
+const CATEGORY_KEYS: Record<ExerciseCategory | 'all', string> = {
+  all: 'all_categories',
+  strength: 'category_strength',
+  cardio: 'category_cardio',
+  flexibility: 'category_flexibility',
+  balance: 'category_balance',
 };
 
 const CATEGORY_COLORS: Record<ExerciseCategory, string> = {
@@ -23,6 +24,7 @@ const CATEGORY_COLORS: Record<ExerciseCategory, string> = {
 };
 
 export default function MyExercisesPage() {
+  const t = useTranslations('dashboard.exercises');
   const router = useRouter();
   const [searchInput, setSearchInput] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<ExerciseCategory | 'all'>('all');
@@ -39,10 +41,10 @@ export default function MyExercisesPage() {
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Mis ejercicios</div>
+        <div className="dash-topbar-title">{t('title')}</div>
         <div className="dash-topbar-right">
           <button onClick={() => router.push('/dashboard/my-exercises/new')} className="dash-btn-publish">
-            Nuevo ejercicio
+            {t('new_exercise_button')}
           </button>
         </div>
       </div>
@@ -52,7 +54,7 @@ export default function MyExercisesPage() {
         <div style={{ marginBottom: 24, display: 'flex', gap: 10, alignItems: 'center' }}>
           <input
             type="text"
-            placeholder="Buscar ejercicios..."
+            placeholder={t('search_placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="dash-input"
@@ -64,14 +66,14 @@ export default function MyExercisesPage() {
             className="dash-input"
             style={{ width: 180 }}
           >
-            {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
-              <option key={key} value={key}>{label}</option>
+            {Object.entries(CATEGORY_KEYS).map(([key, keyName]) => (
+              <option key={key} value={key}>{t(keyName)}</option>
             ))}
           </select>
         </div>
 
         {isLoading ? (
-          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>Cargando ejercicios...</div>
+          <div style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading')}</div>
         ) : error ? (
           <div
             style={{
@@ -82,7 +84,7 @@ export default function MyExercisesPage() {
               color: 'rgb(185,28,28)',
             }}
           >
-            Error al cargar ejercicios. Intenta de nuevo.
+            {t('error_loading')}
           </div>
         ) : isEmpty && !isFiltered ? (
           <div
@@ -102,10 +104,10 @@ export default function MyExercisesPage() {
                 marginBottom: 16,
               }}
             >
-              Aún no tienes ejercicios en tu biblioteca.
+              {t('no_library')}
             </div>
             <button onClick={() => router.push('/dashboard/my-exercises/new')} className="dash-btn-publish">
-              Crear tu primer ejercicio
+              {t('create_first')}
             </button>
           </div>
         ) : isEmpty && isFiltered ? (
@@ -119,7 +121,7 @@ export default function MyExercisesPage() {
             }}
           >
             <div style={{ fontSize: 14, color: 'var(--nc-stone)', fontWeight: 300 }}>
-              No se encontraron ejercicios con esos filtros.
+              {t('no_results_filtered')}
             </div>
           </div>
         ) : (
@@ -178,7 +180,7 @@ export default function MyExercisesPage() {
                         <path d="M 35 30 Q 40 34 45 30" stroke="rgba(139,115,85,0.25)" strokeWidth="1.5" fill="none" />
                       </svg>
                       <div style={{ fontSize: 11, color: 'rgba(139,115,85,0.4)', fontWeight: 300 }}>
-                        Sin foto
+                        {t('no_photo')}
                       </div>
                     </div>
                   )}
@@ -197,7 +199,7 @@ export default function MyExercisesPage() {
                           ...(template.category === 'balance' && { background: '#e9d5ff', color: '#6b21a8' }),
                         }}
                       >
-                        {CATEGORY_LABELS[template.category]}
+                        {t(CATEGORY_KEYS[template.category])}
                       </span>
                     </div>
                     {template.muscle_groups && (
