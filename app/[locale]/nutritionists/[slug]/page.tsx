@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { usePublicProfile } from '@/lib/profile';
 import { connectWithNutritionist } from '@/lib/hiring';
@@ -19,6 +20,7 @@ function billingLabel(type: string): string {
 }
 
 export default function PublicProfilePage() {
+  const t = useTranslations('public.nutritionist_profile');
   const params = useParams();
   const router = useRouter();
   const slug = typeof params.slug === 'string' ? params.slug : '';
@@ -54,7 +56,7 @@ export default function PublicProfilePage() {
         <nav className="nc-nav">
           <Link href="/nutritionists" className="nc-nav-logo">Nutri<span>Red</span></Link>
         </nav>
-        <div style={{ padding: '80px 48px', color: 'var(--nc-stone)', fontWeight: 300 }}>Loading…</div>
+        <div style={{ padding: '80px 48px', color: 'var(--nc-stone)', fontWeight: 300 }}>{t('loading')}</div>
       </div>
     );
   }
@@ -64,10 +66,10 @@ export default function PublicProfilePage() {
       <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
         <nav className="nc-nav">
           <Link href="/nutritionists" className="nc-nav-logo">Nutri<span>Red</span></Link>
-          <Link href="/nutritionists" className="nc-nav-links" style={{ color: 'rgba(245,240,232,0.65)', textDecoration: 'none', fontSize: 13 }}>← Back to nutritionists</Link>
+          <Link href="/nutritionists" className="nc-nav-links" style={{ color: 'rgba(245,240,232,0.65)', textDecoration: 'none', fontSize: 13 }}>{t('back_to_nutritionists')}</Link>
         </nav>
         <div style={{ padding: '80px 48px', color: 'var(--nc-stone)', fontWeight: 300 }}>
-          Profile not found.
+          {t('not_found')}
         </div>
       </div>
     );
@@ -85,15 +87,15 @@ export default function PublicProfilePage() {
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
         <Link href="/nutritionists" className="nc-nav-logo">Nutri<span>Red</span></Link>
-        <Link href="/nutritionists" style={{ color: 'rgba(245,240,232,0.65)', textDecoration: 'none', fontSize: 13 }}>← Back to nutritionists</Link>
+        <Link href="/nutritionists" style={{ color: 'rgba(245,240,232,0.65)', textDecoration: 'none', fontSize: 13 }}>{t('back_to_nutritionists')}</Link>
       </nav>
 
       <div className="nc-profile-hero">
         <div className="nc-profile-hero-inner">
           <div>
-            {isAvailable && <div className="nc-profile-badge">Available</div>}
-            {isAtCapacity && <div className="nc-profile-badge" style={{ background: 'rgba(180,140,60,0.15)', color: '#b48c3c' }}>Lista de espera</div>}
-            {isClosed && <div className="nc-profile-badge" style={{ background: 'rgba(139,115,85,0.12)', color: 'var(--nc-stone)' }}>No acepta nuevos clientes</div>}
+            {isAvailable && <div className="nc-profile-badge">{t('available')}</div>}
+            {isAtCapacity && <div className="nc-profile-badge" style={{ background: 'rgba(180,140,60,0.15)', color: '#b48c3c' }}>{t('waitlist')}</div>}
+            {isClosed && <div className="nc-profile-badge" style={{ background: 'rgba(139,115,85,0.12)', color: 'var(--nc-stone)' }}>{t('not_accepting')}</div>}
             <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '16px' }}>
               <Avatar
                 avatarUrl={profile.avatar_url}
@@ -107,28 +109,28 @@ export default function PublicProfilePage() {
             </div>
             <div className="nc-profile-pills">
               {profile.city && <span className="nc-pill">📍 {profile.city}</span>}
-              {profile.years_exp !== null && <span className="nc-pill">{profile.years_exp} years experience</span>}
+              {profile.years_exp !== null && <span className="nc-pill">{profile.years_exp} {t('years_experience')}</span>}
             </div>
           </div>
         </div>
         <div className="nc-hero-tabs">
-          <div className="nc-hero-tab active">About</div>
-          <div className="nc-hero-tab">Packages</div>
-          <div className="nc-hero-tab">Certifications</div>
+          <div className="nc-hero-tab active">{t('about')}</div>
+          <div className="nc-hero-tab">{t('packages')}</div>
+          <div className="nc-hero-tab">{t('certifications')}</div>
         </div>
       </div>
 
       <div className="nc-profile-content">
         {/* Left column */}
         <div>
-          <p className="nc-section-label">About</p>
-          <p className="nc-bio">{profile.bio || 'No bio provided yet.'}</p>
+          <p className="nc-section-label">{t('about')}</p>
+          <p className="nc-bio">{profile.bio || t('not_provided')}</p>
 
           <div className="nc-divider" />
 
           {profile.specialties.length > 0 && (
             <div className="nc-tags-section">
-              <p className="nc-section-label">Specialties</p>
+              <p className="nc-section-label">{t('specialties')}</p>
               <div className="nc-tags-row">
                 {profile.specialties.map((s) => (
                   <span key={s} className="nc-profile-tag specialty">{s}</span>
@@ -139,7 +141,7 @@ export default function PublicProfilePage() {
 
           {profile.languages.length > 0 && (
             <div className="nc-tags-section">
-              <p className="nc-section-label">Languages</p>
+              <p className="nc-section-label">{t('languages')}</p>
               <div className="nc-tags-row">
                 {profile.languages.map((l) => (
                   <span key={l} className="nc-profile-tag lang">{l}</span>
@@ -152,7 +154,7 @@ export default function PublicProfilePage() {
             <>
               <div className="nc-divider" />
               <div className="nc-tags-section">
-                <p className="nc-section-label">Certifications</p>
+                <p className="nc-section-label">{t('certifications')}</p>
                 <div className="nc-tags-row">
                   {profile.certifications.map((c) => (
                     <span key={c} className="nc-profile-tag cert">{c}</span>
@@ -166,12 +168,12 @@ export default function PublicProfilePage() {
         {/* Right column: packages */}
         <div className="nc-pkg-card">
           <div className="nc-pkg-head">
-            <div className="nc-pkg-title">Service packages</div>
-            <div className="nc-pkg-subtitle">Choose the plan that fits you</div>
+            <div className="nc-pkg-title">{t('service_packages')}</div>
+            <div className="nc-pkg-subtitle">{t('choose_plan')}</div>
           </div>
           {profile.packages.length === 0 ? (
             <div style={{ padding: '20px 22px', color: 'var(--nc-stone)', fontSize: 13, fontWeight: 300 }}>
-              No packages listed yet.
+              {t('no_packages')}
             </div>
           ) : (
             profile.packages.map((pkg) => (
@@ -180,10 +182,10 @@ export default function PublicProfilePage() {
                   <div>
                     <div className="nc-pkg-name">{pkg.name}</div>
                     <div className="nc-pkg-sessions">
-                      {pkg.sessions} session{pkg.sessions !== 1 ? 's' : ''}
+                      {pkg.sessions} {pkg.sessions !== 1 ? t('sessions_plural') : t('sessions')}
                       {' · '}
                       <span style={{ color: 'var(--nc-stone)', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                        {pkg.billing_type === 'monthly' ? 'Monthly' : 'One-time'}
+                        {pkg.billing_type === 'monthly' ? t('monthly') : t('one_time')}
                       </span>
                     </div>
                   </div>
@@ -198,13 +200,13 @@ export default function PublicProfilePage() {
                 <div style={{ marginTop: 12 }}>
                   {isOwnProfile ? (
                     <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, padding: '8px 0', margin: 0 }}>
-                      This is your public profile
+                      {t('your_profile')}
                     </p>
                   ) : (
                     <>
                       {isClosed && (
                         <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, padding: '8px 0', margin: 0 }}>
-                          No acepta nuevos clientes
+                          {t('not_accepting_clients')}
                         </p>
                       )}
                       {isAtCapacity && (
@@ -213,7 +215,7 @@ export default function PublicProfilePage() {
                       {isAvailable && (
                         connected ? (
                           <div style={{ fontSize: 13, color: '#4a7c59', fontWeight: 500, padding: '8px 0' }}>
-                            ✓ Request sent — check your dashboard
+                            {t('request_sent')}
                           </div>
                         ) : (
                           <button
@@ -222,7 +224,7 @@ export default function PublicProfilePage() {
                             disabled={connecting === pkg.id}
                             onClick={() => handleConnect(pkg.id)}
                           >
-                            {connecting === pkg.id ? 'Sending request…' : 'Work with me'}
+                            {connecting === pkg.id ? t('sending') : t('work_with_me')}
                           </button>
                         )
                       )}
@@ -234,7 +236,7 @@ export default function PublicProfilePage() {
           )}
           {profile.intro_consultation_required && (
             <div style={{ padding: '12px 22px', fontSize: 12, color: 'var(--nc-stone)', borderTop: '1px solid rgba(139,115,85,0.1)' }}>
-              Includes a free intro consultation before your plan begins.
+              {t('intro_consultation')}
             </div>
           )}
         </div>
