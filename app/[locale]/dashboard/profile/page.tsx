@@ -7,7 +7,7 @@ import { useMyProfile } from '@/lib/profile';
 import { api, ApiRequestError } from '@/lib/api';
 import type { ServicePackage } from '@/lib/types';
 import { AvatarUpload } from '@/components/AvatarUpload';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 
 interface PkgDraft {
@@ -57,6 +57,7 @@ function TagInput({
 }
 
 export default function DashboardProfilePage() {
+  const t = useTranslations('dashboard.profile');
   const { user } = useAuth();
   const { profile, isLoading, mutate } = useMyProfile();
   const locale = useLocale();
@@ -116,7 +117,7 @@ export default function DashboardProfilePage() {
   };
 
   const handleSave = async () => {
-    if (!displayName.trim()) { setSaveMsg('Display name is required.'); return; }
+    if (!displayName.trim()) { setSaveMsg(t('display_name_required_msg')); return; }
     setSaving(true);
     setSaveMsg('');
     try {
@@ -190,7 +191,7 @@ export default function DashboardProfilePage() {
   if (isLoading) {
     return (
       <div className="dash-content" style={{ padding: 40, color: 'var(--nc-stone)', fontWeight: 300 }}>
-        Loading…
+        {t('loading')}
       </div>
     );
   }
@@ -200,7 +201,7 @@ export default function DashboardProfilePage() {
     return (
       <div className="dash-content" style={{ padding: 40 }}>
         <p style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>
-          Profile management is only available for nutritionists.
+          {t('nutritionist_only')}
         </p>
       </div>
     );
@@ -209,17 +210,17 @@ export default function DashboardProfilePage() {
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">My profile</div>
+        <div className="dash-topbar-title">{t('title')}</div>
         <div className="dash-topbar-right">
           <span className={`dash-status-badge ${status}`}>{status}</span>
           {profile && (
-            <Link href={`/nutritionists/${profile.slug}`} target="_blank" className="dash-btn-preview">
-              Preview
+            <Link href={`/${locale}/nutritionists/${profile.slug}`} target="_blank" className="dash-btn-preview">
+              {t('preview')}
             </Link>
           )}
           {profile && (
             <button className="dash-btn-publish" onClick={handleToggleStatus}>
-              {status === 'draft' ? 'Publish' : 'Unpublish'}
+              {status === 'draft' ? t('publish') : t('unpublish')}
             </button>
           )}
         </div>
@@ -229,8 +230,8 @@ export default function DashboardProfilePage() {
         {/* Profile Photo */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Profile Photo</div>
-            <div className="dash-section-sub">Your profile picture helps clients recognize you</div>
+            <div className="dash-section-title">{t('profile_photo')}</div>
+            <div className="dash-section-sub">{t('profile_photo_desc')}</div>
           </div>
           <div className="dash-section-body">
             <AvatarUpload
@@ -249,14 +250,14 @@ export default function DashboardProfilePage() {
         {/* Basic info */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Basic information</div>
-            <div className="dash-section-sub">How you appear to potential clients</div>
+            <div className="dash-section-title">{t('basic_info')}</div>
+            <div className="dash-section-sub">{t('basic_info_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-row">
               <div className="dash-field">
-                <label className="dash-label">Display name <span className="opt">(required)</span></label>
-                <input className="dash-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Your full name" />
+                <label className="dash-label">{t('display_name')} <span className="opt">{t('display_name_required')}</span></label>
+                <input className="dash-input" value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder={t('display_name_placeholder')} />
                 {profile && (
                   <span style={{ fontSize: 11, color: 'var(--nc-stone)', fontFamily: 'monospace', background: 'rgba(139,115,85,0.08)', padding: '4px 10px', borderRadius: 4, border: '1px solid rgba(139,115,85,0.15)' }}>
                     nutri.red/nutritionists/<strong style={{ color: 'var(--nc-terra)' }}>{profile.slug}</strong>
@@ -264,30 +265,30 @@ export default function DashboardProfilePage() {
                 )}
               </div>
               <div className="dash-field">
-                <label className="dash-label">Tipo de consultoría</label>
+                <label className="dash-label">{t('consultation_type')}</label>
                 <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="radio" name="consultation_type" value="in_person"
                            checked={consultationType === 'in_person'}
                            onChange={(e) => setConsultationType(e.target.value as any)} />
-                    <span style={{ fontSize: 14 }}>Presencial</span>
+                    <span style={{ fontSize: 14 }}>{t('consultation_type_in_person')}</span>
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="radio" name="consultation_type" value="online"
                            checked={consultationType === 'online'}
                            onChange={(e) => setConsultationType(e.target.value as any)} />
-                    <span style={{ fontSize: 14 }}>Online</span>
+                    <span style={{ fontSize: 14 }}>{t('consultation_type_online')}</span>
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
                     <input type="radio" name="consultation_type" value="both"
                            checked={consultationType === 'both'}
                            onChange={(e) => setConsultationType(e.target.value as any)} />
-                    <span style={{ fontSize: 14 }}>Ambos</span>
+                    <span style={{ fontSize: 14 }}>{t('consultation_type_both')}</span>
                   </label>
                 </div>
               </div>
               <div className="dash-field">
-                <label className="dash-label">Preferred Language / Idioma preferido</label>
+                <label className="dash-label">{t('preferred_language')}</label>
                 <select
                   className="dash-input"
                   value={preferredLocale}
@@ -318,28 +319,28 @@ export default function DashboardProfilePage() {
                   <option value="en">🇬🇧 English (Inglés)</option>
                 </select>
                 <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginTop: 4 }}>
-                  Your interface language preference
+                  {t('interface_language')}
                 </span>
               </div>
             </div>
             <div className="dash-row">
               {(consultationType === 'in_person' || consultationType === 'both') && (
                 <div className="dash-field">
-                  <label className="dash-label">Ciudad</label>
-                  <input className="dash-input" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Where you're based" />
+                  <label className="dash-label">{t('city')}</label>
+                  <input className="dash-input" value={city} onChange={(e) => setCity(e.target.value)} placeholder={t('city_placeholder')} />
                 </div>
               )}
             </div>
             <div className="dash-row single">
               <div className="dash-field">
-                <label className="dash-label">Bio</label>
-                <textarea className="dash-textarea" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Describe your approach and background…" />
+                <label className="dash-label">{t('bio')}</label>
+                <textarea className="dash-textarea" value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t('bio_placeholder')} />
               </div>
             </div>
             <div className="dash-row three">
               <div className="dash-field">
-                <label className="dash-label">Years of experience</label>
-                <input className="dash-input" type="number" min="0" max="60" value={yearsExp} onChange={(e) => setYearsExp(e.target.value)} placeholder="e.g. 5" />
+                <label className="dash-label">{t('years_experience')}</label>
+                <input className="dash-input" type="number" min="0" max="60" value={yearsExp} onChange={(e) => setYearsExp(e.target.value)} placeholder={t('years_experience_placeholder')} />
               </div>
             </div>
           </div>
@@ -348,24 +349,24 @@ export default function DashboardProfilePage() {
         {/* Expertise */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Expertise</div>
-            <div className="dash-section-sub">Press Enter or comma to add each item</div>
+            <div className="dash-section-title">{t('expertise')}</div>
+            <div className="dash-section-sub">{t('expertise_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-row single" style={{ marginBottom: 18 }}>
               <div className="dash-field">
-                <label className="dash-label">Specialties</label>
-                <TagInput tags={specialties} onChange={setSpecialties} placeholder="e.g. Weight management" chipClass="specialty" />
+                <label className="dash-label">{t('specialties')}</label>
+                <TagInput tags={specialties} onChange={setSpecialties} placeholder={t('specialties_placeholder')} chipClass="specialty" />
               </div>
             </div>
             <div className="dash-row">
               <div className="dash-field">
-                <label className="dash-label">Languages</label>
-                <TagInput tags={languages} onChange={setLanguages} placeholder="e.g. Spanish" chipClass="lang" />
+                <label className="dash-label">{t('languages')}</label>
+                <TagInput tags={languages} onChange={setLanguages} placeholder={t('languages_placeholder')} chipClass="lang" />
               </div>
               <div className="dash-field">
-                <label className="dash-label">Certifications</label>
-                <TagInput tags={certifications} onChange={setCertifications} placeholder="e.g. RD — CODINUCAT" chipClass="cert" />
+                <label className="dash-label">{t('certifications')}</label>
+                <TagInput tags={certifications} onChange={setCertifications} placeholder={t('certifications_placeholder')} chipClass="cert" />
               </div>
             </div>
           </div>
@@ -374,8 +375,8 @@ export default function DashboardProfilePage() {
         {/* Packages */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Service packages</div>
-            <div className="dash-section-sub">What you offer and at what price</div>
+            <div className="dash-section-title">{t('service_packages')}</div>
+            <div className="dash-section-sub">{t('service_packages_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-pkg-list">
@@ -386,17 +387,17 @@ export default function DashboardProfilePage() {
                       className="dash-pkg-input"
                       value={pkg.name}
                       onChange={(e) => updatePkg(i, 'name', e.target.value)}
-                      placeholder="Package name"
+                      placeholder={t('package_name')}
                     />
                     <input
                       className="dash-pkg-input sm"
                       value={pkg.description}
                       onChange={(e) => updatePkg(i, 'description', e.target.value)}
-                      placeholder="Short description"
+                      placeholder={t('package_description')}
                     />
                   </div>
                   <div className="dash-field">
-                    <label className="dash-label" style={{ fontSize: 11 }}>Sessions</label>
+                    <label className="dash-label" style={{ fontSize: 11 }}>{t('sessions')}</label>
                     <input
                       className="dash-pkg-input"
                       type="number" min="1"
@@ -405,7 +406,7 @@ export default function DashboardProfilePage() {
                     />
                   </div>
                   <div className="dash-field">
-                    <label className="dash-label" style={{ fontSize: 11 }}>Price (€)</label>
+                    <label className="dash-label" style={{ fontSize: 11 }}>{t('price_eur')}</label>
                     <input
                       className="dash-pkg-input"
                       type="number" min="0"
@@ -417,15 +418,15 @@ export default function DashboardProfilePage() {
                 </div>
               ))}
             </div>
-            <button className="dash-btn-add-pkg" onClick={addPackage}>+ Add package</button>
+            <button className="dash-btn-add-pkg" onClick={addPackage}>{t('add_package')}</button>
           </div>
         </div>
 
         {/* Plan & Settings */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Plan & Settings</div>
-            <div className="dash-section-sub">Subscription tier and client preferences</div>
+            <div className="dash-section-title">{t('plan_settings')}</div>
+            <div className="dash-section-sub">{t('plan_settings_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -437,7 +438,7 @@ export default function DashboardProfilePage() {
                 style={{ width: 16, height: 16, accentColor: 'var(--nc-terra)' }}
               />
               <label htmlFor="intro-consultation" style={{ fontSize: 14, color: 'var(--nc-ink)', cursor: 'pointer' }}>
-                Require an intro consultation before client access begins
+                {t('intro_consultation')}
               </label>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 16 }}>
@@ -447,13 +448,13 @@ export default function DashboardProfilePage() {
                 className={`dash-toggle${acceptingNewClients ? ' on' : ''}`}
                 onClick={() => {
                   if (!acceptingNewClients && !isProfileComplete()) {
-                    setSaveMsg('Completa tu perfil (nombre, bio, especialidad, ciudad si es presencial) antes de aceptar clientes');
+                    setSaveMsg(t('profile_incomplete'));
                     return;
                   }
                   setAcceptingNewClients((v) => !v);
                 }}
                 disabled={!isProfileComplete()}
-                aria-label="Aceptando nuevos clientes"
+                aria-label={t('accepting_new_clients')}
                 style={{ opacity: !isProfileComplete() ? 0.5 : 1, cursor: isProfileComplete() ? 'pointer' : 'not-allowed' }}
               />
               <label
@@ -462,17 +463,17 @@ export default function DashboardProfilePage() {
                 onClick={() => {
                   if (!isProfileComplete()) return;
                   if (!acceptingNewClients && !isProfileComplete()) {
-                    setSaveMsg('Completa tu perfil (nombre, bio, especialidad, ciudad si es presencial) antes de aceptar clientes');
+                    setSaveMsg(t('profile_incomplete'));
                     return;
                   }
                   setAcceptingNewClients((v) => !v);
                 }}
               >
-                Aceptando nuevos clientes
+                {t('accepting_new_clients')}
               </label>
               {!isProfileComplete() && (
                 <span style={{ fontSize: 12, color: 'var(--nc-stone)', marginLeft: 'auto' }}>
-                  Completa tu perfil primero
+                  {t('complete_profile_first')}
                 </span>
               )}
             </div>
@@ -483,13 +484,13 @@ export default function DashboardProfilePage() {
         {profile && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Visibility</div>
-              <div className="dash-section-sub">Control who can find you</div>
+              <div className="dash-section-title">{t('visibility')}</div>
+              <div className="dash-section-sub">{t('visibility_desc')}</div>
             </div>
             <div className="dash-publish-row">
               <div className="dash-publish-label">
-                <h3>Publish profile</h3>
-                <p>When published, your profile appears in the public directory.</p>
+                <h3>{t('publish_profile')}</h3>
+                <p>{t('publish_profile_desc')}</p>
               </div>
               <button
                 className={`dash-toggle${status === 'published' ? ' on' : ''}`}
@@ -504,19 +505,19 @@ export default function DashboardProfilePage() {
       {/* Plan info */}
       <div style={{ margin: '24px 40px 0', background: 'white', border: '1px solid rgba(139,115,85,0.15)', borderRadius: 8, padding: '20px 24px' }}>
         <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-ink)', marginBottom: 6 }}>
-          Subscription plan
+          {t('subscription_plan')}
         </div>
         <div style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300 }}>
-          Current tier: <strong style={{ color: 'var(--nc-terra)', textTransform: 'capitalize' }}>{profile?.tier ?? 'free'}</strong>. Manage your plan from the{' '}
-          <a href="/dashboard/billing" style={{ color: 'var(--nc-terra)' }}>Billing page</a>.
+          {t('current_tier')} <strong style={{ color: 'var(--nc-terra)', textTransform: 'capitalize' }}>{profile?.tier ?? 'free'}</strong>. {t('manage_plan')}{' '}
+          <a href={`/${locale}/dashboard/billing`} style={{ color: 'var(--nc-terra)' }}>{t('billing_page')}</a>.
         </div>
       </div>
 
       <div className="dash-save-bar">
-        <span className="dash-save-hint">{saveMsg || (profile ? 'Unsaved changes' : 'Create your profile to get started')}</span>
+        <span className="dash-save-hint">{saveMsg || (profile ? t('unsaved_changes') : t('create_profile_prompt'))}</span>
         <div className="dash-save-actions">
           <button className="dash-btn-save" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : profile ? 'Save changes' : 'Create profile'}
+            {saving ? t('saving') : profile ? t('save_changes') : t('create_profile')}
           </button>
         </div>
       </div>
