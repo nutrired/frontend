@@ -7,7 +7,7 @@ import { useMyClientProfile, useWeightEntries, useActivityEntries } from '@/lib/
 import { api, ApiRequestError } from '@/lib/api';
 import { AvatarUpload } from '@/components/AvatarUpload';
 import { BMIBadge } from '@/components/BMIBadge';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 
 // ─── TagInput ─────────────────────────────────────────────────────────────────
@@ -119,6 +119,7 @@ function WeightChart({ entries }: { entries: ChartEntry[] }) {
 // ─── Weight Log Widget ────────────────────────────────────────────────────────
 
 function WeightLogWidget() {
+  const t = useTranslations('dashboard.client_profile');
   const { entries, mutate } = useWeightEntries();
   const today = new Date().toISOString().split('T')[0];
   const [weightKg, setWeightKg] = useState('');
@@ -153,8 +154,8 @@ function WeightLogWidget() {
   return (
     <div className="dash-section">
       <div className="dash-section-head">
-        <div className="dash-section-title">Registro de peso</div>
-        <div className="dash-section-sub">Añade tu peso diario para hacer seguimiento</div>
+        <div className="dash-section-title">{t('weight_log')}</div>
+        <div className="dash-section-sub">{t('weight_log_desc')}</div>
       </div>
       <div className="dash-section-body">
         <WeightChart entries={entries} />
@@ -164,7 +165,7 @@ function WeightLogWidget() {
             type="number"
             step="0.1"
             min="0"
-            placeholder="kg"
+            placeholder={t('weight_placeholder')}
             value={weightKg}
             onChange={(e) => setWeightKg(e.target.value)}
             style={{ width: 90 }}
@@ -177,7 +178,7 @@ function WeightLogWidget() {
             style={{ width: 150 }}
           />
           <button className="dash-btn-save" onClick={handleLog} disabled={saving || !weightKg}>
-            {saving ? 'Guardando…' : 'Registrar'}
+            {saving ? t('weight_saving') : t('weight_save')}
           </button>
         </div>
         {entries.length > 0 && (
@@ -191,7 +192,7 @@ function WeightLogWidget() {
                     <button
                       onClick={() => handleDelete(e.id)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--nc-stone)', fontSize: 16 }}
-                      aria-label="Delete weight entry"
+                      aria-label={t('delete_entry')}
                     >
                       ×
                     </button>
@@ -209,6 +210,7 @@ function WeightLogWidget() {
 // ─── Activity Log Widget ──────────────────────────────────────────────────────
 
 function ActivityLogWidget() {
+  const t = useTranslations('dashboard.client_profile');
   const { entries, mutate } = useActivityEntries();
   const today = new Date().toISOString().split('T')[0];
   const [activityType, setActivityType] = useState('');
@@ -249,15 +251,15 @@ function ActivityLogWidget() {
   return (
     <div className="dash-section">
       <div className="dash-section-head">
-        <div className="dash-section-title">Registro de actividad</div>
-        <div className="dash-section-sub">Registra tu actividad física diaria</div>
+        <div className="dash-section-title">{t('activity_log')}</div>
+        <div className="dash-section-sub">{t('activity_log_desc')}</div>
       </div>
       <div className="dash-section-body">
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16, flexWrap: 'wrap' }}>
           <input
             className="dash-input"
             type="text"
-            placeholder="Actividad (ej: Running)"
+            placeholder={t('activity_type_placeholder')}
             value={activityType}
             onChange={(e) => setActivityType(e.target.value)}
             style={{ width: 180 }}
@@ -266,7 +268,7 @@ function ActivityLogWidget() {
             className="dash-input"
             type="number"
             min="1"
-            placeholder="min"
+            placeholder={t('duration_placeholder')}
             value={durationMinutes}
             onChange={(e) => setDurationMinutes(e.target.value)}
             style={{ width: 80 }}
@@ -279,7 +281,7 @@ function ActivityLogWidget() {
             style={{ width: 150 }}
           />
           <button className="dash-btn-save" onClick={handleLog} disabled={saving || !activityType || !durationMinutes}>
-            {saving ? 'Guardando…' : 'Registrar'}
+            {saving ? t('activity_saving') : t('activity_save')}
           </button>
         </div>
         {entries.length > 0 && (
@@ -294,7 +296,7 @@ function ActivityLogWidget() {
                     <button
                       onClick={() => handleDelete(e.id)}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--nc-stone)', fontSize: 16 }}
-                      aria-label="Delete activity entry"
+                      aria-label={t('delete_activity')}
                     >
                       ×
                     </button>
@@ -312,6 +314,7 @@ function ActivityLogWidget() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function ClientProfilePage() {
+  const t = useTranslations('dashboard.client_profile');
   const { user } = useAuth();
   const { profile, isLoading, mutate } = useMyClientProfile();
   const locale = useLocale();
@@ -348,7 +351,7 @@ export default function ClientProfilePage() {
   }, [profile]);
 
   const handleSave = async () => {
-    if (!displayName.trim()) { setSaveMsg('El nombre es obligatorio.'); return; }
+    if (!displayName.trim()) { setSaveMsg(t('error_display_name_required')); return; }
     setSaving(true);
     setSaveMsg('');
     try {
@@ -370,9 +373,9 @@ export default function ClientProfilePage() {
         await api.put('/client/me', body);
       }
       await mutate();
-      setSaveMsg('Guardado.');
+      setSaveMsg(t('saved'));
     } catch (err) {
-      setSaveMsg(err instanceof ApiRequestError ? err.message : 'Error al guardar.');
+      setSaveMsg(err instanceof ApiRequestError ? err.message : t('error_save_failed'));
     } finally {
       setSaving(false);
     }
@@ -381,7 +384,7 @@ export default function ClientProfilePage() {
   if (isLoading) {
     return (
       <div className="dash-content" style={{ padding: 40, color: 'var(--nc-stone)', fontWeight: 300 }}>
-        Cargando…
+        {t('loading')}
       </div>
     );
   }
@@ -390,7 +393,7 @@ export default function ClientProfilePage() {
     return (
       <div className="dash-content" style={{ padding: 40 }}>
         <p style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>
-          Esta sección es solo para clientes.
+          {t('client_only')}
         </p>
       </div>
     );
@@ -399,15 +402,15 @@ export default function ClientProfilePage() {
   return (
     <>
       <div className="dash-topbar">
-        <div className="dash-topbar-title">Mi perfil</div>
+        <div className="dash-topbar-title">{t('title')}</div>
       </div>
 
       <div className="dash-content">
         {/* Profile Photo */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Foto de perfil</div>
-            <div className="dash-section-sub">Tu foto ayuda a tu nutricionista a reconocerte</div>
+            <div className="dash-section-title">{t('profile_photo')}</div>
+            <div className="dash-section-sub">{t('profile_photo_desc')}</div>
           </div>
           <div className="dash-section-body">
             <AvatarUpload
@@ -426,33 +429,33 @@ export default function ClientProfilePage() {
         {/* Info básica */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Info básica</div>
-            <div className="dash-section-sub">Cómo te conocerá tu nutricionista</div>
+            <div className="dash-section-title">{t('basic_info')}</div>
+            <div className="dash-section-sub">{t('basic_info_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-row">
               <div className="dash-field">
-                <label className="dash-label">Nombre <span className="opt">(obligatorio)</span></label>
+                <label className="dash-label">{t('display_name')} <span className="opt">{t('display_name_required')}</span></label>
                 <input
                   className="dash-input"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Tu nombre completo"
+                  placeholder={t('display_name_placeholder')}
                 />
               </div>
               <div className="dash-field">
-                <label className="dash-label">Ciudad</label>
+                <label className="dash-label">{t('city')}</label>
                 <input
                   className="dash-input"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="Madrid"
+                  placeholder={t('city_placeholder')}
                 />
               </div>
             </div>
             <div className="dash-row">
               <div className="dash-field">
-                <label className="dash-label">Idioma / Language</label>
+                <label className="dash-label">{t('language')}</label>
                 <select
                   className="dash-input"
                   value={preferredLocale}
@@ -479,12 +482,12 @@ export default function ClientProfilePage() {
             </div>
             <div className="dash-row single">
               <div className="dash-field">
-                <label className="dash-label">Bio</label>
+                <label className="dash-label">{t('bio')}</label>
                 <textarea
                   className="dash-textarea"
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  placeholder="Cuéntanos algo sobre ti y tus hábitos…"
+                  placeholder={t('bio_placeholder')}
                 />
               </div>
             </div>
@@ -494,13 +497,13 @@ export default function ClientProfilePage() {
         {/* Salud */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Salud</div>
-            <div className="dash-section-sub">Información para personalizar tu plan</div>
+            <div className="dash-section-title">{t('health')}</div>
+            <div className="dash-section-sub">{t('health_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-row three">
               <div className="dash-field">
-                <label className="dash-label">Fecha de nacimiento</label>
+                <label className="dash-label">{t('birth_date')}</label>
                 <input
                   className="dash-input"
                   type="date"
@@ -509,7 +512,7 @@ export default function ClientProfilePage() {
                 />
               </div>
               <div className="dash-field">
-                <label className="dash-label">Altura</label>
+                <label className="dash-label">{t('height')}</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <input
                     className="dash-input"
@@ -521,35 +524,35 @@ export default function ClientProfilePage() {
                     placeholder="178"
                     style={{ flex: 1 }}
                   />
-                  <span style={{ color: 'var(--nc-stone)', fontSize: 13 }}>cm</span>
+                  <span style={{ color: 'var(--nc-stone)', fontSize: 13 }}>{t('height_unit')}</span>
                 </div>
               </div>
               <div className="dash-field">
-                <label className="dash-label">Género (opcional)</label>
+                <label className="dash-label">{t('gender')}</label>
                 <select
                   value={gender || ''}
                   onChange={(e) => setGender(e.target.value || null)}
                   className="dash-input"
                 >
-                  <option value="">-- No especificado --</option>
-                  <option value="male">Masculino</option>
-                  <option value="female">Femenino</option>
-                  <option value="other">Otro</option>
-                  <option value="prefer_not_to_say">Prefiero no decir</option>
+                  <option value="">{t('gender_not_specified')}</option>
+                  <option value="male">{t('gender_male')}</option>
+                  <option value="female">{t('gender_female')}</option>
+                  <option value="other">{t('gender_other')}</option>
+                  <option value="prefer_not_to_say">{t('gender_prefer_not_to_say')}</option>
                 </select>
               </div>
               <div className="dash-field">
-                <label className="dash-label">Nivel de actividad</label>
+                <label className="dash-label">{t('activity_level')}</label>
                 <select
                   className="dash-input"
                   value={activityLevel}
                   onChange={(e) => setActivityLevel(e.target.value)}
                 >
-                  <option value="">— seleccionar —</option>
-                  <option value="sedentary">Sedentario</option>
-                  <option value="lightly_active">Ligeramente activo</option>
-                  <option value="moderately_active">Moderadamente activo</option>
-                  <option value="very_active">Muy activo</option>
+                  <option value="">{t('activity_level_select')}</option>
+                  <option value="sedentary">{t('activity_level_sedentary')}</option>
+                  <option value="lightly_active">{t('activity_level_lightly_active')}</option>
+                  <option value="moderately_active">{t('activity_level_moderately_active')}</option>
+                  <option value="very_active">{t('activity_level_very_active')}</option>
                 </select>
               </div>
             </div>
@@ -559,37 +562,37 @@ export default function ClientProfilePage() {
         {/* Objetivos y preferencias */}
         <div className="dash-section">
           <div className="dash-section-head">
-            <div className="dash-section-title">Objetivos y preferencias</div>
-            <div className="dash-section-sub">Enter o coma para añadir cada elemento</div>
+            <div className="dash-section-title">{t('objectives_preferences')}</div>
+            <div className="dash-section-sub">{t('objectives_preferences_desc')}</div>
           </div>
           <div className="dash-section-body">
             <div className="dash-row single" style={{ marginBottom: 18 }}>
               <div className="dash-field">
-                <label className="dash-label">Objetivos</label>
+                <label className="dash-label">{t('goals')}</label>
                 <TagInput
                   tags={goals}
                   onChange={setGoals}
-                  placeholder="ej: Pérdida de peso"
+                  placeholder={t('goals_placeholder')}
                   chipClass="specialty"
                 />
               </div>
             </div>
             <div className="dash-row">
               <div className="dash-field">
-                <label className="dash-label">Restricciones dietéticas</label>
+                <label className="dash-label">{t('dietary_restrictions')}</label>
                 <TagInput
                   tags={dietaryRestrictions}
                   onChange={setDietaryRestrictions}
-                  placeholder="ej: Vegano"
+                  placeholder={t('dietary_restrictions_placeholder')}
                   chipClass="lang"
                 />
               </div>
               <div className="dash-field">
-                <label className="dash-label">Alergias</label>
+                <label className="dash-label">{t('allergies')}</label>
                 <TagInput
                   tags={allergies}
                   onChange={setAllergies}
-                  placeholder="ej: Frutos secos"
+                  placeholder={t('allergies_placeholder')}
                   chipClass="cert"
                 />
               </div>
@@ -603,8 +606,8 @@ export default function ClientProfilePage() {
         {profile?.bmi && (
           <div className="dash-section">
             <div className="dash-section-head">
-              <div className="dash-section-title">Índice de Masa Corporal (IMC)</div>
-              <div className="dash-section-sub">Calculado automáticamente basado en tu peso y altura</div>
+              <div className="dash-section-title">{t('bmi')}</div>
+              <div className="dash-section-sub">{t('bmi_desc')}</div>
             </div>
             <div className="dash-section-body">
               <BMIBadge
@@ -617,10 +620,10 @@ export default function ClientProfilePage() {
       </div>
 
       <div className="dash-save-bar">
-        <span className="dash-save-hint">{saveMsg || (profile ? 'Cambios sin guardar' : 'Crea tu perfil para empezar')}</span>
+        <span className="dash-save-hint">{saveMsg || (profile ? t('unsaved_changes') : t('create_profile_prompt'))}</span>
         <div className="dash-save-actions">
           <button className="dash-btn-save" onClick={handleSave} disabled={saving}>
-            {saving ? 'Guardando…' : profile ? 'Guardar cambios' : 'Crear perfil'}
+            {saving ? t('saving') : profile ? t('save_changes') : t('create_profile')}
           </button>
         </div>
       </div>
