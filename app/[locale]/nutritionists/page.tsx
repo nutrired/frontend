@@ -1,6 +1,7 @@
 // frontend/app/nutritionists/page.tsx
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -82,6 +83,7 @@ function NutriCard({ profile, index }: { profile: ProfileSummary; index: number 
 // ─── list (reads URL params) ──────────────────────────────────────────────────
 
 function NutritionistsList() {
+  const t = useTranslations('public.nutritionists');
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -112,17 +114,17 @@ function NutritionistsList() {
       <div className="nc-stats-bar">
         <div className="nc-stat-item">
           <span className="nc-stat-number">{total}</span>
-          <span className="nc-stat-label">Certified nutritionists</span>
+          <span className="nc-stat-label">{t('stats_label')}</span>
         </div>
       </div>
 
       {isLoading ? (
         <div style={{ padding: '48px', textAlign: 'center', color: 'var(--nc-stone)', fontWeight: 300 }}>
-          Loading nutritionists…
+          {t('loading')}
         </div>
       ) : profiles.length === 0 ? (
         <div style={{ padding: '48px', textAlign: 'center', color: 'var(--nc-stone)', fontWeight: 300 }}>
-          No nutritionists found. Try adjusting your filters.
+          {t('no_results')}
         </div>
       ) : (
         <div className="nc-grid-container">
@@ -146,10 +148,10 @@ function NutritionistsList() {
               cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.4 : 1,
             }}
           >
-            ← Previous
+            {t('page_prev')}
           </button>
           <span style={{ lineHeight: '40px', fontSize: 13, color: 'var(--nc-stone)' }}>
-            Page {page} of {totalPages}
+            {t('page_info', { page, totalPages })}
           </span>
           <button
             onClick={() => goToPage(page + 1)}
@@ -161,7 +163,7 @@ function NutritionistsList() {
               cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.4 : 1,
             }}
           >
-            Next →
+            {t('page_next')}
           </button>
         </div>
       )}
@@ -172,6 +174,8 @@ function NutritionistsList() {
 // ─── page shell ───────────────────────────────────────────────────────────────
 
 export default function NutritionistsPage() {
+  const t = useTranslations('public.nutritionists');
+
   return (
     <div style={{ background: 'var(--nc-cream)', minHeight: '100vh' }}>
       <nav className="nc-nav">
@@ -183,9 +187,9 @@ export default function NutritionistsPage() {
       </nav>
 
       <div className="nc-hero">
-        <p className="nc-hero-label">Find your match</p>
+        <p className="nc-hero-label">{t('hero_label')}</p>
         <h1>Meet the nutritionist<br />who <em>gets you</em></h1>
-        <p>Browse certified professionals. Find someone whose approach fits your life.</p>
+        <p>{t('hero_subtitle')}</p>
         <Suspense>
           <SearchFilters />
         </Suspense>
