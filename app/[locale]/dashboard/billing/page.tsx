@@ -6,6 +6,7 @@ import { useNutritionistRelationships, useNutritionistWaitlist, subscribeToTier,
 import { useMyProfile } from '@/lib/profile';
 import { timeSince } from '@/lib/utils';
 import { useState } from 'react';
+import { toastError } from '@/lib/toast';
 
 function statusLabel(status: string, t: any): { text: string; color: string } {
   switch (status) {
@@ -33,7 +34,7 @@ export default function BillingPage() {
       window.location.href = url;
     } catch {
       setSubscribing(false);
-      alert('Failed to start subscription checkout. Please try again.');
+      toastError('Failed to start subscription checkout. Please try again.');
     }
   }
 
@@ -44,7 +45,7 @@ export default function BillingPage() {
       window.location.href = url;
     } catch {
       setPortaling(false);
-      alert('Failed to open billing portal. Please try again.');
+      toastError('Failed to open billing portal. Please try again.');
     }
   }
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { toastError } from '@/lib/toast';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSurveyTemplates, archiveSurveyTemplate, unarchiveSurveyTemplate } from '@/lib/survey';
 import { useMyProfile } from '@/lib/profile';
@@ -33,7 +34,7 @@ function TemplateRow({ template, onToggleArchive, t }: { template: SurveyTemplat
       }
       onToggleArchive();
     } catch (err) {
-      alert(t('toggle_error'));
+      toastError(t('toggle_error'));
     } finally {
       setIsToggling(false);
     }
@@ -121,7 +122,7 @@ export default function SurveyTemplatesPage() {
       });
       mutateProfile();
     } catch (err) {
-      alert(t('save_default_error'));
+      toastError(t('save_default_error'));
     } finally {
       setIsSavingDefault(false);
     }

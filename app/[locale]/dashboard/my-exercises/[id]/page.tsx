@@ -46,7 +46,7 @@ export default function ExerciseDetailPage({ params }: { params: Promise<{ id: s
       await deleteExerciseTemplate(template.id);
       router.push('/dashboard/my-exercises');
     } catch (err: any) {
-      alert(err?.message ?? 'Error al eliminar el ejercicio');
+      toastError(err?.message ?? 'Error al eliminar el ejercicio');
       setDeleting(false);
     }
   };

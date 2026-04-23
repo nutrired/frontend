@@ -1,4 +1,5 @@
 'use client';
+import { toastError } from '@/lib/toast';
 
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -45,7 +46,7 @@ export default function PublicProfilePage() {
       await connectWithNutritionist(slug, packageID);
       setConnected(true);
     } catch {
-      alert('Could not send connection request. Please try again.');
+      toastError('Could not send connection request. Please try again.');
     } finally {
       setConnecting(null);
     }

@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import type { Appointment } from '@/lib/types';
 import { SeriesDetailModal } from './components/SeriesDetailModal';
+import { toastError, toastWarning } from '@/lib/toast';
 
 export default function CalendarPage() {
   const { user } = useAuth();
@@ -505,7 +506,7 @@ function NutritionistActions({ appointmentId, seriesId, onViewSeries, t }: Nutri
     try {
       await completeAppointment(appointmentId);
     } catch (err) {
-      alert(t?.('error_complete') || 'Error marking as completed');
+      toastError(t?.('error_complete') || 'Error marking as completed');
     } finally {
       setProcessing(false);
     }
@@ -517,7 +518,7 @@ function NutritionistActions({ appointmentId, seriesId, onViewSeries, t }: Nutri
     try {
       await markNoShow(appointmentId);
     } catch (err) {
-      alert(t?.('error_no_show') || 'Error marking as no-show');
+      toastError(t?.('error_no_show') || 'Error marking as no-show');
     } finally {
       setProcessing(false);
     }
@@ -530,7 +531,7 @@ function NutritionistActions({ appointmentId, seriesId, onViewSeries, t }: Nutri
     try {
       await cancelAppointment(appointmentId, reason);
     } catch (err: any) {
-      alert(err.message || t?.('error_cancel') || 'Error cancelando cita');
+      toastError(err.message || t?.('error_cancel') || 'Error cancelando cita');
     } finally {
       setProcessing(false);
     }
@@ -681,7 +682,7 @@ function CancelButton({ appointmentId, startTime, t }: CancelButtonProps) {
 
   const handleSubmitCancel = async () => {
     if (!reason.trim()) {
-      alert(t?.('cancel_reason_required') || 'Por favor indica el motivo de cancelación');
+      toastWarning(t?.('cancel_reason_required') || 'Por favor indica el motivo de cancelación');
       return;
     }
 
@@ -690,7 +691,7 @@ function CancelButton({ appointmentId, startTime, t }: CancelButtonProps) {
       await cancelAppointment(appointmentId, reason);
       setShowModal(false);
     } catch (err: any) {
-      alert(err.message || (t?.('error_cancel') || 'Error cancelling appointment'));
+      toastError(err.message || (t?.('error_cancel') || 'Error cancelling appointment'));
     } finally {
       setProcessing(false);
     }
@@ -786,7 +787,7 @@ function AppointmentModal({ appointment, isNutritionist, onClose, locale, dateFn
       await completeAppointment(appointment.id);
       onClose();
     } catch (err) {
-      alert(t?.('error_complete') || 'Error marking as completed');
+      toastError(t?.('error_complete') || 'Error marking as completed');
     } finally {
       setProcessing(false);
     }
@@ -799,7 +800,7 @@ function AppointmentModal({ appointment, isNutritionist, onClose, locale, dateFn
       await markNoShow(appointment.id);
       onClose();
     } catch (err) {
-      alert(t?.('error_no_show') || 'Error marking as no-show');
+      toastError(t?.('error_no_show') || 'Error marking as no-show');
     } finally {
       setProcessing(false);
     }
@@ -813,7 +814,7 @@ function AppointmentModal({ appointment, isNutritionist, onClose, locale, dateFn
       await cancelAppointment(appointment.id, reason);
       onClose();
     } catch (err: any) {
-      alert(err.message || (t?.('error_cancel') || 'Error cancelando cita'));
+      toastError(err.message || (t?.('error_cancel') || 'Error cancelando cita'));
     } finally {
       setProcessing(false);
     }
@@ -821,7 +822,7 @@ function AppointmentModal({ appointment, isNutritionist, onClose, locale, dateFn
 
   const handleReschedule = () => {
     // TODO: Implement reschedule flow - for now just alert
-    alert(t?.('reschedule_message') || 'Función de reprogramación próximamente. Por ahora, cancela y crea una nueva cita.');
+    toastWarning(t?.('reschedule_message') || 'Función de reprogramación próximamente. Por ahora, cancela y crea una nueva cita.');
   };
 
   return (

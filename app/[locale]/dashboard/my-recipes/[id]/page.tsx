@@ -37,7 +37,7 @@ export default function RecipeDetailPage({
       await deleteRecipe(recipe.id);
       router.push('/dashboard/my-recipes');
     } catch (err: any) {
-      alert(err?.message ?? t('delete_error'));
+      toastError(err?.message ?? t('delete_error'));
       setDeleting(false);
     }
   };

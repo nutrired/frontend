@@ -158,7 +158,7 @@ export default function ClientCard({ client }: ClientCardProps) {
               }}
               onClick={(e) => {
                 // TODO: implement dropdown menu
-                alert(t('alert_create_plan_menu'));
+                toastWarning(t('alert_create_plan_menu'));
               }}
             >
               {t('action_create_plan')}

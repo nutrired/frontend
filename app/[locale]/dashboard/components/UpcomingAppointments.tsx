@@ -24,7 +24,7 @@ export function UpcomingAppointments() {
       await cancelAppointment(id, t('cancel_reason'));
       // SWR will auto-revalidate
     } catch (err: any) {
-      alert(err.message || t('error_cancel'));
+      toastError(err.message || t('error_cancel'));
     } finally {
       setCanceling(null);
     }

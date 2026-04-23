@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
 import Link from 'next/link';
+import { toastError } from '@/lib/toast';
 
 export default function MyNutritionistPage() {
   const locale = useLocale();
@@ -34,7 +35,7 @@ export default function MyNutritionistPage() {
     try {
       await cancelRelationship(id);
     } catch {
-      alert(t('cancel_error'));
+      toastError(t('cancel_error'));
     } finally {
       setCancelling(null);
     }
