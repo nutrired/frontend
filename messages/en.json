@@ -257,6 +257,8 @@
       "todays_schedule": "Upcoming Schedule",
       "no_appointments_today": "No upcoming appointments in the next 5 days",
       "view_calendar": "View full calendar",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
       "client_activity": "Client Activity",
       "recently_active": "Recently Active",
       "clients_active_week": "clients active this week",

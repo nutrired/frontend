@@ -85,6 +85,21 @@ export function TodaysScheduleCard({ appointments, isLoading }: TodaysScheduleCa
               minute: '2-digit',
             });
 
+            // Calculate relative date
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const apptDate = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate());
+            const diffDays = Math.round((apptDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+            let dateLabel;
+            if (diffDays === 0) {
+              dateLabel = t('today');
+            } else if (diffDays === 1) {
+              dateLabel = t('tomorrow');
+            } else {
+              dateLabel = startTime.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+            }
+
             return (
               <div
                 key={appt.id}
@@ -99,12 +114,28 @@ export function TodaysScheduleCard({ appointments, isLoading }: TodaysScheduleCa
                 }}
               >
                 <div style={{
-                  fontSize: 14,
-                  fontWeight: 600,
-                  color: 'var(--nc-forest)',
-                  minWidth: 60,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  minWidth: 80,
                 }}>
-                  {timeStr}
+                  <div style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: 'var(--nc-stone)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.03em',
+                  }}>
+                    {dateLabel}
+                  </div>
+                  <div style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: 'var(--nc-forest)',
+                    marginTop: 2,
+                  }}>
+                    {timeStr}
+                  </div>
                 </div>
                 <div style={{ flex: 1 }}>
                   <Link

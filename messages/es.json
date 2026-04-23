@@ -257,6 +257,8 @@
       "todays_schedule": "Próximas Citas",
       "no_appointments_today": "No hay citas próximas en los siguientes 5 días",
       "view_calendar": "Ver calendario completo",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
       "client_activity": "Actividad de Clientes",
       "recently_active": "Recientemente Activos",
       "clients_active_week": "clientes activos esta semana",
