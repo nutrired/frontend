@@ -146,6 +146,14 @@ export default function BookAppointmentPage() {
               min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
               required
             />
+            <div style={{
+              fontSize: 12,
+              color: 'var(--nc-stone)',
+              marginTop: 8,
+              fontStyle: 'italic'
+            }}>
+              ℹ️ {t('same_day_info')}
+            </div>
           </div>
 
           {selectedTypeID && (

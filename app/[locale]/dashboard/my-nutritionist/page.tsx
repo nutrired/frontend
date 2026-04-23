@@ -2,15 +2,24 @@
 'use client';
 
 import { useState } from 'react';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useMyRelationships, cancelRelationship } from '@/lib/hiring';
-import { timeSince } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function MyNutritionistPage() {
   const locale = useLocale();
+  const t = useTranslations('dashboard.my_nutritionist');
   const { relationships, isLoading } = useMyRelationships();
   const [cancelling, setCancelling] = useState<string | null>(null);
+
+  // Format time since connection with i18n
+  const formatTimeSince = (dateStr: string) => {
+    const days = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+    if (days === 0) return t('time_today');
+    if (days < 30) return t('time_days', { days });
+    const months = Math.floor(days / 30);
+    return t('time_months', { months });
+  };
 
   const active = relationships.filter(
     (r) => r.status === 'active' || r.status === 'pending_intro',
@@ -20,12 +29,12 @@ export default function MyNutritionistPage() {
   );
 
   async function handleCancel(id: string) {
-    if (!confirm('Cancel your programme? This cannot be undone.')) return;
+    if (!confirm(t('confirm_cancel'))) return;
     setCancelling(id);
     try {
       await cancelRelationship(id);
     } catch {
-      alert('Could not cancel programme. Please try again.');
+      alert(t('cancel_error'));
     } finally {
       setCancelling(null);
     }
@@ -42,17 +51,17 @@ export default function MyNutritionistPage() {
   return (
     <div style={{ maxWidth: 680, padding: '32px 24px' }}>
       <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 24, color: 'var(--nc-ink)', marginBottom: 8, fontWeight: 400 }}>
-        My Nutritionist
+        {t('title')}
       </h1>
       <p style={{ color: 'var(--nc-stone)', fontSize: 14, marginBottom: 32, fontWeight: 300 }}>
-        Manage your active programme.
+        {t('subtitle')}
       </p>
 
       {active.length === 0 && past.length === 0 && (
         <div style={{ background: 'white', border: '1px solid rgba(139,115,85,0.15)', borderRadius: 8, padding: '24px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>You have no active programmes.</p>
+          <p style={{ color: 'var(--nc-stone)', fontWeight: 300 }}>{t('no_programmes')}</p>
           <a href={`/${locale}/nutritionists`} className="nc-btn-contact" style={{ display: 'inline-block', marginTop: 16, textDecoration: 'none', fontSize: 13 }}>
-            Browse nutritionists
+            {t('browse_nutritionists')}
           </a>
         </div>
       )}
@@ -71,7 +80,7 @@ export default function MyNutritionistPage() {
             </span>
           </div>
           <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 8 }}>
-            {rel.nutritionist_city} · Conectado hace {timeSince(rel.created_at)}
+            {rel.nutritionist_city} · {t('connected')} {formatTimeSince(rel.created_at)}
           </div>
           {rel.nutritionist_bio && (
             <p style={{ fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.5,
@@ -87,27 +96,27 @@ export default function MyNutritionistPage() {
             ))}
           </div>
           <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginBottom: 12 }}>
-            Estado: <strong>{rel.status === 'active' ? 'Activo' : rel.status === 'pending_intro' ? 'Pendiente' : 'Cancelado'}</strong>
+            {t('status')} <strong>{rel.status === 'active' ? t('active') : rel.status === 'pending_intro' ? t('pending') : t('cancelled')}</strong>
           </div>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             {rel.status === 'active' && (
               <Link
-                href={`/dashboard/appointments/book?relationship_id=${rel.id}&nutritionist_id=${rel.nutritionist_id}`}
+                href={`/${locale}/dashboard/appointments/book?relationship_id=${rel.id}&nutritionist_id=${rel.nutritionist_id}`}
                 className="dash-btn-publish"
                 style={{ fontSize: 12, textDecoration: 'none', padding: '6px 12px' }}
               >
-                Agendar Cita
+                {t('book_appointment')}
               </Link>
             )}
             <a href={`/nutritionists/${rel.nutritionist_slug}`} target="_blank"
                style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none' }}>
-              Ver perfil ↗
+              {t('view_profile')} ↗
             </a>
             {rel.status !== 'cancelled' && (
               <button onClick={() => handleCancel(rel.id)}
                 disabled={cancelling === rel.id}
                 style={{ fontSize: 12, color: 'var(--nc-stone)', background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}>
-                {cancelling === rel.id ? 'Cancelando…' : 'Cancelar'}
+                {cancelling === rel.id ? `${t('cancel')}...` : t('cancel')}
               </button>
             )}
           </div>
@@ -137,7 +146,7 @@ export default function MyNutritionistPage() {
               <div style={{ marginTop: 8 }}>
                 <a href={`/nutritionists/${rel.nutritionist_slug}`} target="_blank"
                    style={{ fontSize: 12, color: 'var(--nc-terra)', textDecoration: 'none' }}>
-                  Ver perfil ↗
+                  {t('view_profile')} ↗
                 </a>
               </div>
             </div>
