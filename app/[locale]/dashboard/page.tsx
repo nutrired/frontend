@@ -422,19 +422,23 @@ function ClientOverview() {
 function NutritionistOverview() {
   const t = useTranslations('dashboard.home');
   const locale = useLocale();
-  const { schedule, activity, surveys, isLoading } = useNutritionistOverview();
+  const { overview, isLoading } = useNutritionistOverview();
   const { reviews } = usePendingSurveyReviews();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Today's Schedule Card */}
-      <TodaysScheduleCard schedule={schedule} isLoading={isLoading} />
+      <TodaysScheduleCard appointments={overview?.todays_appointments || []} isLoading={isLoading} />
 
       {/* Client Activity Card */}
-      <ClientActivityCard activity={activity} isLoading={isLoading} />
+      <ClientActivityCard activity={{
+        recently_active: overview?.recently_active_clients || [],
+        due_for_checkin: overview?.due_for_checkin_clients || [],
+        recently_joined: overview?.recently_joined_clients || [],
+      }} isLoading={isLoading} />
 
       {/* Pending Surveys Alert */}
-      {!isLoading && surveys && surveys.length > 0 && (
+      {!isLoading && reviews && reviews.length > 0 && (
         <div style={{
           background: 'rgba(196,98,45,0.08)',
           border: '1px solid rgba(196,98,45,0.2)',
@@ -442,10 +446,10 @@ function NutritionistOverview() {
           padding: '16px 20px',
         }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--nc-terra)', marginBottom: 12 }}>
-            📋 {t('completed_surveys', { count: surveys.length })}
+            📋 {t('completed_surveys', { count: reviews.length })}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {surveys.slice(0, 3).map((survey) => (
+            {reviews.slice(0, 3).map((survey) => (
               <Link
                 key={survey.assignment_id}
                 href={`/${locale}/dashboard/clients/${survey.client_id}`}
@@ -475,9 +479,9 @@ function NutritionistOverview() {
               </Link>
             ))}
           </div>
-          {surveys.length > 3 && (
+          {reviews.length > 3 && (
             <div style={{ fontSize: 12, color: 'var(--nc-stone)', marginTop: 8, textAlign: 'center' }}>
-              {t('and_more', { count: surveys.length - 3 })}
+              {t('and_more', { count: reviews.length - 3 })}
             </div>
           )}
         </div>
