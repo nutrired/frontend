@@ -20,16 +20,17 @@ export default function AppointmentTypesPage() {
   const t = useTranslations('dashboard.appointments');
   const { types, isLoading, mutate } = useAppointmentTypes();
 
-  // Nutritionist-only page
-  if (user?.role !== 'nutritionist') {
-    return null;
-  }
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingType, setEditingType] = useState<AppointmentType | null>(null);
 
   const [name, setName] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(30);
   const [description, setDescription] = useState('');
+
+  // Nutritionist-only page
+  if (user?.role !== 'nutritionist') {
+    return null;
+  }
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
