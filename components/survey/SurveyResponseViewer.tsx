@@ -34,10 +34,21 @@ interface SurveyResponseViewerProps {
   status: string;
 }
 
-function renderAnswer(r: QuestionWithResponse): string {
+function renderAnswer(r: QuestionWithResponse): string | JSX.Element {
   if (r.answer_text != null && r.answer_text !== '') return r.answer_text;
   if (r.answer_numeric != null) return String(r.answer_numeric);
-  if (r.answer_file_url != null && r.answer_file_url !== '') return 'Archivo subido';
+  if (r.answer_file_url != null && r.answer_file_url !== '') {
+    return (
+      <a
+        href={r.answer_file_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ color: 'var(--nc-forest)', textDecoration: 'none', fontWeight: 500 }}
+      >
+        Ver archivo adjunto ↗
+      </a>
+    );
+  }
   return 'Sin respuesta';
 }
 
