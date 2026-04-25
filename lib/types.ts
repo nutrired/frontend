@@ -229,6 +229,7 @@ export interface NutritionPlan {
   id: string;
   nutritionist_id: string;
   client_id: string;
+  relationship_id: string;
   title: string;
   notes: string;
   plan_style: PlanStyle;
@@ -285,6 +286,7 @@ export interface ExercisePlan {
   id: string;
   nutritionist_id: string;
   client_id: string;
+  relationship_id: string;
   title: string;
   notes: string;
   status: PlanStatus;
