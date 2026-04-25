@@ -15,6 +15,7 @@ import type { WeightEntry, ActivityEntry } from '@/lib/types';
 import { useNutritionistOverview } from '@/lib/nutritionist';
 import { TodaysScheduleCard } from './components/TodaysScheduleCard';
 import { ClientActivityCard } from './components/ClientActivityCard';
+import { PendingIntrosBanner } from '@/components/PendingIntrosBanner';
 
 // ─── Client Health Graphs ──────────────────────────────────────────────────────
 
@@ -427,15 +428,21 @@ function NutritionistOverview() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* Pending Intros Banner */}
+      {overview && (
+        <PendingIntrosBanner count={overview.pending_intros_count} locale={locale} />
+      )}
+
       {/* Today's Schedule Card */}
       <TodaysScheduleCard appointments={overview?.todays_appointments || []} isLoading={isLoading} />
 
       {/* Client Activity Card */}
-      <ClientActivityCard activity={{
-        recently_active: overview?.recently_active_clients || [],
-        due_for_checkin: overview?.due_for_checkin_clients || [],
-        recently_joined: overview?.recently_joined_clients || [],
-      }} isLoading={isLoading} />
+      <ClientActivityCard
+        recentlyActive={overview?.recently_active_clients || []}
+        dueForCheckin={overview?.due_for_checkin_clients || []}
+        recentlyJoined={overview?.recently_joined_clients || []}
+        isLoading={isLoading}
+      />
 
       {/* Pending Surveys Alert */}
       {!isLoading && reviews && reviews.length > 0 && (

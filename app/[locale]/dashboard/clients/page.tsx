@@ -2,14 +2,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import QuickStatsPanel from '@/components/QuickStatsPanel';
 import SearchFilterBar from '@/components/SearchFilterBar';
 import ClientCard from '@/components/ClientCard';
 import { useQuickStats, useEnhancedClients } from '@/lib/enhanced-clients';
+import { useNutritionistOverview } from '@/lib/nutritionist';
+import { useAuth } from '@/lib/auth';
+import { PendingIntrosBanner } from '@/components/PendingIntrosBanner';
 
 export default function MyClientsPage() {
   const t = useTranslations('dashboard.clients');
+  const locale = useLocale();
+  const { user } = useAuth();
+  const { overview } = useNutritionistOverview();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
   const [sort, setSort] = useState('newest');
@@ -29,6 +35,10 @@ export default function MyClientsPage() {
         <div className="dash-topbar-title">{t('title')}</div>
       </div>
       <div className="dash-content">
+        {user?.role === 'nutritionist' && overview && (
+          <PendingIntrosBanner count={overview.pending_intros_count} locale={locale} />
+        )}
+
         <QuickStatsPanel stats={stats} isLoading={statsLoading} />
 
         <SearchFilterBar

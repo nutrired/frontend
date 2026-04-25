@@ -696,4 +696,5 @@ export interface NutritionistOverview {
   recently_active_clients: ClientActivity[];
   due_for_checkin_clients: ClientCheckin[];
   recently_joined_clients: ClientJoined[];
+  pending_intros_count: number;
 }
