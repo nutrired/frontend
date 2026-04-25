@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRecipe, deleteRecipe } from '@/lib/recipes';
 import type { RecipeCategory } from '@/lib/types';
+import { toastError } from '@/lib/toast';
 
 const CATEGORY_KEYS: Record<RecipeCategory, string> = {
   breakfast: 'category_breakfast',

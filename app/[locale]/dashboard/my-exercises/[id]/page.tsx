@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { useExerciseTemplate, deleteExerciseTemplate } from '@/lib/exercise-templates';
 import type { ExerciseCategory } from '@/lib/types';
+import { toastError } from '@/lib/toast';
 
 const CATEGORY_COLORS: Record<ExerciseCategory, string> = {
   strength: '#f0fdf4',

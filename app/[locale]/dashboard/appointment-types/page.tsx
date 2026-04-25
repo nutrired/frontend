@@ -101,7 +101,7 @@ export default function AppointmentTypesPage() {
       await deleteAppointmentType(typeId);
       await mutate();
     } catch (err: any) {
-      toastError(err?.message ?? t('error_delete'));
+      alert(err?.message ?? t('error_delete'));
     }
   };
 

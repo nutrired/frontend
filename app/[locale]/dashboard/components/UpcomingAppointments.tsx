@@ -8,6 +8,7 @@ import { format, formatDistanceToNow } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 import { useUpcomingAppointments } from '@/lib/calendar';
 import { cancelAppointment } from '@/lib/calendar';
+import { toastError } from '@/lib/toast';
 
 export function UpcomingAppointments() {
   const t = useTranslations('dashboard.home');
