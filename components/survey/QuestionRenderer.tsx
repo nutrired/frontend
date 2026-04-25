@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useRef } from 'react';
 import type { QuestionType } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { uploadSurveyAttachment } from '@/lib/survey';
 
 interface QuestionRendererProps {
   questionText: string;
@@ -14,6 +16,7 @@ interface QuestionRendererProps {
   answerFileUrl: string | null;
   onChange: (answer: { text?: string | null; numeric?: number | null; fileUrl?: string | null }) => void;
   disabled?: boolean;
+  relationshipId?: string;
 }
 
 export default function QuestionRenderer({
@@ -26,7 +29,32 @@ export default function QuestionRenderer({
   answerFileUrl,
   onChange,
   disabled = false,
+  relationshipId,
 }: QuestionRendererProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !relationshipId) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const result = await uploadSurveyAttachment(relationshipId, file);
+      onChange({ fileUrl: result.url });
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Error al subir el archivo');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   return (
     <div style={{
       border: '1px solid var(--nc-border)', borderRadius: 8,
@@ -147,9 +175,14 @@ export default function QuestionRenderer({
               padding: '8px 12px', background: 'var(--nc-cream)',
               border: '1px solid var(--nc-border)', borderRadius: 6,
             }}>
-              <span style={{ fontSize: 13, color: 'var(--nc-ink)', fontWeight: 300, flex: 1 }}>
-                Archivo subido
-              </span>
+              <a
+                href={answerFileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 13, color: 'var(--nc-forest)', fontWeight: 400, flex: 1, textDecoration: 'none' }}
+              >
+                Ver archivo ↗
+              </a>
               {!disabled && (
                 <button
                   type="button"
@@ -164,12 +197,47 @@ export default function QuestionRenderer({
               )}
             </div>
           ) : (
-            <div style={{
-              padding: '20px 16px', textAlign: 'center',
-              border: '1.5px dashed var(--nc-border)', borderRadius: 6,
-              fontSize: 13, color: 'var(--nc-stone)', fontWeight: 300,
-            }}>
-              Subida de archivos disponible proximamente
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileSelect}
+                disabled={disabled || isUploading}
+                style={{ display: 'none' }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={disabled || isUploading}
+                style={{
+                  width: '100%',
+                  padding: '20px 16px',
+                  textAlign: 'center',
+                  border: '1.5px dashed var(--nc-border)',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  color: isUploading ? 'var(--nc-stone)' : 'var(--nc-forest)',
+                  fontWeight: 400,
+                  background: 'white',
+                  cursor: disabled || isUploading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {isUploading ? 'Subiendo...' : 'Haz clic para subir un archivo'}
+              </button>
+              {uploadError && (
+                <div style={{
+                  marginTop: 8,
+                  padding: '6px 10px',
+                  background: 'rgba(205,92,92,0.1)',
+                  border: '1px solid rgba(205,92,92,0.2)',
+                  borderRadius: 4,
+                  fontSize: 12,
+                  color: '#cd5c5c',
+                }}>
+                  {uploadError}
+                </div>
+              )}
             </div>
           )}
         </div>

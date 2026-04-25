@@ -73,6 +73,7 @@ export default function ClientSurveyPage() {
           <SurveyForm
             responses={assignment.responses}
             status={assignment.status}
+            relationshipId={relationshipId}
             onSubmit={handleSubmit}
           />
         )}

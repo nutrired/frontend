@@ -77,6 +77,31 @@ export async function reviewSurveyAssignment(
   );
 }
 
+export async function uploadSurveyAttachment(
+  relationshipId: string,
+  file: File,
+): Promise<{ url: string; filename: string; size_bytes: number; content_type: string }> {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080/api/v1';
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(
+    `${BASE_URL}/relationships/${relationshipId}/survey/upload`,
+    {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    },
+  );
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error?.message || 'Upload failed');
+  }
+
+  return res.json();
+}
+
 export async function archiveSurveyTemplate(
   templateId: string,
 ): Promise<{ template_id: string; is_active: boolean }> {

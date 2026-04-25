@@ -8,6 +8,7 @@ import QuestionRenderer from './QuestionRenderer';
 interface SurveyFormProps {
   responses: QuestionWithResponse[];
   status: string;
+  relationshipId: string;
   onSubmit: (answers: {
     response_id: string;
     answer_text?: string | null;
@@ -16,7 +17,7 @@ interface SurveyFormProps {
   }[]) => Promise<void>;
 }
 
-export default function SurveyForm({ responses, status, onSubmit }: SurveyFormProps) {
+export default function SurveyForm({ responses, status, relationshipId, onSubmit }: SurveyFormProps) {
   const t = useTranslations('dashboard.surveys');
   const sortedResponses = [...responses].sort((a, b) => a.display_order - b.display_order);
   const total = sortedResponses.length;
@@ -185,6 +186,7 @@ export default function SurveyForm({ responses, status, onSubmit }: SurveyFormPr
               answerFileUrl={answer?.fileUrl ?? null}
               onChange={(update) => handleAnswerChange(r.id, update)}
               disabled={isReviewed}
+              relationshipId={relationshipId}
             />
           );
         })}
