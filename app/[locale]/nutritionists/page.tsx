@@ -86,6 +86,7 @@ function NutriCard({ profile, index }: { profile: ProfileSummary; index: number 
 
 function NutritionistsList() {
   const t = useTranslations('public.nutritionists');
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const router = useRouter();
 

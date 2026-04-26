@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactElement } from 'react';
 import type { QuestionWithResponse, QuestionType } from '@/lib/types';
 
 function NumericScaleVisual({ options, value }: { options: unknown; value: number }) {
@@ -34,7 +35,7 @@ interface SurveyResponseViewerProps {
   status: string;
 }
 
-function renderAnswer(r: QuestionWithResponse): string | JSX.Element {
+function renderAnswer(r: QuestionWithResponse): string | ReactElement {
   if (r.answer_text != null && r.answer_text !== '') return r.answer_text;
   if (r.answer_numeric != null) return String(r.answer_numeric);
   if (r.answer_file_url != null && r.answer_file_url !== '') {
