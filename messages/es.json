@@ -3,9 +3,21 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
+    "confirm": "Confirmar",
     "loading": "Cargando...",
     "error": "Error",
-    "success": "Éxito"
+    "success": "Éxito",
+    "activate_confirm": "¿Activar este plan?",
+    "activate_confirm_description": "Activar este plan archivará el plan activo anterior del cliente (si existe). ¿Continuar?",
+    "activating": "Activando…",
+    "delete_confirm": "¿Eliminar este borrador?",
+    "delete_confirm_description": "Esta acción no se puede deshacer.",
+    "deleting": "Eliminando…",
+    "duplicate_confirm": "¿Duplicar este plan?",
+    "duplicate_confirm_description": "Se creará una copia como borrador.",
+    "duplicate_with_exercise_description": "Se duplicará este plan nutricional y el plan de ejercicios activo como borradores.",
+    "duplicate_with_nutrition_description": "Se duplicará este plan de ejercicios y el plan nutricional activo como borradores.",
+    "duplicating": "Duplicando…"
   },
   "nav": {
     "profile": "Mi perfil",

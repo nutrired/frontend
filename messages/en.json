@@ -3,9 +3,21 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
+    "confirm": "Confirm",
     "loading": "Loading…",
     "error": "Error",
-    "success": "Success"
+    "success": "Success",
+    "activate_confirm": "Activate this plan?",
+    "activate_confirm_description": "Activating this plan will archive the client's previous active plan (if any). Continue?",
+    "activating": "Activating…",
+    "delete_confirm": "Delete this draft?",
+    "delete_confirm_description": "This action cannot be undone.",
+    "deleting": "Deleting…",
+    "duplicate_confirm": "Duplicate this plan?",
+    "duplicate_confirm_description": "A draft copy will be created.",
+    "duplicate_with_exercise_description": "This nutrition plan and the active exercise plan will be duplicated as drafts.",
+    "duplicate_with_nutrition_description": "This exercise plan and the active nutrition plan will be duplicated as drafts.",
+    "duplicating": "Duplicating…"
   },
   "nav": {
     "profile": "My profile",

@@ -58,6 +58,7 @@ function StatusPill({ status, t }: { status: PlanStatus; t: ReturnType<typeof us
 
 export default function EditExercisePlanPage() {
   const t = useTranslations('dashboard.exercise_plans');
+  const tCommon = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
   const params = useParams<{ clientId: string; id: string }>();
@@ -78,6 +79,9 @@ export default function EditExercisePlanPage() {
   const [duplicating, setDuplicating] = useState(false);
   const [error, setError] = useState('');
   const [saveMsg, setSaveMsg] = useState('');
+  const [showActivateModal, setShowActivateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
 
   useEffect(() => {
     if (!plan) return;
@@ -272,12 +276,12 @@ export default function EditExercisePlanPage() {
   }
 
   async function handleActivate() {
-    if (!confirm('Activar este plan archivará el plan activo anterior del cliente (si existe). ¿Continuar?')) return;
     setActivating(true);
     setError('');
     try {
       await activateExercisePlan(id);
       await mutate();
+      setShowActivateModal(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al activar el plan.');
     } finally {
@@ -286,12 +290,12 @@ export default function EditExercisePlanPage() {
   }
 
   async function handleDelete() {
-    if (!confirm('Eliminar este borrador. Esta acción no se puede deshacer.')) return;
     setDeleting(true);
     setError('');
     try {
       await deleteExercisePlan(id);
-      router.push(`/dashboard/clients/${clientId}`);
+      router.push(`/${locale}/dashboard/clients/${clientId}`);
+      setShowDeleteModal(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al eliminar el plan.');
     } finally {
@@ -302,7 +306,6 @@ export default function EditExercisePlanPage() {
   async function handleDuplicate() {
     if (!plan) return;
     const activeNutritionPlan = nutritionPlans.find((p) => p.status === 'active');
-    if (!confirm(`Duplicar este plan de ejercicios${activeNutritionPlan ? ' y el plan nutricional activo' : ''} como borrador?`)) return;
     setDuplicating(true);
     setError('');
     try {
@@ -312,8 +315,9 @@ export default function EditExercisePlanPage() {
         id,
       );
       if (result.exercise_plan) {
-        router.push(`/dashboard/clients/${plan.client_id}/plans/exercise/${result.exercise_plan.id}`);
+        router.push(`/${locale}/dashboard/clients/${plan.client_id}/plans/exercise/${result.exercise_plan.id}`);
       }
+      setShowDuplicateModal(false);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al duplicar el plan.');
     } finally {
@@ -358,7 +362,7 @@ export default function EditExercisePlanPage() {
         {isDraft && (
           <div style={{ display: 'flex', gap: 8 }}>
             <button
-              onClick={handleDuplicate}
+              onClick={() => setShowDuplicateModal(true)}
               disabled={duplicating}
               style={{
                 height: 34, padding: '0 16px',
@@ -370,7 +374,7 @@ export default function EditExercisePlanPage() {
               {duplicating ? 'Duplicando…' : 'Duplicar plan'}
             </button>
             <button
-              onClick={handleActivate}
+              onClick={() => setShowActivateModal(true)}
               disabled={activating}
               style={{
                 height: 34, padding: '0 16px',
@@ -382,7 +386,7 @@ export default function EditExercisePlanPage() {
               {activating ? 'Activando…' : 'Activar plan'}
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteModal(true)}
               disabled={deleting}
               style={{
                 height: 34, padding: '0 16px',
@@ -732,6 +736,164 @@ export default function EditExercisePlanPage() {
             <button className="dash-btn-save" onClick={handleSave} disabled={saving}>
               {saving ? 'Guardando…' : 'Guardar cambios'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Activate Modal */}
+      {showActivateModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.4)', zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+        onClick={() => setShowActivateModal(false)}
+        >
+          <div
+            style={{
+              background: 'white', borderRadius: 8, padding: 24, maxWidth: 400, width: '90%',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: 'var(--nc-ink)' }}>
+              {tCommon('activate_confirm')}
+            </h3>
+            <p style={{ fontSize: 14, color: 'var(--nc-stone)', marginBottom: 20, lineHeight: 1.5 }}>
+              {tCommon('activate_confirm_description')}
+            </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowActivateModal(false)}
+                style={{
+                  height: 36, padding: '0 16px', background: 'transparent',
+                  border: '1px solid var(--nc-border)', borderRadius: 6,
+                  color: 'var(--nc-stone)', fontFamily: 'var(--font-body)',
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {tCommon('cancel')}
+              </button>
+              <button
+                onClick={handleActivate}
+                disabled={activating}
+                style={{
+                  height: 36, padding: '0 16px',
+                  background: '#4a7c59', border: 'none', borderRadius: 6,
+                  color: 'white', fontFamily: 'var(--font-body)',
+                  fontSize: 13, fontWeight: 500, cursor: activating ? 'not-allowed' : 'pointer',
+                  opacity: activating ? 0.6 : 1,
+                }}
+              >
+                {activating ? tCommon('activating') : tCommon('confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.4)', zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+        onClick={() => setShowDeleteModal(false)}
+        >
+          <div
+            style={{
+              background: 'white', borderRadius: 8, padding: 24, maxWidth: 400, width: '90%',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: 'var(--nc-ink)' }}>
+              {tCommon('delete_confirm')}
+            </h3>
+            <p style={{ fontSize: 14, color: 'var(--nc-stone)', marginBottom: 20, lineHeight: 1.5 }}>
+              {tCommon('delete_confirm_description')}
+            </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                style={{
+                  height: 36, padding: '0 16px', background: 'transparent',
+                  border: '1px solid var(--nc-border)', borderRadius: 6,
+                  color: 'var(--nc-stone)', fontFamily: 'var(--font-body)',
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {tCommon('cancel')}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  height: 36, padding: '0 16px',
+                  background: '#b94a3a', border: 'none', borderRadius: 6,
+                  color: 'white', fontFamily: 'var(--font-body)',
+                  fontSize: 13, fontWeight: 500, cursor: deleting ? 'not-allowed' : 'pointer',
+                  opacity: deleting ? 0.6 : 1,
+                }}
+              >
+                {deleting ? tCommon('deleting') : tCommon('confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Duplicate Modal */}
+      {showDuplicateModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.4)', zIndex: 100,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+        onClick={() => setShowDuplicateModal(false)}
+        >
+          <div
+            style={{
+              background: 'white', borderRadius: 8, padding: 24, maxWidth: 400, width: '90%',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 12, color: 'var(--nc-ink)' }}>
+              {tCommon('duplicate_confirm')}
+            </h3>
+            <p style={{ fontSize: 14, color: 'var(--nc-stone)', marginBottom: 20, lineHeight: 1.5 }}>
+              {plan && nutritionPlans.find((p) => p.status === 'active')
+                ? tCommon('duplicate_with_nutrition_description')
+                : tCommon('duplicate_confirm_description')}
+            </p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowDuplicateModal(false)}
+                style={{
+                  height: 36, padding: '0 16px', background: 'transparent',
+                  border: '1px solid var(--nc-border)', borderRadius: 6,
+                  color: 'var(--nc-stone)', fontFamily: 'var(--font-body)',
+                  fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {tCommon('cancel')}
+              </button>
+              <button
+                onClick={handleDuplicate}
+                disabled={duplicating}
+                style={{
+                  height: 36, padding: '0 16px',
+                  background: 'var(--nc-stone)', border: 'none', borderRadius: 6,
+                  color: 'white', fontFamily: 'var(--font-body)',
+                  fontSize: 13, fontWeight: 500, cursor: duplicating ? 'not-allowed' : 'pointer',
+                  opacity: duplicating ? 0.6 : 1,
+                }}
+              >
+                {duplicating ? tCommon('duplicating') : tCommon('confirm')}
+              </button>
+            </div>
           </div>
         </div>
       )}
