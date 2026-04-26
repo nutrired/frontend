@@ -1173,5 +1173,32 @@
       "back_to_register": "Volver al registro",
       "back_to_login": "Volver al inicio de sesión"
     }
+  },
+  "plans": {
+    "my_plans": "Mis planes",
+    "active": "Activos",
+    "archived": "Archivados",
+    "no_active_plans": "No tienes planes activos",
+    "no_active_plans_description": "Tus nutricionistas te asignarán planes en breve.",
+    "no_archived_plans": "No tienes planes archivados.",
+    "nutrition_plan": "Plan de Nutrición",
+    "exercise_plan": "Plan de Ejercicio",
+    "by_nutritionist": "por {name}",
+    "created_on": "Creado el {date}",
+    "status_active": "Activo",
+    "status_draft": "Borrador",
+    "status_archived": "Archivado",
+    "days": "{count, plural, one {# día} other {# días}}",
+    "meals": "{count, plural, one {# comida} other {# comidas}}",
+    "supplements": "{count, plural, one {# suplemento} other {# suplementos}}",
+    "time_slots": "{count, plural, one {# franja horaria} other {# franjas horarias}}",
+    "workout_days": "{count, plural, one {# entrenamiento} other {# entrenamientos}}",
+    "rest_days": "{count, plural, one {# descanso} other {# descansos}}",
+    "back_to_list": "Mis planes",
+    "download_pdf": "Descargar PDF",
+    "not_found": "Plan no encontrado",
+    "not_found_description": "Este plan no existe o fue eliminado.",
+    "loading": "Cargando plan…",
+    "error": "Error al cargar planes. Por favor, recarga la página."
   }
 }
