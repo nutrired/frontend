@@ -24,6 +24,8 @@ type NutritionTab = 'meals' | 'supplements';
 function NutritionPlanView({ plan }: { plan: NutritionPlan }) {
   const [activeTab, setActiveTab] = useState<NutritionTab>('meals');
   const sorted = [...(plan.days ?? [])].sort((a, b) => a.day_number - b.day_number);
+  const sortedSlots = [...(plan.slots ?? [])].sort((a, b) => a.display_order - b.display_order);
+  const isFlexible = plan.plan_style === 'flexible';
 
   return (
     <div>
@@ -62,7 +64,69 @@ function NutritionPlanView({ plan }: { plan: NutritionPlan }) {
       {/* Tab content */}
       {activeTab === 'meals' && (
         <>
-          {sorted.map((day) => (
+          {/* Flexible plan: render slots */}
+          {isFlexible && sortedSlots.map((slot) => (
+            <div key={slot.id} style={{
+              border: '1px solid var(--nc-border)', borderRadius: 10,
+              marginBottom: 16, overflow: 'hidden',
+            }}>
+              <div style={{
+                padding: '12px 20px', background: 'var(--nc-forest-pale)',
+                borderBottom: '1px solid var(--nc-border)',
+              }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 500, color: 'var(--nc-forest)' }}>
+                  {MEAL_TYPE_LABELS[slot.meal_type]}
+                </span>
+              </div>
+              <div style={{ padding: '8px 20px 16px' }}>
+                {[...slot.options]
+                  .sort((a, b) => a.display_order - b.display_order)
+                  .map((opt, idx) => (
+                    <div key={opt.id} style={{
+                      padding: '10px 14px',
+                      border: '1px solid rgba(139,115,85,0.12)',
+                      borderRadius: 6, marginTop: 8, background: 'white',
+                    }}>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--nc-ink)', marginBottom: 2 }}>
+                        {slot.options.length > 1 ? `Opción ${String.fromCharCode(65 + idx)}: ` : ''}{opt.name}
+                      </div>
+                      {opt.description && (
+                        <div style={{ fontSize: 12, color: 'var(--nc-stone)', fontWeight: 300, lineHeight: 1.5, marginBottom: 6 }}>
+                          {opt.description}
+                        </div>
+                      )}
+                      {(opt.calories !== null || opt.protein_g !== null || opt.carbs_g !== null || opt.fat_g !== null) && (
+                        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                          {opt.calories !== null && (
+                            <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                              <strong>{opt.calories}</strong> kcal
+                            </span>
+                          )}
+                          {opt.protein_g !== null && (
+                            <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                              Prot <strong>{opt.protein_g}g</strong>
+                            </span>
+                          )}
+                          {opt.carbs_g !== null && (
+                            <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                              HC <strong>{opt.carbs_g}g</strong>
+                            </span>
+                          )}
+                          {opt.fat_g !== null && (
+                            <span style={{ fontSize: 11, color: 'var(--nc-stone)' }}>
+                              Grasas <strong>{opt.fat_g}g</strong>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
+
+          {/* Structured plan: render days */}
+          {!isFlexible && sorted.map((day) => (
             <div key={day.id} style={{
               border: '1px solid var(--nc-border)', borderRadius: 10,
               marginBottom: 16, overflow: 'hidden',
