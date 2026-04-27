@@ -2,18 +2,17 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useExercisePlan } from '@/lib/plans';
 import { useMyRelationships } from '@/lib/hiring';
 import { ExercisePlanView } from '../../components/PlanViews';
 
-export default function ExercisePlanDetailPage({
-  params,
-}: {
-  params: { locale: string; id: string };
-}) {
+export default function ExercisePlanDetailPage() {
+  const params = useParams();
+  const locale = useLocale();
   const t = useTranslations('plans');
-  const { plan, isLoading, error } = useExercisePlan(params.id);
+  const { plan, isLoading, error } = useExercisePlan(params.id as string);
   const { relationships } = useMyRelationships();
 
   // Match nutritionist name
@@ -75,7 +74,7 @@ export default function ExercisePlanDetailPage({
             </h2>
             <p style={{ marginBottom: 20 }}>{t('not_found_description')}</p>
             <Link
-              href={`/${params.locale}/dashboard/my-plans`}
+              href={`/${locale}/dashboard/my-plans`}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
