@@ -38,7 +38,7 @@ async function request<T>(
     headers,
   });
 
-  if (res.status === 401 && retry && path !== '/auth/login') {
+  if (res.status === 401 && retry && path !== '/auth/login' && path !== '/auth/me') {
     // Try to refresh the access token once.
     const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
       method: 'POST',
@@ -58,7 +58,8 @@ async function request<T>(
       return request<T>(path, options, false, isFormData);
     }
     // Refresh failed — redirect to login (preserve locale from current path).
-    if (typeof window !== 'undefined') {
+    // But only if we're not checking auth status (/auth/me)
+    if (typeof window !== 'undefined' && path !== '/auth/me') {
       const currentPath = window.location.pathname;
       const localeMatch = currentPath.match(/^\/(en|es)\//);
       const locale = localeMatch ? localeMatch[1] : 'en';
