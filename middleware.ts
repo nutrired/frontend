@@ -40,7 +40,7 @@ function hasValidAccessToken(request: NextRequest): boolean {
   return Date.now() / 1000 < exp;
 }
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip API routes and static files
